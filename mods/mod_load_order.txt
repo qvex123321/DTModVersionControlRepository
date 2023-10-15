@@ -1,0 +1,43 @@
+-- ################################################################
+-- Enter user mod names below, separated by line.
+-- Order in the list determines the order in which mods are loaded.
+-- Do not rename a mod's folders.
+-- You do not need to include 'base' or 'dmf' mod folders.
+-- ################################################################
+ui_extension
+settings_extension
+animation_events
+Blessings of the Omnissiah
+crosshairs_fix
+Healthbars
+LogMeIn
+NoSkull
+PingMonitor
+scoreboard
+sorted_mission_grid
+NumericUI
+hub_hotkey_menus
+PsykaniumInvHotkey
+ChatBlock
+MutePerilSounds
+pickup_notif_tweaker
+book_finder
+reveal_blessings
+BetterMelk
+buy_until_rating
+PenanceDetails
+true_level
+SoloPlay
+DarkCache
+contracts_overlay
+PlayerOutlines
+ScoreboardDamage
+MyFavorites
+smaller_talent_tree
+QuickLookCard
+InventoryStats
+TalentRefundBelow
+ENLocalizationFIXBlessings
+show_cjk_glyphs
+creature_spawner
+weapon_customization
