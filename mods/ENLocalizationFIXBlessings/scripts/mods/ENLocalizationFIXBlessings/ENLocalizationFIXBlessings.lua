@@ -217,13 +217,13 @@ mod.localization_templates = {
 	return "+{power_level:%s} Melee Power for {time:%s} seconds on Hitting 3+ Enemies with a Ranged Attack." end},
 
 -- FOR TESTS ONLY!!!
-{id = "weap_testum00",
-loc_keys = {
-"",},
-locales = {"en",},
-handle_func = function(locale, value)
-return string.gsub(value, ":", "!!!")
-end,},
+-- {id = "weap_testum00",
+-- loc_keys = {
+-- "",},
+-- locales = {"en",},
+-- handle_func = function(locale, value)
+-- return string.gsub(value, ":", "!!!")
+-- end,},
 }
 
 

@@ -1,0 +1,787 @@
+local mod = get_mod("LoadoutMonitor")
+
+-- Your mod code goes here.
+-- https://vmf-docs.verminti.de
+
+local UIWidget = require("scripts/managers/ui/ui_widget")
+local MasterItems = require("scripts/backend/master_items")
+local ItemUtils = require("scripts/utilities/items")
+local lid = Application.user_setting("language_id")
+local function get_local_player()
+	return Managers.player:local_player(1)
+end
+local scoreboard = get_mod("scoreboard")
+
+mod.teamatesloadout = {}
+mod.left_panel_lift = 0 - mod:get("left_panel_lift")
+mod.text_color = {255,239,238,238}
+
+mod.init = function(self)
+	mod.display_player_name = mod:get("display_player_name")
+	mod.player_PlayerName_offset = { mod:get("player_name_offset_x"), mod:get("player_name_offset_y"),}
+	mod.player_PlayerName_font_size = mod:get("player_name_font_size")
+	mod.display_player_Feats = mod:get("display_player_feats")
+	mod.player_Feats_offset = { mod:get("player_feats_offset_x"), mod:get("player_feats_offset_y"),}
+	mod.player_Feats_font_size = mod:get("player_feats_font_size")
+	mod.offsets = {
+		lobby = {mod:get("lobby_talent_offset"),mod:get("lobby_weapon_offset"),mod:get("lobby_weapon_gap")},
+	
+	}
+	mod.font_size = {
+		lobby = mod:get("lobby_weapon_font_size"),
+	}
+	mod.display_main_class = mod:get("display_main_class")
+	mod.display_sub_class = mod:get("display_sub_class")
+	mod.player_Class_offset = { mod:get("player_class_offset_x"), mod:get("player_class_offset_y"),}
+	mod.player_Class_font_size = mod:get("player_class_font_size")
+	
+	mod.weapon_enable = mod:get("display_player_weapon")
+	mod.weapon_name_lenghth = mod:get("user_weapon_name_lenghth")
+	mod.weapon_name_size = mod:get("user_weapon_name_size")
+	mod.weapon_name_multiplier = mod:get("user_weapon_name_multiplier") / 100
+	
+	mod.trait_display_by = {
+		bless = mod:get("blessing_level_rule"),
+		bless_offset = mod:get("user_bless_offset"),
+		perk = mod:get("perk_level_rule"),
+		perk_offset = mod:get("user_perk_offset"),
+		font_size = mod:get("user_bless_perk_font_size")
+	}
+	
+	mod.SHUD = get_mod("SpectatorHUD") and true
+	scoreboard = get_mod("scoreboard")
+	mod.left_panel_lift = 0 - mod:get("left_panel_lift")
+	mod.lobby_exhibition = { weapon = mod:get("lobby_exhibition_weapons"), feat = mod:get("lobby_exhibition_feats")}
+	mod.endview_scoreboard_length = mod:get("endview_scoreboard_length")
+
+	mod.teamatesloadout = {}
+end
+
+local function player_career(profile)
+	local archetype = profile.archetype
+	local archetypename = archetype.archetype_name
+	local subclass = profile.specialization
+	local subclassname = archetype.specializations[subclass].title
+	local symble = archetype.string_symbol
+	return Localize(archetypename),Localize(subclassname),symble
+end
+
+
+local function player_feats(profile)
+	local talents_index = {
+		veteran = {
+			{"veteran_combat_ability_elite_and_special_outlines","veteran_combat_ability_stagger_nearby_enemies","veteran_invisibility_on_combat_ability"},
+			{"veteran_grenade_apply_bleed","veteran_krak_grenade","veteran_smoke_grenade"},
+			{"veteran_aura_gain_ammo_on_elite_kill_improved","veteran_increased_damage_coherency","veteran_movement_speed_coherency"},
+		},
+		zealot = {
+			{"zealot_attack_speed_post_ability","zealot_bolstering_prayer","zealot_stealth"},
+			{"zealot_improved_stun_grenade","zealot_flame_grenade","zealot_throwing_knives"},
+			{"zealot_toughness_damage_reduction_coherency_improved","zealot_corruption_healing_coherency_improved","zealot_always_in_coherency"},
+		},
+		psyker = {
+			{"psyker_shout_vent_warp_charge","psyker_combat_ability_force_field","psyker_combat_ability_stance"},
+			{"psyker_brain_burst_improved","psyker_grenade_chain_lightning","psyker_grenade_throwing_knives"},
+			{"psyker_aura_damage_vs_elites","psyker_cooldown_aura_improved","psyker_aura_crit_chance_aura"},
+		},
+		ogryn = {
+			{"ogryn_longer_charge","ogryn_taunt_shout","ogryn_special_ammo"},
+			{"ogryn_grenade_friend_rock","ogryn_box_explodes","ogryn_grenade_frag"},
+			{"ogryn_melee_damage_coherency_improved","ogryn_toughness_regen_aura","ogryn_damage_vs_suppressed_coherency"},
+		},
+	}
+	local archetype = profile.archetype.name
+	local talents = profile.talents
+	
+    if mod.display_player_Feats then
+		local feats = {"X","X","X"}
+		if talents_index[archetype] then
+			for i = 1,3 do
+				local current = talents_index[archetype][i]
+				for o = 1,3 do
+					if talents[current[o]] then
+						feats[i] = o
+					end
+				end
+			end
+		end
+		return table.concat(feats,"-")
+	end
+    return ""
+end
+
+local function perk_blessing(item,trait_type)
+	local traits = item[trait_type]
+	local subjects = {" "," "," "," ",}
+	if traits then
+		for i = 1, 2 do
+			if traits[i] then
+				local id = traits[i].id
+				local MasterItem = MasterItems.get_item(id)
+				if trait_type == "traits" then
+					subjects[i] = ItemUtils.display_name(MasterItem)
+				elseif trait_type == "perks" then
+					local perk = mod:localize(string.format("trait_%s",MasterItem.trait))
+					if string.find(perk,"<") then perk = "????" end
+					subjects[i] = perk
+				end
+				subjects[i+2] = traits[i].rarity
+			end
+		end
+	end
+	return subjects
+end
+
+
+local function weapon_display_name(profile,slot)
+	local loadout = profile.loadout
+	local slots = { Melee = "slot_primary",Range = "slot_secondary", }
+	local kind = slots[slot]
+	local weapon = loadout[kind]
+	local name = " "
+	if not slot or not slots[slot] then
+		return name
+	else		
+		name = ItemUtils.display_name(weapon) or " "
+	end
+	return string.trim(name)
+end
+
+
+
+local trait_offsets = {
+	bless = {280,},
+	perk = {370,},
+}
+
+mod.get_playerloadout_intel = function(profile,widget)
+	local player_name = profile.name
+	local Melee, Range = profile.loadout["slot_primary"], profile.loadout["slot_secondary"]
+	local content = widget.content
+	local style = widget.style
+	local class,career,symble = player_career(profile)
+	local weapons = {
+		Melee = {
+			name = weapon_display_name(profile,"Melee"),
+			bless = perk_blessing(Melee,"traits"),
+			perk = perk_blessing(Melee,"perks"),
+			name_offset = 29.5,
+			--template = Melee.weapon_template,
+		},
+		Range = {
+			name = weapon_display_name(profile,"Range"),
+			bless = perk_blessing(Range,"traits"),
+			perk = perk_blessing(Range,"perks"),
+			name_offset = 59.5
+			--template = Range.weapon_template,
+		},
+	}
+	-- feats class name
+	content.loadout_intel_Feats = player_feats(profile)
+	if mod.display_main_class ~= "hide" then
+		if mod.display_main_class == "name" then
+			content.loadout_intel_Class = class
+		elseif mod.display_main_class == "symble" then
+			content.loadout_intel_Class = symble
+		elseif mod.display_main_class == "both" then
+			content.loadout_intel_Class = class..symble
+		end
+		if mod.display_sub_class then
+			content.loadout_intel_Class = string.format("%s = %s",content.loadout_intel_Class,career)
+		end
+	else
+		content.loadout_intel_Class = ""
+	end
+	content.loadout_intel_PlayerName = mod.display_player_name and player_name or " "
+	
+	for k,part in pairs({"Feats","Class","PlayerName"}) do
+		for i = 1,2 do
+			style["loadout_intel_"..part].offset[i] = mod["player_"..part.."_offset"][i]
+		end
+		style["loadout_intel_"..part].font_size = mod["player_"..part.."_font_size"]
+	end
+	if mod.weapon_enable then
+		-- weapon perk blessing
+		for weapon_type,value in pairs(weapons) do
+
+			-- display name
+			content["loadout_intel_"..weapon_type] = value.name
+			
+			-- Thunder hammer
+			--local name_bug = mod["name_bug_"..value.template] or 0
+			local weapon_style = style["loadout_intel_"..weapon_type]
+			weapon_style.offset[2] = value.name_offset
+			weapon_style.font_size = mod.weapon_name_size * (string.len(value.name) >= mod.weapon_name_lenghth and mod.weapon_name_multiplier or 1)
+			
+			
+			for _,trait_type in pairs({"perk","bless"}) do
+				for i = 1,2 do
+					local id = string.format("loadout_intel_%s_%s_%s",weapon_type,trait_type,i)
+					local text = value[trait_type][i]
+					if text == " " or not value[trait_type][i + 2] or mod.trait_display_by[trait_type] == "hide" then
+						style[id].text_color = Color["item_rarity_1"](255,true)
+						text = ""
+					else
+						if mod.trait_display_by[trait_type] == "number" or mod.trait_display_by[trait_type] == "both" then
+							text = string.format("%s(%s)",text,value[trait_type][i+2])
+						end
+						if mod.trait_display_by[trait_type] == "color" or mod.trait_display_by[trait_type] == "both" then
+							style[id].text_color = Color["item_rarity_"..tostring(value[trait_type][i+2])](255,true)
+						else
+							style[id].text_color = mod.text_color
+						end
+					end
+					content[id] = text
+					style[id].offset[1] = trait_offsets[trait_type][1] + (mod.trait_display_by[trait_type.."_offset"] or 0)
+					style[id].font_size = mod.trait_display_by.font_size
+				end
+			end
+		end
+	end
+end
+
+mod.lobby_loadout = function (self, dt, t, input_service)
+	local spawn_slots = self._spawn_slots
+
+	for i = 1, #spawn_slots do
+		local slot = spawn_slots[i]
+
+		if slot.occupied then
+			local panel_widget = slot.panel_widget
+			local panel_content = panel_widget.content
+			local panel_style = panel_widget.style
+			local profile = slot.player:profile()
+			if not mod.lobby_exhibition.weapon then
+				panel_content.loadout_intel_Melee = ""
+				panel_content.loadout_intel_Range = ""
+			else
+				local offset_M = mod.offsets.lobby[2]
+				local offset_gap = mod.offsets.lobby[3]
+				panel_content.loadout_intel_Melee = weapon_display_name(profile,"Melee")
+				panel_content.loadout_intel_Range = weapon_display_name(profile,"Range")
+				panel_style.loadout_intel_Melee.offset[2] = offset_M
+				panel_style.loadout_intel_Range.offset[2] = offset_M + offset_gap
+				panel_style.loadout_intel_Melee.font_size = mod.font_size.lobby or 17
+				panel_style.loadout_intel_Range.font_size = mod.font_size.lobby or 17
+			end
+		end
+	end
+end
+
+local function spectating_hud_tactical_overlay()
+	local me = get_local_player()
+	local camera = me.camera_handler
+	if mod.SHUD and (camera._is_hogtied or camera._mode == "dead" or camera._mode == "observer") then
+		if Managers.input and Managers.input:get_input_service("Ingame") and Managers.input:get_input_service("Ingame"):get("tactical_overlay_hold") then
+			return true
+		end
+	end
+	return false
+end
+
+mod.player_loaded = function(player,widget)
+	local psyroom = Managers.state and Managers.state.game_mode and Managers.state.game_mode:game_mode_name() == "shooting_range"
+	if psyroom then
+		return false
+	end
+	
+	local account = player._account_id
+	local profile = player._profile
+	local Melee, Range = weapon_display_name(profile,"Melee"), weapon_display_name(profile,"Range")
+	if mod.teamatesloadout[account] then
+		local gears = mod.teamatesloadout[account].Melee == Melee and mod.teamatesloadout[account].Range == Range
+		local intel = mod.weapon_enable and widget.content.loadout_intel_Melee ~= " " and widget.content.loadout_intel_Range ~= " "
+		return  gears and intel
+	end
+	return false
+end
+
+mod.update_loadout = function(self, dt, t, player, ui_renderer)
+	if not player:is_human_controlled() then
+		return
+	end
+	
+	local tactical_active = Managers.ui and Managers.ui._hud and Managers.ui._hud._tactical_overlay_active or spectating_hud_tactical_overlay()
+	local profile = player._profile
+	local account = player._account_id
+	local widget = self._widgets_by_name.playerloadout_intel
+	if not mod.player_loaded(player,widget) and tactical_active then
+		mod.get_playerloadout_intel(profile,widget)
+		mod.teamatesloadout[account] = {
+			Melee = widget.content.loadout_intel_Melee,
+			Range = widget.content.loadout_intel_Range,
+			--scenegraph = self._ui_scenegraph.player_loadout
+		}
+		--self._position_scenegraphs
+	end
+	self:_set_widget_visible(widget,tactical_active,ui_renderer)
+end
+mod:hook_safe("HudElementPersonalPlayerPanel", "_update_player_features", mod.update_loadout)
+mod:hook_safe("HudElementTeamPlayerPanel", "_update_player_features", mod.update_loadout)
+
+
+-- overlap with P1/P2
+mod:hook_safe("HudElementTacticalOverlay","_update_left_panel_elements",function(self, ui_renderer)
+	self:set_scenegraph_position("left_panel",nil,mod.left_panel_lift)
+end)
+
+mod:hook_safe("CameraHandler","_switch_follow_target",function (self, new_unit)
+	mod.teamatesloadout = {}
+end)
+
+
+mod.on_all_mods_loaded = function()
+	mod:init()
+end
+mod.on_game_state_changed = function(status,state_name)
+	mod.teamatesloadout = {}
+end
+
+
+mod.playerloadout_definition = function(instance)
+	instance.scenegraph_definition.player_loadout = {
+		parent = "background",
+		vertical_alignment = "top",
+		horizontal_alignment = "left",
+		size = {500,100},
+		position = {33,	-12,2}
+	}
+	
+	instance.widget_definitions.playerloadout_intel = UIWidget.create_definition(
+		{
+			{
+				pass_type = "text",
+				value_id = "loadout_intel_Feats",
+				style_id = "loadout_intel_Feats",
+				value = " ",
+				style = {
+					vertical_alignment = "top",
+					text_vertical_alignment = "top",
+					horizontal_alignment = "left",
+					text_horizontal_alignment = "left",
+					offset = {0, 11.5, 150},
+					size = {500, 100},
+					text_color = Color.golden_rod(255, true),
+					font_size = 18,
+				},
+				
+			},
+			{
+				pass_type = "text",
+				value_id = "loadout_intel_Class",
+				style_id = "loadout_intel_Class",
+				value = " ",
+				style = {
+					vertical_alignment = "top",
+					text_vertical_alignment = "top",
+					horizontal_alignment = "left",
+					text_horizontal_alignment = "left",
+					offset = {105, 6.5, 150},
+					size = {500, 100},
+					text_color = Color.golden_rod(255, true),
+					font_size = 18,
+				},
+				
+			},
+			{
+				pass_type = "text",
+				value_id = "loadout_intel_PlayerName",
+				style_id = "loadout_intel_PlayerName",
+				value = " ",
+				style = {
+					vertical_alignment = "top",
+					text_vertical_alignment = "top",
+					horizontal_alignment = "left",
+					text_horizontal_alignment = "left",
+					offset = {300, 6.5, 150},
+					size = {500, 100},
+					text_color = Color.golden_rod(255, true),
+					font_size = 18,
+				},
+				
+			},		
+			{
+				pass_type = "text",
+				value_id = "loadout_intel_Melee",
+				style_id = "loadout_intel_Melee",
+				value = " ",
+				style = {
+					vertical_alignment = "top",
+					text_vertical_alignment = "top",
+					horizontal_alignment = "left",
+					text_horizontal_alignment = "left",
+					offset = {0, 29.5, 200},
+					size = {275, 100},
+					text_color = mod.text_color,
+					font_size = 20,
+					line_spacing = 0.8,
+				},
+				
+			},
+			{
+				pass_type = "text",
+				value_id = "loadout_intel_Melee_bless_1",
+				style_id = "loadout_intel_Melee_bless_1",
+				value = " ",
+				style = {
+					vertical_alignment = "top",
+					text_vertical_alignment = "top",
+					horizontal_alignment = "left",
+					text_horizontal_alignment = "left",
+					offset = {trait_offsets.bless[1], 22.5, 200},
+					size = {500, 100},
+					text_color = mod.text_color,
+					font_size = 14,
+				},
+				
+			},
+			{
+				pass_type = "text",
+				value_id = "loadout_intel_Melee_bless_2",
+				style_id = "loadout_intel_Melee_bless_2",
+				value = " ",
+				style = {
+					vertical_alignment = "top",
+					text_vertical_alignment = "top",
+					horizontal_alignment = "left",
+					text_horizontal_alignment = "left",
+					offset = {trait_offsets.bless[1], 38.5, 200},
+					size = {500, 100},
+					text_color = mod.text_color,
+					font_size = 14,
+				},
+				
+			},
+			{
+				pass_type = "text",
+				value_id = "loadout_intel_Melee_perk_1",
+				style_id = "loadout_intel_Melee_perk_1",
+				value = " ",
+				style = {
+					vertical_alignment = "top",
+					text_vertical_alignment = "top",
+					horizontal_alignment = "left",
+					text_horizontal_alignment = "left",
+					offset = {370, 23, 200},
+					size = {275, 100},
+					text_color = mod.text_color,
+					font_size = 14,
+				},
+				
+			},
+			{
+				pass_type = "text",
+				value_id = "loadout_intel_Melee_perk_2",
+				style_id = "loadout_intel_Melee_perk_2",
+				value = " ",
+				style = {
+					vertical_alignment = "top",
+					text_vertical_alignment = "top",
+					horizontal_alignment = "left",
+					text_horizontal_alignment = "left",
+					offset = {370, 39, 200},
+					size = {500, 100},
+					text_color = mod.text_color,
+					font_size = 14,
+				},
+				
+			},
+			{
+				pass_type = "text",
+				value_id = "loadout_intel_Range",
+				style_id = "loadout_intel_Range",
+				value = " ",
+				style = {
+					vertical_alignment = "top",
+					text_vertical_alignment = "top",
+					horizontal_alignment = "left",
+					text_horizontal_alignment = "left",
+					offset = {0, 59.5, 200},
+					size = {275, 100},
+					text_color = mod.text_color,
+					font_size = 20,
+					line_spacing = 0.8,
+				},
+				
+			},
+			{
+				pass_type = "text",
+				value_id = "loadout_intel_Range_bless_1",
+				style_id = "loadout_intel_Range_bless_1",
+				value = " ",
+				style = {
+					vertical_alignment = "top",
+					text_vertical_alignment = "top",
+					horizontal_alignment = "left",
+					text_horizontal_alignment = "left",
+					offset = {trait_offsets.bless[1], 57, 200},
+					size = {500, 100},
+					text_color = mod.text_color,
+					font_size = 14,
+				},
+				
+			},
+			{
+				pass_type = "text",
+				value_id = "loadout_intel_Range_bless_2",
+				style_id = "loadout_intel_Range_bless_2",
+				value = " ",
+				style = {
+					vertical_alignment = "top",
+					text_vertical_alignment = "top",
+					horizontal_alignment = "left",
+					text_horizontal_alignment = "left",
+					offset = {trait_offsets.bless[1], 72, 200},
+					size = {500, 100},
+					text_color = mod.text_color,
+					font_size = 14,
+				},
+				
+			},
+			{
+				pass_type = "text",
+				value_id = "loadout_intel_Range_perk_1",
+				style_id = "loadout_intel_Range_perk_1",
+				value = " ",
+				style = {
+					vertical_alignment = "top",
+					text_vertical_alignment = "top",
+					horizontal_alignment = "left",
+					text_horizontal_alignment = "left",
+					offset = {370, 57, 200},
+					size = {500, 100},
+					text_color = mod.text_color,
+					font_size = 14,
+				},
+				
+			},
+			{
+				pass_type = "text",
+				value_id = "loadout_intel_Range_perk_2",
+				style_id = "loadout_intel_Range_perk_2",
+				value = " ",
+				style = {
+					vertical_alignment = "top",
+					text_vertical_alignment = "top",
+					horizontal_alignment = "left",
+					text_horizontal_alignment = "left",
+					offset = {370, 72, 200},
+					size = {500, 100},
+					text_color = mod.text_color,
+					font_size = 14,
+				},
+				
+			},
+		},"player_loadout")
+		--},"player_icon")
+end
+
+
+mod:hook_safe("LobbyView","_update_player_slots",mod.lobby_loadout)
+local personal_player_panel_definition_path = "scripts/ui/hud/elements/personal_player_panel/hud_element_personal_player_panel_definitions"
+local team_player_panel_definition_path = "scripts/ui/hud/elements/team_player_panel/hud_element_team_player_panel_definitions"
+local lobby_view_definition_path = "scripts/ui/views/lobby_view/lobby_view_definitions"
+mod:hook_require(personal_player_panel_definition_path,mod.playerloadout_definition)
+mod:hook_require(team_player_panel_definition_path,mod.playerloadout_definition)
+mod:hook_require(lobby_view_definition_path,function(instance)
+	local extra = {
+			{
+				pass_type = "text",
+				value_id = "loadout_intel_Melee",
+				style_id = "loadout_intel_Melee",
+				value = "",
+				style = {
+					vertical_alignment = "top",
+					text_vertical_alignment = "top",
+					horizontal_alignment = "center",
+					text_horizontal_alignment = "center",
+					offset = {0, 165, 1},
+					size = {250, 100},
+					text_color = mod.text_color,
+					font_size = 17,
+					line_spacing = 0.95,
+				},
+				
+			},
+			{
+				pass_type = "text",
+				value_id = "loadout_intel_Range",
+				style_id = "loadout_intel_Range",
+				value = "",
+				style = {
+					vertical_alignment = "top",
+					text_vertical_alignment = "top",
+					horizontal_alignment = "center",
+					text_horizontal_alignment = "center",
+					offset = {0, 200, 1},
+					size = {250, 100},
+					text_color = mod.text_color,
+					font_size = 17,
+					line_spacing = 0.95,
+				},
+			},
+			{
+				pass_type = "text",
+				value_id = "loadout_intel_Feats",
+				style_id = "loadout_intel_Feats",
+				value = "",
+				style = {
+					vertical_alignment = "top",
+					text_vertical_alignment = "top",
+					horizontal_alignment = "center",
+					text_horizontal_alignment = "center",
+					offset = {0, 235, 1},
+					size = {250, 100},
+					text_color = mod.text_color,
+					font_size = 17,
+					line_spacing = 0.95,
+				},
+			},
+	}
+	for i = 1,#extra do
+		UIWidget.add_definition_pass(instance.panel_definition,extra[i])
+	end
+end)
+
+mod.on_setting_changed = function(setting_name)
+	mod:init()
+end
+mod:command("lom",mod:localize("echo_team_loadout_brief"),function(...)
+	local key = {...}
+	if key[1] == "reset" then
+		mod.teamatesloadout = {}
+	elseif key[1] == "weapon" then
+		local me_loadout = get_local_player()._profile.loadout
+		local templates = {
+			me_loadout["slot_primary"].weapon_template or "????",
+			me_loadout["slot_secondary"].weapon_template or "????",			
+		}
+		mod:echo("\n"..templates[1].."\n"..templates[2])
+	elseif table.is_empty(key) then
+		local brief = "\n"
+		local players = Managers.player and Managers.player:players()
+		if players then
+			for k,player in pairs(players) do
+				if player:is_human_controlled() then
+					local profile = player._profile
+					local name = profile.name
+					local Melee, Range = weapon_display_name(profile,"Melee"),weapon_display_name(profile,"Range")
+					brief = string.format("%s%s:\n%s\n%s\n",brief,name,Melee,Range)
+				end
+			end
+			mod:echo(brief)
+		end
+	end
+end)
+local function get_charas(str)
+	local count = 0
+	if str then
+		for chara in string.gmatch(str,"[%.%w ]") do
+			count = count + 1
+		end
+	end
+	return count
+end
+
+-- Define rows
+mod.scoreboard_rows = {
+	{name = "row_scoreboard_weapon_Melee_1",
+		text = "row_scoreboard_weapon_melee",
+		group = "offense",
+		setting = "Loadout_weapons",
+		is_text = true,
+		validation = "ASC",
+	},
+	{name = "row_scoreboard_weapon_Melee_2",
+		text = "row_scoreboard_blank",
+		group = "offense",
+		setting = "Loadout_weapons",
+		is_text = true,
+		validation = "ASC",
+	},
+	{name = "row_scoreboard_weapon_Range_1",
+		text = "row_scoreboard_weapon_range",
+		group = "offense",
+		setting = "Loadout_weapons",
+		is_text = true,
+		validation = "ASC",
+	},
+	{name = "row_scoreboard_weapon_Range_2",
+		text = "row_scoreboard_blank",
+		group = "offense",
+		setting = "Loadout_weapons",
+		is_text = true,
+		validation = "ASC",
+	},
+	{name = "row_scoreboard_player_feat",
+		text = "row_scoreboard_player_feat",
+		group = "offense",
+		setting = "Loadout_feat",
+		is_text = true,
+		validation = "ASC",
+	},
+	{name = "row_scoreboard_blank_1",
+		text = "row_scoreboard_blank",
+		group = "offense",
+		setting = "Loadout_scoreboard_blank",
+		is_text = true,
+		big = true,
+		validation = "ASC",
+	},
+}
+mod.remainder = {
+	["zh-cn"] = 3,
+	ja = 3,
+}
+mod.scoreboard_weaponname = function(profile,weapon_type)
+	local disname = weapon_display_name(profile,weapon_type)
+	local length = string.len(disname)
+	local line = {" "," "}
+	if length >= (mod.endview_scoreboard_length or 30) then
+		length = math.floor(length / 2)
+		if mod.remainder[lid] then
+			local charas = get_charas(string.sub(disname,1,length))
+			local remainder = (length - charas) % mod.remainder[lid]
+			if remainder > 0 then
+				length = length + mod.remainder[lid] - remainder
+			end
+		end
+		line[1] = string.sub(disname,1,length)
+		line[2] = string.sub(disname,length + 1, -1)
+	else
+		line[1] = disname
+	end
+	return line
+end
+mod:hook_safe(CLASS.EndView, "on_enter", function(...)
+	if scoreboard then
+		local players = Managers.player and Managers.player:players()
+		if players then
+			mod:set("Loadout_weapons",mod:get("endview_scoreboard_weapons"))
+			mod:set("Loadout_feat",mod:get("endview_scoreboard_feat"))
+			mod:set("Loadout_scoreboard_blank",mod:get("endview_scoreboard_blank"))
+			for k,player in pairs(players) do
+				local profile = player._profile
+				local account_id = player:account_id() or player:name()
+				local human = player:is_human_controlled()
+				for k,weapon_type in pairs({"Melee","Range"}) do
+					local line = {" "," "}
+					if human then
+						line = mod.scoreboard_weaponname(profile,weapon_type)
+					end
+					for i =1,2 do
+						scoreboard:update_stat(string.format("row_scoreboard_weapon_%s_%s",weapon_type,i), account_id, line[i])
+					end
+				end
+				local feats = human and player_feats(profile) or " "
+				scoreboard:update_stat("row_scoreboard_player_feat", account_id, feats)
+				scoreboard:update_stat("row_scoreboard_blank_1", account_id, " ")
+			end
+		end
+	end
+end)
+mod:hook_safe(CLASS.EndView, "on_exit", function(...)
+	mod:set("Loadout_weapons",false)
+	mod:set("Loadout_feat",false)
+	mod:set("Loadout_scoreboard_blank",false)
+end)
