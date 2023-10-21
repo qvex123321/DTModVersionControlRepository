@@ -42,3 +42,5 @@ show_cjk_glyphs
 creature_spawner
 weapon_customization
 LoadoutMonitor
+OpenPlayerProfile
+CThruShields
