@@ -44,3 +44,4 @@ weapon_customization
 LoadoutMonitor
 OpenPlayerProfile
 CThruShields
+quickest_play
