@@ -5,6 +5,8 @@ local mod = get_mod("weapon_customization")
 -- ##### ┴└─└─┘└─┘└└─┘┴┴└─└─┘ #########################################################################################
 
 local ScriptCamera = mod:original_require("scripts/foundation/utilities/script_camera")
+local Crouch = mod:original_require("scripts/extension_systems/character_state_machine/character_states/utilities/crouch")
+local Recoil = mod:original_require("scripts/utilities/recoil")
 
 -- ##### ┌─┐┌─┐┬─┐┌─┐┌─┐┬─┐┌┬┐┌─┐┌┐┌┌─┐┌─┐ ############################################################################
 -- ##### ├─┘├┤ ├┬┘├┤ │ │├┬┘│││├─┤││││  ├┤  ############################################################################
@@ -16,13 +18,18 @@ local ScriptCamera = mod:original_require("scripts/foundation/utilities/script_c
     local vector3_unbox = vector3_box.unbox
     local vector3 = Vector3
     local vector3_zero = vector3.zero
+    local Quaternion = Quaternion
     local quaternion_identity = Quaternion.identity
     local quaternion_from_euler_angles_xyz = Quaternion.from_euler_angles_xyz
     local quaternion_multiply = Quaternion.multiply
     local quaternion_matrix4x4 = Quaternion.matrix4x4
+    local quaternion_to_elements = Quaternion.to_elements
+    local quaternion_from_elements = Quaternion.from_elements
     local matrix4x4_transform = Matrix4x4.transform
+    local Camera = Camera
     local camera_local_position = Camera.local_position
     local Camera_local_rotation = Camera.local_rotation
+    local Unit = Unit
     local unit_alive = Unit.alive
     local unit_local_position = Unit.local_position
     local unit_set_local_position = Unit.set_local_position
@@ -41,6 +48,8 @@ local ScriptCamera = mod:original_require("scripts/foundation/utilities/script_c
 -- #####  ││├─┤ │ ├─┤ #################################################################################################
 -- ##### ─┴┘┴ ┴ ┴ ┴ ┴ #################################################################################################
 
+local CROUCH_OPTION = "mod_option_misc_cover_on_crouch"
+local REFERENCE = "weapon_customization"
 local default_sight_offset_position = vector3_box(vector3_zero())
 local default_sight_offset_rotation = vector3_box(vector3_zero())
 local default_sight_offset = {
@@ -89,6 +98,17 @@ mod.get_sight_offset = function(self, weapon, offset_type)
 end
 
 mod:hook(CLASS.ActionAim, "start", function(func, self, action_settings, t, ...)
+    if mod:get(CROUCH_OPTION) then
+        if self._first_person_extension.crouch_braced then
+            local first_person_unit = self._first_person_extension._first_person_unit
+            if Unit.has_animation_event(first_person_unit, "from_cover") then
+                Unit.animation_event(first_person_unit, "from_cover")
+            end
+            self._first_person_extension.crouch_braced = nil
+            self._first_person_extension.was_crouch_braced = true
+        end
+    end
+
     if self._is_local_unit and self._weapon and self._weapon.item then
         local sight = mod:get_sight(self._weapon.item)
         if sight and sight.item and sight.item ~= "" then
@@ -165,6 +185,16 @@ mod:hook(CLASS.ActionUnaim, "finish", function(func, self, reason, data, t, time
         mod.camera_position = nil
         mod.camera_rotation = nil
     end
+    if mod:get(CROUCH_OPTION) then
+        if self._first_person_extension.was_crouch_braced then
+            local first_person_unit = self._first_person_extension._first_person_unit
+            if Unit.has_animation_event(first_person_unit, "to_cover") then
+                Unit.animation_event(first_person_unit, "to_cover")
+            end
+            self._first_person_extension.crouch_braced = true
+            self._first_person_extension.was_crouch_braced = nil
+        end
+    end
 end)
 
 -- ##### ┌─┐┬ ┬┌─┐┬─┐┌─┐┌─┐  ┌─┐┬┌┬┐┬┌┐┌┌─┐ ###########################################################################
@@ -214,13 +244,19 @@ end)
 mod.camera_position_reset = function(self, dt, t)
     if mod.do_camera_position_reset then
         local has_scope = mod.do_camera_position_reset.has_scope
+        local has_sight = mod.do_camera_position_reset.has_sight
         local scope_offset = mod.do_camera_position_reset.scope_offset
+        local sight_offset = mod.do_camera_position_reset.sight_offset
         local is_local_unit = mod.do_camera_position_reset.is_local_unit
         local time_in_action = 1 - (mod.do_camera_position_reset.end_time - t)
         if time_in_action < 1 then
-            if is_local_unit and has_scope then
+            if is_local_unit and has_scope and scope_offset then
                 local progress = time_in_action / 1
                 local position = vector3_unbox(scope_offset.position) * (1 - progress)
+                mod.camera_position = vector3_box(position)
+            elseif is_local_unit and has_sight and sight_offset then
+                local progress = time_in_action / 1
+                local position = vector3_unbox(sight_offset.position) * (1 - progress)
                 mod.camera_position = vector3_box(position)
             end
         else
@@ -229,6 +265,38 @@ mod.camera_position_reset = function(self, dt, t)
         end
     end
 end
+
+local _abort_camera_aim = function(func, self, action_settings, t, ...)
+    if self._is_local_unit and self._weapon and self._weapon.item and self._weapon.item.__master_item then
+        local sight = mod:get_sight(self._weapon.item)
+        if sight and sight.item and sight.item ~= "" then
+            mod.do_camera_position_reset = {
+                has_scope = mod:is_scope(sight),
+                has_sight = mod:is_sight(sight),
+                scope_offset = mod:get_sight_offset(self._weapon) or default_sight_offset,
+                sight_offset = mod:get_sight_offset(self._weapon, "no_scope_offset") or default_sight_offset,
+                is_local_unit = self._is_local_unit,
+                end_time = t + 1,
+            }
+        end
+    end
+    func(self, action_settings, t, ...)
+end
+
+mod:hook(CLASS.ActionAimProjectile, "start", _abort_camera_aim)
+mod:hook(CLASS.ActionChainLightning, "start", _abort_camera_aim)
+mod:hook(CLASS.ActionSmiteTargeting, "start", _abort_camera_aim)
+mod:hook(CLASS.ActionExplosion, "start", _abort_camera_aim)
+mod:hook(CLASS.ActionVentOverheat, "start", _abort_camera_aim)
+mod:hook(CLASS.ActionVentWarpCharge, "start", _abort_camera_aim)
+mod:hook(CLASS.ActionPlaceForceField, "start", _abort_camera_aim)
+mod:hook(CLASS.ActionActivateSpecial, "start", _abort_camera_aim)
+mod:hook(CLASS.ActionInspect, "start", _abort_camera_aim)
+mod:hook(CLASS.ActionOverloadExplosion, "start", _abort_camera_aim)
+mod:hook(CLASS.ActionReloadShotgunSpecial, "start", _abort_camera_aim)
+mod:hook(CLASS.ActionReloadShotgun, "start", _abort_camera_aim)
+mod:hook(CLASS.ActionReloadState, "start", _abort_camera_aim)
+mod:hook(CLASS.ActionUnwield, "start", _abort_camera_aim)
 
 -- ##### ┬ ┬┌─┐┌┬┐┌─┐┌┬┐┌─┐ ###########################################################################################
 -- ##### │ │├─┘ ││├─┤ │ ├┤  ###########################################################################################
@@ -243,9 +311,9 @@ mod:hook(CLASS.PlayerUnitFirstPersonExtension, "update_unit_position", function(
     func(self, unit, dt, t, ...)
     if unit == mod.player_unit and self:is_in_first_person_mode() then
         local first_person_unit = self._first_person_unit
-        local position = unit_local_position(first_person_unit, 1)
-        local rotation = unit_local_rotation(first_person_unit, 1)
         if mod.camera_position then
+            local position = unit_local_position(first_person_unit, 1)
+            local rotation = unit_local_rotation(first_person_unit, 1)
             local mat = quaternion_matrix4x4(rotation)
             local rotated_pos = matrix4x4_transform(mat, vector3_unbox(mod.camera_position))
             unit_set_local_position(first_person_unit, 1, position - rotated_pos)
@@ -257,6 +325,23 @@ mod:hook(CLASS.PlayerUnitFirstPersonExtension, "update_unit_position", function(
             if weapon_unit and unit_alive(weapon_unit) then
                 local camera_rotation = quaternion_from_euler_angles_xyz(mod.camera_rotation[1], mod.camera_rotation[2], mod.camera_rotation[3])
                 unit_set_local_rotation(weapon_unit, 1, camera_rotation)
+            end
+        end
+    end
+    if mod:get(CROUCH_OPTION) then
+        local movement_state_component = self._movement_state_component
+        local is_crouching = movement_state_component and movement_state_component.is_crouching
+        local first_person_unit = self._first_person_unit
+        if is_crouching then
+            if Unit.has_animation_event(first_person_unit, "to_cover") and not self.crouch_braced then
+                Unit.animation_event(first_person_unit, "to_cover")
+                self.crouch_braced = true
+            end
+        else
+            if Unit.has_animation_event(first_person_unit, "from_cover") and self.crouch_braced then
+                Unit.animation_event(first_person_unit, "from_cover")
+                self.crouch_braced = nil
+                self.was_crouch_braced = nil
             end
         end
     end

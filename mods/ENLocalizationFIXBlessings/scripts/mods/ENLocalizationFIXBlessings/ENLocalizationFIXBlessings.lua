@@ -85,11 +85,11 @@ mod.localization_templates = {
 	handle_func = function(locale, value)
 	return "+{finesse:%s} Finesse for {time:%s} seconds on Enemy One-Shot. Stacks {stacks:%s} times." end},
 -- ==================================================Combat Blade
-{	id = "trait_bespoke_fix_14", -- Smackdown -- "s" -> "seconds"
+{	id = "trait_bespoke_fix_14", -- Smackdown -- "s" -> "seconds" () -> for
 	loc_keys = {"loc_trait_bespoke_increased_crit_chance_after_punching_staggered_enemy_desc",},
 	locales = {"en",},
 	handle_func = function(locale, value)
-	return "+{crit_chance:%s} Critical Chance for {time:%s} seconds on Special Action Hit (Staggered Enemy)." end},
+	return "+{crit_chance:%s} Critical Chance for {time:%s} seconds on Special Action Hit  for Staggered Enemy." end},
 -- ==================================================Force Staff - Surge
 {	id = "trait_bespoke_fix_15", -- Terrifying Barrage -- "m" -> "meters" ({range:%s}=5m)
 	loc_keys = {"loc_trait_bespoke_suppression_on_close_kill_desc",},
@@ -102,6 +102,11 @@ mod.localization_templates = {
 	locales = {"en",},
 	handle_func = function(locale, value)
 	return "Target receives up to {stacks:%s} Stacks of {rending:%s} Brittleness, scaling with charge time of Secondary Attack. Lasts {time:%s} seconds." end},
+{	id = "trait_bespoke_fix_16", -- Sustained Fire -- "on Third and Fourth shots" -> "on Second and Third shots"
+	loc_keys = {"loc_trait_bespoke_followup_shots_ranged_damage_desc",},
+	locales = {"en",},
+	handle_func = function(locale, value)
+	return "+{damage:%s} Damage on Second and Third shots in a Salvo." end},
 -- ==================================================Headhunter Autogun
 {	id = "trait_bespoke_fix_16", -- Ghost -- "s" -> "seconds"
 	loc_keys = {"loc_trait_bespoke_count_as_dodge_vs_ranged_on_weakspot_desc",},
@@ -119,11 +124,11 @@ mod.localization_templates = {
 	handle_func = function(locale, value)
 	return "Gain Suppression Immunity for {time:%s} seconds on Weak Spot Hit." end},
 -- ==================================================Infantry Autogun
-{	id = "trait_bespoke_fix_16", -- Fire Frenzy -- "<unlocalised..." fix and "s" -> "seconds"
-	loc_keys = {"loc_trait_bespoke_increase_close_damage_on_close_kill_desc",},
+{	id = "trait_bespoke_fix_16", -- Punishing Salvo -- "on Third and Fourth shots" to "on Second and Third shots"
+	loc_keys = {"loc_trait_bespoke_followup_shots_ranged_weakspot_damage_desc",},
 	locales = {"en",},
 	handle_func = function(locale, value)
-	return "Gain +{attack_speed:%s} Attack Speed for {time:%s} seconds after Killing an Enemy at close range. Stacks 5 times." end},
+	return "+{damage:%s} Weakspot Damage on Second and Third shots in a Salvo." end},
 {	id = "trait_bespoke_fix_16", -- Deathspitter -- hidden "Stacks 5 times." and "s" -> "seconds"
 	loc_keys = {"loc_trait_bespoke_increase_power_on_close_kill_desc",},
 	locales = {"en",},
@@ -170,11 +175,6 @@ mod.localization_templates = {
 	locales = {"en",},
 	handle_func = function(locale, value)
 	return "{proc_chance:%s} chance Elite and Special enemies Explode on Kill." end},
-{	id = "trait_bespoke_fix_16", -- Inspiring Barrage -- "<unlocalised..." fix {ammo:%s}
-	loc_keys = {"loc_trait_bespoke_toughness_on_continuous_fire_desc",},
-	locales = {"en",},
-	handle_func = function(locale, value)
-	return "+{toughness:%s} Toughness for every 10% of magazine spent during continuous fire. Stacks {stacks:%s} times." end},
 -- ==================================================Spearhead Boldgun
 {	id = "trait_bespoke_fix_16", -- Shattering Impact -- "s" -> "seconds"
 	loc_keys = {"loc_trait_bespoke_armor_rend_on_projectile_hit_desc",},
@@ -189,6 +189,12 @@ mod.localization_templates = {
 	locales = {"en",},
 	handle_func = function(locale, value)
 	return "+{charge_speed:%s} Charge Speed on low Overheat. Stacks up to {stacks:%s} times." end},
+{	id = "trait_bespoke_fix_16", -- Gets Hot! -- "(scales on Heat Level)" -> "Scales with increasing Heat level."
+	loc_keys = {"loc_trait_bespoke_crit_chance_scaled_on_heat_desc",},
+	locales = {"en",},
+	handle_func = function(locale, value)
+	return "Up to +{crit_chance:%s} Critical Chance. Scales with increasing Heat level." end},
+
 
 -- ==================================================OGRYN
 -- ==================================================Cleaver
@@ -216,14 +222,6 @@ mod.localization_templates = {
 	handle_func = function(locale, value)
 	return "+{power_level:%s} Melee Power for {time:%s} seconds on Hitting 3+ Enemies with a Ranged Attack." end},
 
--- FOR TESTS ONLY!!!
--- {id = "weap_testum00",
--- loc_keys = {
--- "",},
--- locales = {"en",},
--- handle_func = function(locale, value)
--- return string.gsub(value, ":", "!!!")
--- end,},
 }
 
 
