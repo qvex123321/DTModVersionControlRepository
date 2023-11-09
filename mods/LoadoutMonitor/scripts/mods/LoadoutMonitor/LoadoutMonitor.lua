@@ -17,23 +17,27 @@ mod.left_panel_lift = 0 - mod:get("left_panel_lift")
 mod.text_color = {255,239,238,238}
 
 mod.init = function(self)
-	mod.display_player_name = mod:get("display_player_name")
-	mod.player_PlayerName_offset = { mod:get("player_name_offset_x"), mod:get("player_name_offset_y"),}
-	mod.player_PlayerName_font_size = mod:get("player_name_font_size")
-	mod.display_player_Feats = mod:get("display_player_feats")
-	mod.player_Feats_offset = { mod:get("player_feats_offset_x"), mod:get("player_feats_offset_y"),}
-	mod.player_Feats_font_size = mod:get("player_feats_font_size")
+	mod.display = {
+		player_Feats = mod:get("display_player_feats"),
+		notable_talents = mod:get("display_notable_talents"),
+		player_name = mod:get("display_player_name"),
+		main_class = mod:get("display_main_class"),
+	}
 	mod.offsets = {
 		lobby = {mod:get("lobby_talent_offset"),mod:get("lobby_weapon_offset"),mod:get("lobby_weapon_gap")},
-	
+		notable_talents = {mod:get("notable_talents_offset_x"),mod:get("notable_talents_offset_y"),mod:get("notable_talents_separation")},
+		PlayerName = { mod:get("player_name_offset_x"), mod:get("player_name_offset_y"),},
+		Feats = { mod:get("player_feats_offset_x"), mod:get("player_feats_offset_y"),},
+		Class = { mod:get("player_class_offset_x"), mod:get("player_class_offset_y"),},
 	}
 	mod.font_size = {
 		lobby = mod:get("lobby_weapon_font_size"),
+		feats = mod:get("player_feats_font_size"),
+		notable_talents = {mod:get("notable_talents_icon_size"),mod:get("notable_talents_icon_size")},
+		PlayerName = mod:get("player_name_font_size"),
+		Feats = mod:get("player_feats_font_size"),
+		Class = mod:get("player_class_font_size"),
 	}
-	mod.display_main_class = mod:get("display_main_class")
-	mod.display_sub_class = mod:get("display_sub_class")
-	mod.player_Class_offset = { mod:get("player_class_offset_x"), mod:get("player_class_offset_y"),}
-	mod.player_Class_font_size = mod:get("player_class_font_size")
 	
 	mod.weapon_enable = mod:get("display_player_weapon")
 	mod.weapon_name_lenghth = mod:get("user_weapon_name_lenghth")
@@ -51,9 +55,9 @@ mod.init = function(self)
 	mod.SHUD = get_mod("SpectatorHUD") and true
 	scoreboard = get_mod("scoreboard")
 	mod.left_panel_lift = 0 - mod:get("left_panel_lift")
-	mod.lobby_exhibition = { weapon = mod:get("lobby_exhibition_weapons"), feat = mod:get("lobby_exhibition_feats")}
+	mod.lobby_exhibition = { weapon = mod:get("lobby_exhibition_weapons")}
 	mod.endview_scoreboard_length = mod:get("endview_scoreboard_length")
-
+	mod.notable_talents_intensity = mod:get("notable_talents_intensity")
 	mod.teamatesloadout = {}
 end
 
@@ -93,7 +97,7 @@ local function player_feats(profile)
 	local archetype = profile.archetype.name
 	local talents = profile.talents
 	
-    if mod.display_player_Feats then
+    if mod.display.player_Feats then
 		local feats = {"X","X","X"}
 		if talents_index[archetype] then
 			for i = 1,3 do
@@ -108,6 +112,104 @@ local function player_feats(profile)
 		return table.concat(feats,"-")
 	end
     return ""
+end
+
+local function notable_talents(profile,style)
+	if not mod.display.notable_talents then
+		for i = 1,5 do
+			style["loadout_intel_icon_"..tostring(i)].color[1] = 0
+		end
+		return
+	end	
+	local archetype = profile.archetype.name
+	local talents = profile.talents
+	local talents_index = {
+		veteran = {
+			{
+				"veteran_better_deployables",
+				"content/ui/textures/icons/talents/veteran/veteran_better_deployables",
+			},
+			{
+				"veteran_movement_speed_towards_downed",
+				"content/ui/textures/icons/talents/veteran/veteran_movement_speed_towards_downed",
+			},
+			{
+				"veteran_allies_in_coherency_share_toughness_gain",
+				"content/ui/textures/icons/talents/veteran/veteran_allies_in_coherency_share_toughness_gain",
+			},
+			{
+				"veteran_combat_ability_revive_nearby_allies",
+				"content/ui/textures/icons/talents/veteran/veteran_combat_ability_revive_nearby_allies",
+				Color.salmon(255, true),
+				-0.03
+			},
+			{
+				"veteran_reduced_threat_after_combat_ability",
+				"content/ui/textures/icons/talents/veteran/veteran_reduced_threat_when_still",
+				Color.salmon(255, true),
+			},
+			{
+				"veteran_combat_ability_melee_and_ranged_damage_to_coherency",
+				"content/ui/textures/icons/talents/veteran/veteran_combat_ability_melee_and_ranged_damage_to_coherency",
+				Color.salmon(255, true),
+			},
+		},
+		zealot = {
+			{
+				"zealot_ally_damage_taken_reduced",
+				"content/ui/textures/icons/talents/zealot/zealot_ally_damage_taken_reduced",
+			},
+			{
+				"zealot_channel_grants_toughness_damage_reduction",
+				"content/ui/textures/icons/talents/zealot/zealot_channel_grants_toughness_damage_reduction",
+				Color.salmon(255, true),
+			},
+			{
+				"zealot_channel_grants_damage",
+				"content/ui/textures/icons/talents/zealot/zealot_channel_grants_damage",
+				Color.salmon(255, true),
+			},
+		},
+		psyker = {
+			{
+				"psyker_elite_kills_add_warpfire",
+				"content/ui/textures/icons/talents/psyker/psyker_2_tier_2_name_3",
+			},
+			{
+				"psyker_2_tier_3_name_2",
+				"content/ui/textures/icons/talents/psyker/psyker_2_tier_3_name_2",
+			},
+		},
+		ogryn = {
+			{
+				"ogryn_taunt_damage_taken_increase",
+				"content/ui/textures/icons/talents/ogryn/ogryn_taunt_damage_taken_increase",
+				Color.salmon(255, true),
+			},
+		},	
+	}
+	
+	if talents_index[archetype] then
+		local num = 1
+		for i = 1, #talents_index[archetype] do
+			local current = talents_index[archetype][i]
+			if talents[current[1]] then
+				local slot = "loadout_intel_icon_"..tostring(num)
+				style[slot].material_values.icon_texture = current[2]
+				style[slot].material_values.intensity = mod.notable_talents_intensity + (current[4] or 0)
+				style[slot].color = current[3] or Color.turquoise(255, true)
+				style[slot].size = mod.font_size.notable_talents
+				style[slot].offset[1] = mod.offsets.notable_talents[1] + mod.offsets.notable_talents[3] * (num - 1)
+				style[slot].offset[2] = mod.offsets.notable_talents[2]
+				num = num + 1
+			end
+		end
+		if num < 6 then
+			for i = 5, num, -1 do
+				style["loadout_intel_icon_"..tostring(i)].color[1] = 0
+			end
+		end
+	end
 end
 
 local function perk_blessing(item,trait_type)
@@ -153,13 +255,16 @@ local trait_offsets = {
 	bless = {280,},
 	perk = {370,},
 }
-
+--mod:command("vl","",function(v)
+--mod.try_value = v
+--end)
 mod.get_playerloadout_intel = function(profile,widget)
 	local player_name = profile.name
 	local Melee, Range = profile.loadout["slot_primary"], profile.loadout["slot_secondary"]
 	local content = widget.content
 	local style = widget.style
 	local class,career,symble = player_career(profile)
+	local main_class_method = {hide = "",name = class, symble = symble}
 	local weapons = {
 		Melee = {
 			name = weapon_display_name(profile,"Melee"),
@@ -178,27 +283,12 @@ mod.get_playerloadout_intel = function(profile,widget)
 	}
 	-- feats class name
 	content.loadout_intel_Feats = player_feats(profile)
-	if mod.display_main_class ~= "hide" then
-		if mod.display_main_class == "name" then
-			content.loadout_intel_Class = class
-		elseif mod.display_main_class == "symble" then
-			content.loadout_intel_Class = symble
-		elseif mod.display_main_class == "both" then
-			content.loadout_intel_Class = class..symble
-		end
-		if mod.display_sub_class then
-			content.loadout_intel_Class = string.format("%s = %s",content.loadout_intel_Class,career)
-		end
-	else
-		content.loadout_intel_Class = ""
-	end
-	content.loadout_intel_PlayerName = mod.display_player_name and player_name or " "
-	
+	content.loadout_intel_Class = main_class_method[mod.display.main_class]
+	content.loadout_intel_PlayerName = mod.display.player_name and player_name or " "
+	notable_talents(profile,style)
 	for k,part in pairs({"Feats","Class","PlayerName"}) do
-		for i = 1,2 do
-			style["loadout_intel_"..part].offset[i] = mod["player_"..part.."_offset"][i]
-		end
-		style["loadout_intel_"..part].font_size = mod["player_"..part.."_font_size"]
+		table.merge(style["loadout_intel_"..part].offset,mod.offsets[part])
+		style["loadout_intel_"..part].font_size = mod.font_size[part]
 	end
 	if mod.weapon_enable then
 		-- weapon perk blessing
@@ -363,9 +453,94 @@ mod.playerloadout_definition = function(instance)
 					size = {500, 100},
 					text_color = Color.golden_rod(255, true),
 					font_size = 18,
-				},
+				},	
 				
 			},
+			{
+				pass_type = "texture",
+				value_id = "loadout_intel_icon_1",
+				style_id = "loadout_intel_icon_1",
+				value = "content/ui/materials/icons/talents/talent_icon_container",
+                style = {
+					vertical_alignment = "top",
+					horizontal_alignment = "left",
+					offset = {200, 0, 150},
+                    size = { 36, 36 },
+					color = Color.aqua(0, true),
+					material_values = {
+						icon_texture = "content/ui/textures/icons/talents/psyker/psyker_2_tier_1_name_2",
+						intensity = -0.05,
+					},
+                },
+            },
+			{
+				pass_type = "texture",
+				value_id = "loadout_intel_icon_2",
+				style_id = "loadout_intel_icon_2",
+				value = "content/ui/materials/icons/talents/talent_icon_container",
+                style = {
+					vertical_alignment = "top",
+					horizontal_alignment = "left",
+					offset = {200, 0, 150},
+                    size = { 36, 36 },
+					color = Color.aqua(0, true),
+					material_values = {
+						icon_texture = "content/ui/textures/icons/talents/psyker/psyker_2_tier_1_name_2",
+						intensity = -0.05,
+					},
+                },
+            },
+			{
+				pass_type = "texture",
+				value_id = "loadout_intel_icon_3",
+				style_id = "loadout_intel_icon_3",
+				value = "content/ui/materials/icons/talents/talent_icon_container",
+                style = {
+					vertical_alignment = "top",
+					horizontal_alignment = "left",
+					offset = {200, 0, 150},
+                    size = { 36, 36 },
+					color = Color.aqua(0, true),
+					material_values = {
+						icon_texture = "content/ui/textures/icons/talents/psyker/psyker_2_tier_1_name_2",
+						intensity = -0.05,
+					},
+                },
+            },
+			{
+				pass_type = "texture",
+				value_id = "loadout_intel_icon_4",
+				style_id = "loadout_intel_icon_4",
+				value = "content/ui/materials/icons/talents/talent_icon_container",
+                style = {
+					vertical_alignment = "top",
+					horizontal_alignment = "left",
+					offset = {200, 0, 150},
+                    size = { 36, 36 },
+					color = Color.aqua(0, true),
+					material_values = {
+						icon_texture = "content/ui/textures/icons/talents/psyker/psyker_2_tier_1_name_2",
+						intensity = -0.05,
+					},
+                },
+            },
+			{
+				pass_type = "texture",
+				value_id = "loadout_intel_icon_5",
+				style_id = "loadout_intel_icon_5",
+				value = "content/ui/materials/icons/talents/talent_icon_container",
+                style = {
+					vertical_alignment = "top",
+					horizontal_alignment = "left",
+					offset = {200, 0, 150},
+                    size = { 36, 36 },
+					color = Color.aqua(0, true),
+					material_values = {
+						icon_texture = "content/ui/textures/icons/talents/psyker/psyker_2_tier_1_name_2",
+						intensity = -0.05,
+					},
+                },
+            },
 			{
 				pass_type = "text",
 				value_id = "loadout_intel_Class",

@@ -54,6 +54,18 @@ local locr = {
 		en = "Feats",
 		["zh-cn"] = "天赋",
 	},
+	setting_player_notable_talents = {
+		en = "Notable talents",
+		["zh-cn"] = "特别天赋",
+	},
+	display_notable_talents = {
+		en = "Display notable talents",
+		["zh-cn"] = "特别天赋",
+	},
+	notable_talents_intensity = {
+		en = "Intensity",
+		["zh-cn"] = "亮度",
+	},
 	setting_player_class_group = {
 		en = "Class",
 		["zh-cn"] = "职业",
@@ -93,6 +105,14 @@ local locr = {
 	setting_font_size = {
 		en = "Font size",
 		["zh-cn"] = "字体大小",
+	},
+	setting_icon_size = {
+		en = "Icon size",
+		["zh-cn"] = "图标大小",
+	},
+	setting_separation = {
+		en = "Separation",
+		["zh-cn"] = "间距",
 	},
 	user_bless_offset = {
 		en = "Blessing offset adjust",

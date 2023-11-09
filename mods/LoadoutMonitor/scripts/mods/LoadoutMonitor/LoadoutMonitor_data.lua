@@ -135,6 +135,56 @@ return {
 				},
 			},
 			{
+				setting_id = "setting_player_notable_talents",
+				type = "group",
+				sub_widgets = {
+					{
+						setting_id = "display_notable_talents",
+						title = "setting_display",
+						type = "checkbox",
+						default_value = true,
+					},
+					{
+						setting_id = "notable_talents_icon_size",
+						title = "setting_icon_size",
+						type = "numeric",
+						default_value = 36,
+						range = { 1, 50 },
+					},
+					{
+						setting_id = "notable_talents_intensity",
+						title = "notable_talents_intensity",
+						type = "numeric",
+						default_value = 0.05,
+						range = { -1, 1 },
+						decimals_number = 2
+					},
+					{
+						setting_id = "notable_talents_offset_x",
+						title = "setting_offset_x",
+						type = "numeric",
+						default_value = 0,
+						range = { 0, 500 },
+					},
+					{
+						setting_id = "notable_talents_offset_y",
+						title = "setting_offset_y",
+						type = "numeric",
+						default_value = 0,
+						range = { -25, 25 },
+						decimals_number = 1,
+					},
+					{
+						setting_id = "notable_talents_separation",
+						title = "setting_separation",
+						type = "numeric",
+						default_value = 11.5,
+						range = { 0, 50 },
+						decimals_number = 1,
+					},
+				},
+			},
+			{
 				setting_id = "setting_player_class_group",
 				type = "group",
 				sub_widgets = {
@@ -145,14 +195,9 @@ return {
 						options = {
 							{text = "by_name", value = "name"},
 							{text = "by_symble", value = "symble"},
-							{text = "by_both", value = "both"},
+							--{text = "by_both", value = "both"},
 							{text = "setting_hide", value = "hide"},
 						},
-					},
-					{
-						setting_id = "display_sub_class",
-						type = "checkbox",
-						default_value = true,
 					},
 					{
 						setting_id = "player_class_font_size",
@@ -266,7 +311,7 @@ return {
 						tooltip = "left_panel_lift_tip",
 						type = "numeric",
 						default_value = position_y + 120,
-						range = { position_y, position_y + 500 },
+						range = { position_y - 500, position_y + 500 },
 					},
 					{
 						setting_id = "endview_scoreboard_weapons",
