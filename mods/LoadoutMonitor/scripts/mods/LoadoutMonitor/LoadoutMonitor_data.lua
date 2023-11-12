@@ -194,8 +194,8 @@ return {
 						default_value = "name",
 						options = {
 							{text = "by_name", value = "name"},
-							{text = "by_symble", value = "symble"},
-							--{text = "by_both", value = "both"},
+							{text = "by_symbol", value = "symbol"},
+							{text = "by_both", value = "both"},
 							{text = "setting_hide", value = "hide"},
 						},
 					},

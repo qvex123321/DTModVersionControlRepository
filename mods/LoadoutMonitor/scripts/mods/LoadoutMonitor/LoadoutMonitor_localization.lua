@@ -78,8 +78,8 @@ local locr = {
 		en = "By class name",
 		["zh-cn"] = "以职业名",
 	},
-	by_symble = {
-		en = "By class symble",
+	by_symbol = {
+		en = "By class symbol",
 		["zh-cn"] = "以职业符号",
 	},
 	by_both = {

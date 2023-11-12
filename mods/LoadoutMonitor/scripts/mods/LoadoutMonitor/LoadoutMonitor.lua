@@ -66,8 +66,8 @@ local function player_career(profile)
 	local archetypename = archetype.archetype_name
 	local subclass = profile.specialization
 	local subclassname = archetype.specializations[subclass].title
-	local symble = archetype.string_symbol
-	return Localize(archetypename),Localize(subclassname),symble
+	local symbol = archetype.string_symbol
+	return Localize(archetypename),Localize(subclassname),symbol
 end
 
 
@@ -263,8 +263,8 @@ mod.get_playerloadout_intel = function(profile,widget)
 	local Melee, Range = profile.loadout["slot_primary"], profile.loadout["slot_secondary"]
 	local content = widget.content
 	local style = widget.style
-	local class,career,symble = player_career(profile)
-	local main_class_method = {hide = "",name = class, symble = symble}
+	local class,career,symbol = player_career(profile)
+	local main_class_method = {hide = "",name = class, symbol = symbol, both = symbol..class}
 	local weapons = {
 		Melee = {
 			name = weapon_display_name(profile,"Melee"),
@@ -283,7 +283,7 @@ mod.get_playerloadout_intel = function(profile,widget)
 	}
 	-- feats class name
 	content.loadout_intel_Feats = player_feats(profile)
-	content.loadout_intel_Class = main_class_method[mod.display.main_class]
+	content.loadout_intel_Class = main_class_method[mod.display.main_class] or main_class_method.symbol
 	content.loadout_intel_PlayerName = mod.display.player_name and player_name or " "
 	notable_talents(profile,style)
 	for k,part in pairs({"Feats","Class","PlayerName"}) do
