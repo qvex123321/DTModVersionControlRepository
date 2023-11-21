@@ -25,7 +25,6 @@ book_finder
 reveal_blessings
 BetterMelk
 buy_until_rating
-PenanceDetails
 true_level
 SoloPlay
 DarkCache
