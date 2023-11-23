@@ -51,7 +51,7 @@ mod.init = function(self)
 		perk_offset = mod:get("user_perk_offset"),
 		font_size = mod:get("user_bless_perk_font_size")
 	}
-	
+	mod.load_package("packages/ui/views/talents_view/talents_view")
 	mod.SHUD = get_mod("SpectatorHUD") and true
 	scoreboard = get_mod("scoreboard")
 	mod.left_panel_lift = 0 - mod:get("left_panel_lift")
@@ -77,30 +77,34 @@ local function player_feats(profile)
 			{"veteran_combat_ability_elite_and_special_outlines","veteran_combat_ability_stagger_nearby_enemies","veteran_invisibility_on_combat_ability"},
 			{"veteran_grenade_apply_bleed","veteran_krak_grenade","veteran_smoke_grenade"},
 			{"veteran_aura_gain_ammo_on_elite_kill_improved","veteran_increased_damage_coherency","veteran_movement_speed_coherency"},
+			{"veteran_snipers_focus","veteran_improved_tag","veteran_weapon_switch_passive"},
 		},
 		zealot = {
 			{"zealot_attack_speed_post_ability","zealot_bolstering_prayer","zealot_stealth"},
 			{"zealot_improved_stun_grenade","zealot_flame_grenade","zealot_throwing_knives"},
 			{"zealot_toughness_damage_reduction_coherency_improved","zealot_corruption_healing_coherency_improved","zealot_always_in_coherency"},
+			{"zealot_fanatic_rage","zealot_martyrdom","zealot_quickness_passive"},
 		},
 		psyker = {
 			{"psyker_shout_vent_warp_charge","psyker_combat_ability_force_field","psyker_combat_ability_stance"},
 			{"psyker_brain_burst_improved","psyker_grenade_chain_lightning","psyker_grenade_throwing_knives"},
 			{"psyker_aura_damage_vs_elites","psyker_cooldown_aura_improved","psyker_aura_crit_chance_aura"},
+			{"psyker_passive_souls_from_elite_kills","psyker_empowered_ability","psyker_new_mark_passive"},
 		},
 		ogryn = {
 			{"ogryn_longer_charge","ogryn_taunt_shout","ogryn_special_ammo"},
 			{"ogryn_grenade_friend_rock","ogryn_box_explodes","ogryn_grenade_frag"},
 			{"ogryn_melee_damage_coherency_improved","ogryn_toughness_regen_aura","ogryn_damage_vs_suppressed_coherency"},
+			{"ogryn_passive_heavy_hitter","ogryn_carapace_armor","ogryn_leadbelcher_no_ammo_chance"},
 		},
 	}
 	local archetype = profile.archetype.name
 	local talents = profile.talents
 	
     if mod.display.player_Feats then
-		local feats = {"X","X","X"}
+		local feats = {"X","X","X","X"}
 		if talents_index[archetype] then
-			for i = 1,3 do
+			for i = 1,4 do
 				local current = talents_index[archetype][i]
 				for o = 1,3 do
 					if talents[current[o]] then
@@ -255,9 +259,7 @@ local trait_offsets = {
 	bless = {280,},
 	perk = {370,},
 }
---mod:command("vl","",function(v)
---mod.try_value = v
---end)
+
 mod.get_playerloadout_intel = function(profile,widget)
 	local player_name = profile.name
 	local Melee, Range = profile.loadout["slot_primary"], profile.loadout["slot_secondary"]
@@ -468,8 +470,8 @@ mod.playerloadout_definition = function(instance)
                     size = { 36, 36 },
 					color = Color.aqua(0, true),
 					material_values = {
-						icon_texture = "content/ui/textures/icons/talents/psyker/psyker_2_tier_1_name_2",
-						intensity = -0.05,
+						icon_texture = "",
+						intensity = 1,
 					},
                 },
             },
@@ -485,8 +487,8 @@ mod.playerloadout_definition = function(instance)
                     size = { 36, 36 },
 					color = Color.aqua(0, true),
 					material_values = {
-						icon_texture = "content/ui/textures/icons/talents/psyker/psyker_2_tier_1_name_2",
-						intensity = -0.05,
+						icon_texture = "",
+						intensity = 1,
 					},
                 },
             },
@@ -502,8 +504,8 @@ mod.playerloadout_definition = function(instance)
                     size = { 36, 36 },
 					color = Color.aqua(0, true),
 					material_values = {
-						icon_texture = "content/ui/textures/icons/talents/psyker/psyker_2_tier_1_name_2",
-						intensity = -0.05,
+						icon_texture = "",
+						intensity = 1,
 					},
                 },
             },
@@ -519,8 +521,8 @@ mod.playerloadout_definition = function(instance)
                     size = { 36, 36 },
 					color = Color.aqua(0, true),
 					material_values = {
-						icon_texture = "content/ui/textures/icons/talents/psyker/psyker_2_tier_1_name_2",
-						intensity = -0.05,
+						icon_texture = "",
+						intensity = 1,
 					},
                 },
             },
@@ -536,8 +538,8 @@ mod.playerloadout_definition = function(instance)
                     size = { 36, 36 },
 					color = Color.aqua(0, true),
 					material_values = {
-						icon_texture = "content/ui/textures/icons/talents/psyker/psyker_2_tier_1_name_2",
-						intensity = -0.05,
+						icon_texture = "",
+						intensity = 1,
 					},
                 },
             },
@@ -817,6 +819,36 @@ mod:hook_require(lobby_view_definition_path,function(instance)
 		UIWidget.add_definition_pass(instance.panel_definition,extra[i])
 	end
 end)
+-- Make tactical overlay available in meat grinder
+mod:hook_require("scripts/ui/hud/hud_elements_player_onboarding", function(instance)
+    local found = false
+    -- Check if another mod already added tactical overlay
+    for _, entry in pairs(instance) do
+        if entry.class_name == "HudElementTacticalOverlay" then
+			found = true
+			break
+		end
+    end
+    if not found then
+        -- Add tactical overlay
+        instance[#instance+1] = {
+            package = "packages/ui/hud/tactical_overlay/tactical_overlay",
+            use_hud_scale = false,
+            class_name = "HudElementTacticalOverlay",
+            filename = "scripts/ui/hud/elements/tactical_overlay/hud_element_tactical_overlay",
+            visibility_groups = {
+                "tactical_overlay",
+                "alive",
+            }
+        }
+    end
+end)
+
+mod.load_package = function(package_name)
+    if not Managers.package:is_loading(package_name) and not Managers.package:has_loaded(package_name) then
+        return Managers.package:load(package_name, "loadout_monitor", nil, true)
+    end
+end
 
 mod.on_setting_changed = function(setting_name)
 	mod:init()
