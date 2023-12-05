@@ -48,3 +48,5 @@ ItemSorting
 more_characters_and_loadouts
 ForTheEmperor
 Ration Pack
+MergedTalentStats
+ScoreboardTagCounter
