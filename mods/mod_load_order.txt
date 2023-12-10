@@ -50,3 +50,6 @@ ForTheEmperor
 Ration Pack
 MergedTalentStats
 ScoreboardTagCounter
+StimmsPickupIcon
+InspectFromSocial
+
