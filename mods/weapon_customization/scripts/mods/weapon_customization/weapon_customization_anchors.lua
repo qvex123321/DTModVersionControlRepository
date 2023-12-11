@@ -1,5 +1,113 @@
 local mod = get_mod("weapon_customization")
 
+-- ##### ┌┬┐┌─┐┌┬┐┌─┐ #################################################################################################
+-- #####  ││├─┤ │ ├─┤ #################################################################################################
+-- ##### ─┴┘┴ ┴ ┴ ┴ ┴ #################################################################################################
+
+local _item = "content/items/weapons/player"
+local _item_ranged = _item.."/ranged"
+local _item_melee = _item.."/melee"
+local _item_minion = "content/items/weapons/minions"
+
+-- ##### ┌─┐┌─┐┬─┐┌─┐┌─┐┬─┐┌┬┐┌─┐┌┐┌┌─┐┌─┐ ############################################################################
+-- ##### ├─┘├┤ ├┬┘├┤ │ │├┬┘│││├─┤││││  ├┤  ############################################################################
+-- ##### ┴  └─┘┴└─└  └─┘┴└─┴ ┴┴ ┴┘└┘└─┘└─┘ ############################################################################
+
+--#region local functions
+    local table_size = table.size
+--#endregion
+
+-- ##### ┌─┐┬ ┬┌─┐┌┬┐┌─┐┌┬┐  ┌┬┐┌─┐┌┐ ┬  ┌─┐  ┌─┐┬ ┬┌┐┌┌─┐┌┬┐┬┌─┐┌┐┌┌─┐ ###############################################
+-- ##### │  │ │└─┐ │ │ ││││   │ ├─┤├┴┐│  ├┤   ├┤ │ │││││   │ ││ ││││└─┐ ###############################################
+-- ##### └─┘└─┘└─┘ ┴ └─┘┴ ┴   ┴ ┴ ┴└─┘┴─┘└─┘  └  └─┘┘└┘└─┘ ┴ ┴└─┘┘└┘└─┘ ###############################################
+
+local index = 1
+table.combine = function(...)
+    local arg = {...}
+    local combined = {}
+    for _, t in ipairs(arg) do
+        for name, value in pairs(t) do
+            combined[name] = value
+        end
+    end
+    return combined
+end
+table.icombine = function(...)
+    local arg = {...}
+    local combined = {}
+    for _, t in ipairs(arg) do
+        for _, value in pairs(t) do
+            combined[#combined+1] = value
+        end
+    end
+    return combined
+end
+table.tv = function(t, i)
+    local res = nil
+    if type(t) == "table" then
+        if #t >= i then
+            res = t[i]
+        elseif #t >= 1 then
+            res = t[1]
+        else
+            return nil
+        end
+    else
+        res = t
+    end
+    if res == "" then
+        return nil
+    end
+    return res
+end
+table.model_table = function(content, parent, angle, move, remove, type, no_support, automatic_equip, hide_mesh, mesh_move, special_resolve)
+    local angle = angle or 0
+    local move = move or Vector3Box(0, 0, 0)
+    local remove = remove or Vector3Box(0, 0, 0)
+    local type = type or "none"
+    local no_support = no_support or {}
+    local automatic_equip = automatic_equip or {}
+    local hide_mesh = hide_mesh or {}
+    if mesh_move == nil then mesh_move = true end
+    -- Build table
+    local _table = {}
+    local i = 1
+    for _, content_line in pairs(content) do
+        _table[content_line.name] = {
+            model = content_line.model,
+            data = content_line.data,
+            type = table.tv(type, i),
+            parent = table.tv(parent, i),
+            angle = table.tv(angle, i),
+            move = table.tv(move, i),
+            remove = table.tv(remove, i),
+            mesh_move = table.tv(mesh_move, i),
+            no_support = table.tv(no_support, i),
+            automatic_equip = table.tv(automatic_equip, i),
+            hide_mesh = table.tv(hide_mesh, i),
+            special_resolve = table.tv(special_resolve, i),
+            index = index,
+        }
+        i = i + 1
+        index = index + 1
+    end
+    return _table
+end
+
+-- ##### ┌─┐┌─┐┬─┐┌─┐┌─┐┬─┐┌┬┐┌─┐┌┐┌┌─┐┌─┐ ############################################################################
+-- ##### ├─┘├┤ ├┬┘├┤ │ │├┬┘│││├─┤││││  ├┤  ############################################################################
+-- ##### ┴  └─┘┴└─└  └─┘┴└─┴ ┴┴ ┴┘└┘└─┘└─┘ ############################################################################
+
+--#region local functions
+local string = string
+local string_find = string.find
+local vector3_box = Vector3Box
+local pairs = pairs
+local ipairs = ipairs
+local type = type
+local table = table
+--#endregion
+
 -- ##### ┬─┐┌─┐┌─┐ ┬ ┬┬┬─┐┌─┐ #########################################################################################
 -- ##### ├┬┘├┤ │─┼┐│ ││├┬┘├┤  #########################################################################################
 -- ##### ┴└─└─┘└─┘└└─┘┴┴└─└─┘ #########################################################################################
@@ -41,74 +149,6 @@ local _chainsword_2h_p1_m1 = mod:io_dofile("weapon_customization/scripts/mods/we
 local _combatsword_p2_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/combatsword_p2_m1")
 local _forcesword_p1_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/forcesword_p1_m1")
 local _combatsword_p3_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/combatsword_p3_m1")
-
-local UISoundEvents = mod:original_require("scripts/settings/ui/ui_sound_events")
-local _barrel_sound = UISoundEvents.talents_equip_talent
-local _receiver_sound = UISoundEvents.weapons_equip_weapon
-local _magazine_sound = UISoundEvents.weapons_trinket_select
-local _grip_sound = UISoundEvents.smart_tag_hud_default
-local _knife_sound = UISoundEvents.end_screen_summary_plasteel_zero
-
--- ##### ┌┬┐┌─┐┌┬┐┌─┐ #################################################################################################
--- #####  ││├─┤ │ ├─┤ #################################################################################################
--- ##### ─┴┘┴ ┴ ┴ ┴ ┴ #################################################################################################
-
-local _item = "content/items/weapons/player"
-local _item_ranged = _item.."/ranged"
-local _item_melee = _item.."/melee"
-local _item_minion = "content/items/weapons/minions"
-
--- ##### ┌─┐┌─┐┬─┐┌─┐┌─┐┬─┐┌┬┐┌─┐┌┐┌┌─┐┌─┐ ############################################################################
--- ##### ├─┘├┤ ├┬┘├┤ │ │├┬┘│││├─┤││││  ├┤  ############################################################################
--- ##### ┴  └─┘┴└─└  └─┘┴└─┴ ┴┴ ┴┘└┘└─┘└─┘ ############################################################################
-
---#region local functions
-    local string = string
-    local string_find = string.find
-    local vector3_box = Vector3Box
-    local table = table
-    local pairs = pairs
-    local ipairs = ipairs
-    local type = type
-    table.combine = function(...)
-        local arg = {...}
-        local combined = {}
-        for _, t in ipairs(arg) do
-            for name, value in pairs(t) do
-                combined[name] = value
-            end
-        end
-        return combined
-    end
-    table.icombine = function(...)
-        local arg = {...}
-        local combined = {}
-        for _, t in ipairs(arg) do
-            for _, value in pairs(t) do
-                combined[#combined+1] = value
-            end
-        end
-        return combined
-    end
-    local tv = function(t, i)
-        local res = nil
-        if type(t) == "table" then
-            if #t >= i then
-                res = t[i]
-            elseif #t >= 1 then
-                res = t[1]
-            else
-                return nil
-            end
-        else
-            res = t
-        end
-        if res == "" then
-            return nil
-        end
-        return res
-    end
---#endregion
 
 --#region Anchors
     mod.anchors = {
@@ -171,10 +211,12 @@ local _item_minion = "content/items/weapons/minions"
             mod.anchors.ogryn_club_p2_m3 = mod.anchors.ogryn_club_p2_m1
         --#endregion
         --#region Guns
+            mod.anchors.stubrevolver_p1_m2 = mod.anchors.stubrevolver_p1_m1
             mod.anchors.shotgun_p1_m2 = mod.anchors.shotgun_p1_m1
             mod.anchors.shotgun_p1_m3 = mod.anchors.shotgun_p1_m1
             mod.anchors.bolter_p1_m2 = mod.anchors.bolter_p1_m1
             mod.anchors.bolter_p1_m3 = mod.anchors.bolter_p1_m1
+            mod.anchors.laspistol_p1_m3 = mod.anchors.laspistol_p1_m1
             mod.anchors.autogun_p1_m2 = mod.anchors.autogun_p1_m1
             mod.anchors.autogun_p1_m3 = mod.anchors.autogun_p1_m1
             mod.anchors.autogun_p2_m1 = mod.anchors.autogun_p1_m1
@@ -195,6 +237,7 @@ local _item_minion = "content/items/weapons/minions"
             mod.anchors.combataxe_p1_m3 = mod.anchors.combataxe_p1_m1
             mod.anchors.combataxe_p2_m2 = mod.anchors.combataxe_p2_m1
             mod.anchors.combataxe_p2_m3 = mod.anchors.combataxe_p2_m1
+            mod.anchors.combataxe_p3_m2 = mod.anchors.combataxe_p3_m1
             mod.anchors.powersword_p1_m2 = mod.anchors.powersword_p1_m1
             mod.anchors.combatsword_p1_m2 = mod.anchors.combatsword_p1_m1
             mod.anchors.combatsword_p1_m3 = mod.anchors.combatsword_p1_m1
@@ -276,6 +319,7 @@ local _item_minion = "content/items/weapons/minions"
             mod.attachment.bolter_p1_m3 = mod.attachment.bolter_p1_m1
             mod.attachment.stubrevolver_p1_m2 = mod.attachment.stubrevolver_p1_m1
             mod.attachment.stubrevolver_p1_m3 = mod.attachment.stubrevolver_p1_m1
+            mod.attachment.laspistol_p1_m3 = mod.attachment.laspistol_p1_m1
             mod.attachment.autogun_p1_m2 = mod.attachment.autogun_p1_m1
             mod.attachment.autogun_p1_m3 = mod.attachment.autogun_p1_m1
             mod.attachment.autogun_p2_m1 = mod.attachment.autogun_p1_m1
@@ -299,6 +343,7 @@ local _item_minion = "content/items/weapons/minions"
             mod.attachment.combataxe_p1_m3 = mod.attachment.combataxe_p1_m1
             mod.attachment.combataxe_p2_m2 = mod.attachment.combataxe_p2_m1
             mod.attachment.combataxe_p2_m3 = mod.attachment.combataxe_p2_m1
+            mod.attachment.combataxe_p3_m2 = mod.attachment.combataxe_p3_m1
             mod.attachment.powersword_p1_m2 = mod.attachment.powersword_p1_m1
             mod.attachment.combatsword_p1_m2 = mod.attachment.combatsword_p1_m1
             mod.attachment.combatsword_p1_m3 = mod.attachment.combatsword_p1_m1
@@ -330,6 +375,7 @@ local _item_minion = "content/items/weapons/minions"
         rail = "rails",
         emblem_left = "emblems_left",
         emblem_right = "emblems_right",
+        sight = "sights",
         sight_2 = "reflex_sights",
         help_sight = "help_sights",
         muzzle = "muzzles",
@@ -339,6 +385,35 @@ local _item_minion = "content/items/weapons/minions"
         decal_right = "decals_right",
         decal_left = "decals_left",
         hilt = "hilts",
+        shaft = "shafts",
+        head = "heads",
+        connector = "connectors",
+        lens = "lenses",
+        lens_2 = "lenses",
+    }
+    mod.shafts = {
+        "small_shaft_01",
+        "small_shaft_02",
+        "small_shaft_03",
+        "small_shaft_04",
+        "small_shaft_05",
+        "small_shaft_06",
+    }
+    mod.heads = {
+        "small_head_01",
+        "small_head_02",
+        "small_head_03",
+        "small_head_04",
+        "small_head_05",
+        "small_head_06",
+    }
+    mod.connectors = {
+        "small_connector_01",
+        "small_connector_02",
+        "small_connector_03",
+        "small_connector_04",
+        "small_connector_05",
+        "small_connector_06",
     }
     mod.hilts = {
         "power_sword_hilt_01",
@@ -412,7 +487,10 @@ local _item_minion = "content/items/weapons/minions"
         "reflex_sight_01",
         "reflex_sight_02",
         "reflex_sight_03",
-        -- "scope",
+        "scope_sight_default",
+        "scope_sight_01",
+        "scope_sight_02",
+        "scope_sight_03",
     }
     mod.sights = {
         "lasgun_rifle_elysian_sight_01",
@@ -424,6 +502,18 @@ local _item_minion = "content/items/weapons/minions"
         "lasgun_rifle_sight_01",
         "sight_01",
         "shotgun_double_barrel_sight_01",
+        "buggy_sight",
+        "scope_01",
+        "scope_02",
+        "scope_03",
+        "reflex_sight_01",
+        "reflex_sight_02",
+        "reflex_sight_03",
+    }
+    mod.scopes = {
+        "lasgun_rifle_krieg_muzzle_02",
+        "lasgun_rifle_krieg_muzzle_04",
+        "lasgun_rifle_krieg_muzzle_05",
     }
     mod.all_sights = table.combine(
         mod.reflex_sights,
@@ -439,6 +529,15 @@ local _item_minion = "content/items/weapons/minions"
         "muzzle_03",
         "muzzle_04",
         "muzzle_05",
+        "muzzle_06",
+        "muzzle_07",
+        "muzzle_08",
+        "muzzle_09",
+        "muzzle_10",
+        "muzzle_11",
+        "muzzle_12",
+        "muzzle_13",
+        "muzzle_14",
         "barrel_01",
         "barrel_02",
         "barrel_03",
@@ -483,6 +582,17 @@ local _item_minion = "content/items/weapons/minions"
         "emblem_left_11",
         "emblem_left_12",
     }
+    mod.lenses = {
+        "scope_lens_01",
+        "scope_lens_2_01",
+        "scope_lens_02",
+        "scope_lens_2_02",
+    }
+    mod.sniper_zoom_levels = {
+        lasgun_rifle_krieg_muzzle_02 = 15,
+        lasgun_rifle_krieg_muzzle_04 = 9,
+        lasgun_rifle_krieg_muzzle_05 = 20,
+    }
     mod.flashlights = {
         "flashlight_01",
         "flashlight_02",
@@ -501,6 +611,7 @@ local _item_minion = "content/items/weapons/minions"
         "bayonet_01",
         "bayonet_02",
         "bayonet_03",
+        "bayonet_04",
     }
     mod.stocks = {
         "autogun_rifle_stock_01",
@@ -526,6 +637,12 @@ local _item_minion = "content/items/weapons/minions"
         "shotgun_rifle_stock_02",
         "shotgun_rifle_stock_03",
         "shotgun_rifle_stock_04",
+        "shotgun_rifle_stock_07",
+        "shotgun_rifle_stock_08",
+        "shotgun_rifle_stock_09",
+        "shotgun_rifle_stock_10",
+        "shotgun_rifle_stock_11",
+        "shotgun_rifle_stock_12",
     }
     mod.attachment_units = {
         ["#ID[c54f4d16d170cfdb]"] = "flashlight_01",
@@ -550,6 +667,9 @@ local _item_minion = "content/items/weapons/minions"
         ["#ID[891692deb6c77ef1]"] = "stock_05",
         -- ["#ID[bc25db1df0670d2a]"] = "bulwark_shield_01",
     }
+    mod.attachment_slots_show_always = {
+        -- "speedloader",
+    }
     mod.attachment_slots = {
         "flashlight",
         "handle",
@@ -560,6 +680,7 @@ local _item_minion = "content/items/weapons/minions"
         "receiver",
         "magazine",
         "magazine2",
+        "speedloader",
         "bullet",
         "ammo",
         "ammo_used",
@@ -590,6 +711,16 @@ local _item_minion = "content/items/weapons/minions"
         "trinket_hook",
         "slot_trinket_1",
         "slot_trinket_2",
+        "bullet_01",
+        "bullet_02",
+        "bullet_03",
+        "bullet_04",
+        "bullet_05",
+        "casing_01",
+        "casing_02",
+        "casing_03",
+        "casing_04",
+        "casing_05",
     }
 --#endregion
 
@@ -660,6 +791,7 @@ local _item_minion = "content/items/weapons/minions"
             mod.attachment_models.bolter_p1_m3 = mod.attachment_models.bolter_p1_m1
             mod.attachment_models.stubrevolver_p1_m2 = mod.attachment_models.stubrevolver_p1_m1
             mod.attachment_models.stubrevolver_p1_m3 = mod.attachment_models.stubrevolver_p1_m1
+            mod.attachment_models.laspistol_p1_m3 = mod.attachment_models.laspistol_p1_m1
             mod.attachment_models.autogun_p1_m2 = mod.attachment_models.autogun_p1_m1
             mod.attachment_models.autogun_p1_m3 = mod.attachment_models.autogun_p1_m1
             mod.attachment_models.autogun_p2_m1 = mod.attachment_models.autogun_p1_m1
@@ -683,6 +815,7 @@ local _item_minion = "content/items/weapons/minions"
             mod.attachment_models.combataxe_p1_m3 = mod.attachment_models.combataxe_p1_m1
             mod.attachment_models.combataxe_p2_m2 = mod.attachment_models.combataxe_p1_m1
             mod.attachment_models.combataxe_p2_m3 = mod.attachment_models.combataxe_p1_m1
+            mod.attachment_models.combataxe_p3_m2 = mod.attachment_models.combataxe_p3_m1
             mod.attachment_models.powersword_p1_m2 = mod.attachment_models.powersword_p1_m1
             mod.attachment_models.combatsword_p1_m2 = mod.attachment_models.combatsword_p1_m1
             mod.attachment_models.combatsword_p1_m3 = mod.attachment_models.combatsword_p1_m1
@@ -693,6 +826,33 @@ local _item_minion = "content/items/weapons/minions"
             mod.attachment_models.forcesword_p1_m3 = mod.attachment_models.forcesword_p1_m1
             mod.attachment_models.combatsword_p3_m2 = mod.attachment_models.combatsword_p3_m1
             mod.attachment_models.combatsword_p3_m3 = mod.attachment_models.combatsword_p3_m1
+        --#endregion
+    --#endregion
+--#endregion
+
+mod.default_attachment_models = {}
+for weapon_name, weapon_data in pairs(mod.attachment_models) do
+    mod.default_attachment_models[weapon_name] = {}
+    for attachment_name, attachment_data in pairs(weapon_data) do
+        if attachment_data.index then
+            mod.default_attachment_models[weapon_name][attachment_data.index] = attachment_name
+        end
+    end
+end
+
+--#region Sounds
+    mod.attachment_sounds = {
+        --#region Ogryn Guns
+            ogryn_heavystubber_p1_m1 = _ogryn_heavystubber_p1_m1.sounds,
+            ogryn_rippergun_p1_m1 = _ogryn_rippergun_p1_m1.sounds,
+        --#endregion
+    }
+    --#region Copies
+        --#region Ogryn Guns
+            mod.attachment_sounds.ogryn_heavystubber_p1_m2 = mod.attachment_sounds.ogryn_heavystubber_p1_m1
+            mod.attachment_sounds.ogryn_heavystubber_p1_m3 = mod.attachment_sounds.ogryn_heavystubber_p1_m1
+            mod.attachment_sounds.ogryn_rippergun_p1_m2 = mod.attachment_sounds.ogryn_rippergun_p1_m1
+            mod.attachment_sounds.ogryn_rippergun_p1_m3 = mod.attachment_sounds.ogryn_rippergun_p1_m1
         --#endregion
     --#endregion
 --#endregion

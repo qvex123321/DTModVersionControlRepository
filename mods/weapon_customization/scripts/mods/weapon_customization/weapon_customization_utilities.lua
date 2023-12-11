@@ -34,42 +34,6 @@ local _item_melee = _item.."/melee"
 -- ##### ├┤ │ │││││   │ ││ ││││└─┐ ####################################################################################
 -- ##### └  └─┘┘└┘└─┘ ┴ ┴└─┘┘└┘└─┘ ####################################################################################
 
-mod.find_attachment_entry_in_mod = function(self, name)
-	for weapon_name, weapon_data in pairs(self.attachment_models) do
-		for attachment_name, attachment_data in pairs(weapon_data) do
-			if attachment_data.model == name then
-				return true
-			end
-		end
-	end
-end
-
-mod.attachment_entry_is_weapon = function(self, name)
-	for weapon_name, weapon_data in pairs(self.attachment_models) do
-		if string_find(name, weapon_name) then
-			return true
-		end
-	end
-end
-
-mod.find_attachment_entries = function(self)
-	self:setup_item_definitions()
-	local ranged_definitions = {}
-	local melee_definitions = {}
-	local item_definitions = self:persistent_table(REFERENCE).item_definitions
-	for name, data in pairs(item_definitions) do
-		if not self:find_attachment_entry_in_mod(name) and not self:attachment_entry_is_weapon(name) then
-			if string_find(name, _item_ranged) then
-				ranged_definitions[name] = data
-			elseif string_find(name, _item_melee) then
-				melee_definitions[name] = data
-			end
-		end
-	end
-	self:dtf(ranged_definitions, "ranged_definitions", 15)
-	self:dtf(melee_definitions, "melee_definitions", 15)
-end
-
 mod.release_non_essential_packages = function(self)
 	-- Release all non-essential packages
 	local unloaded_packages = {}
@@ -91,12 +55,14 @@ mod.load_needed_packages = function(self)
         "content/weapons/player/ranged/bolt_gun/attachments/sight_01/sight_01",
 		"content/fx/particles/enemies/sniper_laser_sight",
 		"content/fx/particles/enemies/red_glowing_eyes",
-		"content/characters/player/human/third_person/animations/lasgun_pistol",
-		"content/characters/player/human/first_person/animations/lasgun_pistol",
-		"content/characters/player/human/third_person/animations/stubgun_pistol",
-		"content/characters/player/human/first_person/animations/stubgun_pistol",
-		"content/characters/player/human/third_person/animations/autogun_pistol",
-		"content/characters/player/human/first_person/animations/autogun_pistol",
+		-- "content/characters/player/human/third_person/animations/lasgun_pistol",
+		-- "content/characters/player/human/first_person/animations/lasgun_pistol",
+		-- "content/characters/player/human/third_person/animations/stubgun_pistol",
+		-- "content/characters/player/human/first_person/animations/stubgun_pistol",
+		-- "content/characters/player/human/third_person/animations/autogun_pistol",
+		-- "content/characters/player/human/first_person/animations/autogun_pistol",
+		"content/fx/particles/screenspace/screen_ogryn_dash",
+		"wwise/events/weapon/play_lasgun_p3_mag_button",
     }
     for _, package_name in pairs(_needed_packages) do
 		if not self:persistent_table(REFERENCE).loaded_packages.needed[package_name] then
@@ -113,9 +79,11 @@ end
 
 -- Get currently wielded weapon
 mod.get_wielded_weapon = function(self)
-	local inventory_component = self.weapon_extension._inventory_component
-	local weapons = self.weapon_extension._weapons
-	return self.weapon_extension:_wielded_weapon(inventory_component, weapons)
+	if self.initialized then
+		local inventory_component = self.weapon_extension._inventory_component
+		local weapons = self.weapon_extension._weapons
+		return self.weapon_extension:_wielded_weapon(inventory_component, weapons)
+	end
 end
 
 -- Get wielded slot
@@ -147,8 +115,8 @@ mod.get_weapon_from_gear_id = function(self, from_gear_id)
 end
 
 -- Check cached third person
-mod.is_in_third_person = function(self)
-	local is_third_person = self:_is_in_third_person()
+mod.is_in_third_person = function(self, player_unit)
+	local is_third_person = self:_is_in_third_person(player_unit)
 	local changed = false
 	if self.was_third_person == nil then self.was_third_person = is_third_person end
 	if self.was_third_person ~= is_third_person then
@@ -158,7 +126,8 @@ mod.is_in_third_person = function(self)
 end
 
 -- Check third person
-mod._is_in_third_person = function(self)
+mod._is_in_third_person = function(self, player_unit)
+	local player_unit = player_unit or self.player_unit
 	local first_person_extension = script_unit.extension(self.player_unit, "first_person_system")
 	local first_person = first_person_extension and first_person_extension:is_in_first_person_mode()
 	return not first_person
@@ -167,7 +136,7 @@ end
 -- Check cached character state
 mod.character_state_changed = function(self)
 	local changed = false
-	local character_state = self:_character_state()
+	local character_state = self:character_state()
 	if character_state ~= self.last_character_state then
 		changed = true
 	end
@@ -175,8 +144,30 @@ mod.character_state_changed = function(self)
 end
 
 -- Check character state
-mod._character_state = function(self)
+mod.character_state = function(self)
 	return self.character_state_machine_extension:current_state()
+end
+
+mod.player_from_viewport = function(self, viewport_name)
+    local players = managers.player:players()
+    for _, player in pairs(players) do
+        if player.viewport_name == viewport_name then
+            return player
+        end
+    end
+end
+
+-- Get player from player_unit
+mod.player_from_unit = function(self, unit)
+    if unit then
+        local player_manager = managers.player
+        for _, player in pairs(player_manager:players()) do
+            if player.player_unit == unit then
+                return player
+            end
+        end
+    end
+    return managers.player:local_player_safe(1)
 end
 
 mod.world = function(self)
@@ -192,6 +183,68 @@ mod.wwise_world = function(self, world)
 	return wwise_wwise_world(world)
 end
 
+mod.get_view = function(self, view_name)
+    return managers.ui:view_active(view_name) and managers.ui:view_instance(view_name) or nil
+end
+
 mod.get_cosmetic_view = function(self)
-    return managers.ui:view_active(COSMETIC_VIEW) and managers.ui:view_instance(COSMETIC_VIEW) or nil
+	return self:get_view(COSMETIC_VIEW)
+    -- return managers.ui:view_active(COSMETIC_VIEW) and managers.ui:view_instance(COSMETIC_VIEW) or nil
+end
+
+mod.is_light_mutator = function(self)
+	local FLASHLIGHT_AGGRO_MUTATORS = {
+		"mutator_darkness_los",
+		"mutator_ventilation_purge_los"
+	}
+	local mutator_manager = managers.state.mutator
+	for i = 1, #FLASHLIGHT_AGGRO_MUTATORS do
+		if mutator_manager:mutator(FLASHLIGHT_AGGRO_MUTATORS[i]) then
+			return true
+		end
+	end
+end
+
+mod.is_in_hub = function()
+	local state_manager = managers.state
+	local game_mode = state_manager and state_manager.game_mode
+	local game_mode_name = game_mode and game_mode:game_mode_name()
+	return game_mode_name == "hub" or mod:is_in_prologue_hub()
+end
+
+mod.is_in_prologue_hub = function()
+	local state_manager = managers.state
+	local game_mode = state_manager and state_manager.game_mode
+	local game_mode_name = game_mode and game_mode:game_mode_name()
+	return game_mode_name == "prologue_hub"
+end
+
+mod.main_time = function()
+	return managers.time:time("main")
+end
+
+mod.game_time = function()
+	return managers.time:time("gameplay")
+end
+
+mod.recreate_hud = function(self)
+	local ui_manager = managers.ui
+	if ui_manager then
+		local hud = ui_manager._hud
+		if hud then
+			local player = managers.player:local_player(1)
+			local peer_id = player:peer_id()
+			local local_player_id = player:local_player_id()
+			local elements = hud._element_definitions
+			local visibility_groups = hud._visibility_groups
+			hud:destroy()
+			ui_manager:create_player_hud(peer_id, local_player_id, elements, visibility_groups)
+		end
+	end
+end
+
+mod.has_flashlight = function(self, item)
+	local gear_id = self:get_gear_id(item)
+	local flashlight = gear_id and self:get_gear_setting(gear_id, "flashlight")
+	return flashlight and flashlight ~= "laser_pointer"
 end

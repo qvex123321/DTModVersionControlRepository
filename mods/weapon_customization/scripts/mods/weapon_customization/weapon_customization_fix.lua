@@ -21,6 +21,7 @@ local UISettings = mod:original_require("scripts/settings/ui/ui_settings")
     local table_remove = table.remove
     local table_clone = table.clone
     local table_enum = table.enum
+    local table_find = table.find
     local math_uuid = math.uuid
     local Unit = Unit
     local unit_has_node = Unit.has_node
@@ -160,19 +161,19 @@ mod:hook(CLASS.InventoryWeaponsView, "_equip_item", function(func, self, slot_na
         -- Update used packages
         mod:update_modded_packages()
     end
-    -- Laser pointer
-    local ITEM_TYPES = UISettings.ITEM_TYPES
-	local item_type = item.item_type
-    if item_type == ITEM_TYPES.WEAPON_RANGED then
-        mod:reset_laser_pointer()
-    end
+    -- -- Laser pointer
+    -- local ITEM_TYPES = UISettings.ITEM_TYPES
+	-- local item_type = item.item_type
+    -- if item_type == ITEM_TYPES.WEAPON_RANGED then
+    --     mod:reset_laser_pointer()
+    -- end
 end)
 
 mod:hook(CLASS.PackageManager, "release", function(func, self, id, ...)
 	local load_call_item = self._load_call_data[id]
 	local package_name = load_call_item.package_name
     -- -- Get modded packages
-    mod:get_modded_packages()
+    mod:update_modded_packages()
     -- Check if package is used
     local package_used = false
     for _, USED_PACKAGES in pairs(mod:persistent_table(REFERENCE).used_packages) do
@@ -186,6 +187,8 @@ mod:hook(CLASS.PackageManager, "release", function(func, self, id, ...)
     end
     -- Temp trinket fix
     if string_find(package_name, "trinkets") then package_used = true end
+    -- Tempt random fix
+    if mod.keep_all_packages then package_used = true end
     -- Unload if possible
     if not package_used or self._shutdown_has_started then
         func(self, id, ...)
@@ -204,6 +207,15 @@ mod:hook(CLASS.UIUnitSpawner, "_world_delete_units", function(func, self, world,
 		local unit_is_alive = unit_alive(unit)
         if unit_is_alive then
             world_unlink_unit(world, unit)
+            -- unit_flow_event(unit, "unit_despawned")
+            -- world_destroy_unit(world, unit)
+        end
+	end
+    for i = 1, num_units do
+		local unit = units_list[i]
+		local unit_is_alive = unit_alive(unit)
+        if unit_is_alive then
+            -- world_unlink_unit(world, unit)
             unit_flow_event(unit, "unit_despawned")
             world_destroy_unit(world, unit)
         end
@@ -493,10 +505,10 @@ mod:hook_require("scripts/backend/master_items", function(instance)
             __gear = {
                 masterDataInstance = {
                     id = data.id,
-                    overrides = data.overrides
+                    overrides = data.overrides,
                 }
             },
-            __gear_id = data.gear_id or data.gearId
+            __gear_id = data.gear_id or data.gearId,
         }
     
         setmetatable(item_instance, {
@@ -538,6 +550,7 @@ mod:hook_require("scripts/backend/master_items", function(instance)
                 return field_value
             end,
             __newindex = function (t, field_name, value)
+                rawset(t, field_name, value)
                 -- ferror("Not allowed to modify inventory items - %s[%s]", rawget(item_instance, "__gear_id"), field_name)
             end,
             __tostring = function (t)
@@ -568,7 +581,26 @@ mod:hook_require("scripts/backend/master_items", function(instance)
         end
     end
 
-    instance.get_store_item_instance = function (description)
-        return _store_item_plus_overrides(description)
+    instance.get_store_item_instance = function(description)
+        local instance = _store_item_plus_overrides(description)
+        instance.__master_item.store_item = true
+        local definition = mod:persistent_table(REFERENCE).item_definitions[instance.__master_item.name]
+        if definition and definition.feature_flags and table_find(definition.feature_flags, "FEATURE_premium_store") then
+            instance.__master_item.premium_store_item = true
+        end
+        return instance
     end
+
+    if not instance._get_cached then instance._get_cached = instance.get_cached end
+    instance.get_cached = function ()
+        local master_items = instance._get_cached()
+        if not mod:persistent_table(REFERENCE).item_definitions and master_items then
+            mod:setup_item_definitions(master_items)
+        end
+        if mod:persistent_table(REFERENCE).item_definitions then
+            return mod:persistent_table(REFERENCE).item_definitions
+        end
+        return master_items
+    end
+
 end)
