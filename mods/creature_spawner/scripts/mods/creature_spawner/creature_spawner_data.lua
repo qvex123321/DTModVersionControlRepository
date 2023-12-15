@@ -140,7 +140,7 @@ mod.unit_categories = {
   },
   renegade_sniper = {
     "regular",
-    "elite"
+    "specialist"
   },
 }
 
@@ -201,6 +201,22 @@ mod_data.options = {
       ["default_value"] = true -- Default first option is enabled. In this case true
     },
     
+    { -- Keybind for toggling player invisibility
+      ["setting_id"] = "cs_enable_training_grounds_invisibility_keybind",
+      ["type"] = "keybind",
+      ["keybind_trigger"] = "pressed",
+      ["keybind_type"] = "function_call",
+      ["default_value"] = {},
+      ["function_name"] = "toggle_invisibility"
+    },
+    { -- Keybind for toggling player invulnerability
+      ["setting_id"] = "cs_enable_training_grounds_invulnerability_keybind",
+      ["type"] = "keybind",
+      ["keybind_trigger"] = "pressed",
+      ["keybind_type"] = "function_call",
+      ["default_value"] = {},
+      ["function_name"] = "toggle_invulnerability"
+    },
     { -- Keybind for spawning units
       ["setting_id"] = "cs_spawn_keybind",
       ["type"] = "keybind",
@@ -282,6 +298,14 @@ mod_data.options = {
       ["keybind_type"] = "function_call",
       ["default_value"] = {},
       ["function_name"] = "assist_player"
+    },
+    { -- Keybind to reset combat ability cooldown
+      ["setting_id"] = "cs_reset_combat_ability_cooldown_keybind",
+      ["type"] = "keybind",
+      ["keybind_trigger"] = "pressed",
+      ["keybind_type"] = "function_call",
+      ["default_value"] = {},
+      ["function_name"] = "reset_combat_ability_cooldown"
     },
   }
 }

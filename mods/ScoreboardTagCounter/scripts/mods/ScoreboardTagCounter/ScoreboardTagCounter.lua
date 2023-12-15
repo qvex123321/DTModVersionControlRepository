@@ -66,7 +66,7 @@ mod.scoreboard_rows = {
 	{
 		name = stat_name,
 		text = "enemies_tagged",
-		validation = "DESC",
+		validation = "ASC",
 		iteration = "ADD",
 		group = "team",
 		setting = "option_enemies_tagged",
