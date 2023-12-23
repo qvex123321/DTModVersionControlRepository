@@ -425,6 +425,14 @@ local locr = {
 		en = "Scoreboard: weapons",
 		["zh-cn"] = "计分板：武器",
 	},
+	endview_scoreboard_weapons_perk = {
+		en = "Scoreboard: weapon perks",
+		["zh-cn"] = "计分板：武器专长",
+	},
+	endview_scoreboard_weapons_blessing = {
+		en = "Scoreboard: weapon blessings",
+		["zh-cn"] = "计分板：武器祝福",
+	},
 	endview_scoreboard_feat = {
 		en = "Scoreboard: feats",
 		["zh-cn"] = "计分板：天赋",
@@ -453,10 +461,55 @@ local locr = {
 		en = " ",
 		["zh-cn"] = " ",
 	},
+	row_scoreboard_perk = {
+		en = "Perks",
+		["zh-cn"] = "专长",
+	},
+	row_scoreboard_blessing = {
+		en = "Blessings",
+		["zh-cn"] = "祝福",
+	},
 	endview_scoreboard_length = {
 		en = "Scoreboard: Row length",
 		["zh-cn"] = "计分板：单行长度",
 	},
+	player_Feats_symbol_Ability = {
+		en = "A",
+		["zh-cn"] = "技",
+	},
+	player_Feats_symbol_Blitz = {
+		en = "B",
+		["zh-cn"] = "闪",
+	},
+	player_Feats_symbol_Aura = {
+		en = "Ar",
+		["zh-cn"] = "环",
+	},
+	player_Feats_symbol_Keystone = {
+		en = "K",
+		["zh-cn"] = "基",
+	},
+	setting_Feats_order_Ability = {
+		en = "Ability",
+		["zh-cn"] = "技能",
+	},
+	setting_Feats_order_Blitz = {
+		en = "Blitz",
+		["zh-cn"] = "闪击",
+	},
+	setting_Feats_order_Aura = {
+		en = "Aura",
+		["zh-cn"] = "光环",
+	},
+	setting_Feats_order_Keystone = {
+		en = "Keystone",
+		["zh-cn"] = "基石",
+	},
 }
-
+for i = 1,4 do
+	locr[string.format("player_Feats_order_%s",i)] = {
+		en = "Slot: "..tostring(i),
+		["zh-cn"] = "槽位："..tostring(i),
+	}
+end
 return locr

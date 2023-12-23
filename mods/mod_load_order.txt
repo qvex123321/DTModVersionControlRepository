@@ -27,7 +27,6 @@ BetterMelk
 buy_until_rating
 true_level
 SoloPlay
-DarkCache
 contracts_overlay
 PlayerOutlines
 ScoreboardDamage

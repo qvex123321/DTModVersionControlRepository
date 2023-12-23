@@ -11,7 +11,14 @@ local function get_local_player()
 	return Managers.player:local_player(1)
 end
 local scoreboard = get_mod("scoreboard")
-
+local default_feats_order = {"Ability","Blitz","Aura","Keystone"}
+local feats_symbol = {
+	Ability = "("..mod:localize("player_Feats_symbol_Ability")..")",
+	Blitz = "("..mod:localize("player_Feats_symbol_Blitz")..")",
+	Aura = "("..mod:localize("player_Feats_symbol_Aura")..")",
+	Keystone = "("..mod:localize("player_Feats_symbol_Keystone")..")",
+}
+local weapon_slot = {Melee = "slot_primary", Range = "slot_secondary"}
 mod.teamatesloadout = {}
 mod.left_panel_lift = 0 - mod:get("left_panel_lift")
 mod.text_color = {255,239,238,238}
@@ -19,6 +26,8 @@ mod.text_color = {255,239,238,238}
 mod.init = function(self)
 	mod.display = {
 		player_Feats = mod:get("display_player_feats"),
+		player_Feats_order = {},
+		player_Feats_default_order = true,
 		notable_talents = mod:get("display_notable_talents"),
 		player_name = mod:get("display_player_name"),
 		main_class = mod:get("display_main_class"),
@@ -59,6 +68,10 @@ mod.init = function(self)
 	mod.endview_scoreboard_length = mod:get("endview_scoreboard_length")
 	mod.notable_talents_intensity = mod:get("notable_talents_intensity")
 	mod.teamatesloadout = {}
+	for i =1,#default_feats_order do
+		mod.display.player_Feats_order[i] = mod:get(string.format("player_Feats_order_%s",i))
+		mod.display.player_Feats_default_order = mod.display.player_Feats_order[i] == default_feats_order[i] and mod.display.player_Feats_default_order ~= false
+	end
 end
 
 local function player_career(profile)
@@ -74,41 +87,50 @@ end
 local function player_feats(profile)
 	local talents_index = {
 		veteran = {
-			{"veteran_combat_ability_elite_and_special_outlines","veteran_combat_ability_stagger_nearby_enemies","veteran_invisibility_on_combat_ability"},
-			{"veteran_grenade_apply_bleed","veteran_krak_grenade","veteran_smoke_grenade"},
-			{"veteran_aura_gain_ammo_on_elite_kill_improved","veteran_increased_damage_coherency","veteran_movement_speed_coherency"},
-			{"veteran_snipers_focus","veteran_improved_tag","veteran_weapon_switch_passive"},
+			Ability = {"veteran_combat_ability_elite_and_special_outlines","veteran_combat_ability_stagger_nearby_enemies","veteran_invisibility_on_combat_ability"},
+			Blitz = {"veteran_grenade_apply_bleed","veteran_krak_grenade","veteran_smoke_grenade"},
+			Aura = {"veteran_aura_gain_ammo_on_elite_kill_improved","veteran_increased_damage_coherency","veteran_movement_speed_coherency"},
+			Keystone = {"veteran_snipers_focus","veteran_improved_tag","veteran_weapon_switch_passive"},
 		},
 		zealot = {
-			{"zealot_attack_speed_post_ability","zealot_bolstering_prayer","zealot_stealth"},
-			{"zealot_improved_stun_grenade","zealot_flame_grenade","zealot_throwing_knives"},
-			{"zealot_toughness_damage_reduction_coherency_improved","zealot_corruption_healing_coherency_improved","zealot_always_in_coherency"},
-			{"zealot_fanatic_rage","zealot_martyrdom","zealot_quickness_passive"},
+			Ability = {"zealot_attack_speed_post_ability","zealot_bolstering_prayer","zealot_stealth"},
+			Blitz = {"zealot_improved_stun_grenade","zealot_flame_grenade","zealot_throwing_knives"},
+			Aura = {"zealot_toughness_damage_reduction_coherency_improved","zealot_corruption_healing_coherency_improved","zealot_always_in_coherency"},
+			Keystone = {"zealot_fanatic_rage","zealot_martyrdom","zealot_quickness_passive"},
 		},
 		psyker = {
-			{"psyker_shout_vent_warp_charge","psyker_combat_ability_force_field","psyker_combat_ability_stance"},
-			{"psyker_brain_burst_improved","psyker_grenade_chain_lightning","psyker_grenade_throwing_knives"},
-			{"psyker_aura_damage_vs_elites","psyker_cooldown_aura_improved","psyker_aura_crit_chance_aura"},
-			{"psyker_passive_souls_from_elite_kills","psyker_empowered_ability","psyker_new_mark_passive"},
+			Ability = {"psyker_shout_vent_warp_charge","psyker_combat_ability_force_field","psyker_combat_ability_stance"},
+			Blitz = {"psyker_brain_burst_improved","psyker_grenade_chain_lightning","psyker_grenade_throwing_knives"},
+			Aura = {"psyker_aura_damage_vs_elites","psyker_cooldown_aura_improved","psyker_aura_crit_chance_aura"},
+			Keystone = {"psyker_passive_souls_from_elite_kills","psyker_empowered_ability","psyker_new_mark_passive"},
 		},
 		ogryn = {
-			{"ogryn_longer_charge","ogryn_taunt_shout","ogryn_special_ammo"},
-			{"ogryn_grenade_friend_rock","ogryn_box_explodes","ogryn_grenade_frag"},
-			{"ogryn_melee_damage_coherency_improved","ogryn_toughness_regen_aura","ogryn_damage_vs_suppressed_coherency"},
-			{"ogryn_passive_heavy_hitter","ogryn_carapace_armor","ogryn_leadbelcher_no_ammo_chance"},
+			Ability = {"ogryn_longer_charge","ogryn_taunt_shout","ogryn_special_ammo"},
+			Blitz = {"ogryn_grenade_friend_rock","ogryn_box_explodes","ogryn_grenade_frag"},
+			Aura = {"ogryn_melee_damage_coherency_improved","ogryn_toughness_regen_aura","ogryn_damage_vs_suppressed_coherency"},
+			Keystone = {"ogryn_passive_heavy_hitter","ogryn_carapace_armor","ogryn_leadbelcher_no_ammo_chance"},
 		},
 	}
 	local archetype = profile.archetype.name
 	local talents = profile.talents
 	
     if mod.display.player_Feats then
-		local feats = {"X","X","X","X"}
+		local slots = 0
+		local feats = {}
 		if talents_index[archetype] then
-			for i = 1,4 do
-				local current = talents_index[archetype][i]
-				for o = 1,3 do
-					if talents[current[o]] then
-						feats[i] = o
+			for i = 1,#default_feats_order do
+				if mod.display.player_Feats_order[i] ~= "Disable" then
+					slots = slots + 1
+					local current = talents_index[archetype][mod.display.player_Feats_order[i]]
+					for o = 1,#current do
+						if talents[current[o]] then
+							feats[slots] = tostring(o)
+							break
+						end
+					end
+					feats[slots] = feats[slots] or "X"
+					if not mod.display.player_Feats_default_order then
+						feats[slots] = feats[slots]..feats_symbol[mod.display.player_Feats_order[i]]
 					end
 				end
 			end
@@ -216,7 +238,8 @@ local function notable_talents(profile,style)
 	end
 end
 
-local function perk_blessing(item,trait_type)
+local function perk_blessing(profile,weapon_type,trait_type)
+	local item = profile.loadout[weapon_slot[weapon_type]]
 	local traits = item[trait_type]
 	local subjects = {" "," "," "," ",}
 	if traits then
@@ -238,22 +261,17 @@ local function perk_blessing(item,trait_type)
 	return subjects
 end
 
-
 local function weapon_display_name(profile,slot)
 	local loadout = profile.loadout
-	local slots = { Melee = "slot_primary",Range = "slot_secondary", }
-	local kind = slots[slot]
-	local weapon = loadout[kind]
+	local weapon = loadout[weapon_slot[slot]]
 	local name = " "
-	if not slot or not slots[slot] then
+	if not slot or not weapon_slot[slot] then
 		return name
 	else		
 		name = ItemUtils.display_name(weapon) or " "
 	end
 	return string.trim(name)
 end
-
-
 
 local trait_offsets = {
 	bless = {280,},
@@ -270,15 +288,15 @@ mod.get_playerloadout_intel = function(profile,widget)
 	local weapons = {
 		Melee = {
 			name = weapon_display_name(profile,"Melee"),
-			bless = perk_blessing(Melee,"traits"),
-			perk = perk_blessing(Melee,"perks"),
+			bless = perk_blessing(profile,"Melee","traits"),
+			perk = perk_blessing(profile,"Melee","perks"),
 			name_offset = 29.5,
 			--template = Melee.weapon_template,
 		},
 		Range = {
 			name = weapon_display_name(profile,"Range"),
-			bless = perk_blessing(Range,"traits"),
-			perk = perk_blessing(Range,"perks"),
+			bless = perk_blessing(profile,"Range","traits"),
+			perk = perk_blessing(profile,"Range","perks"),
 			name_offset = 59.5
 			--template = Range.weapon_template,
 		},
@@ -880,15 +898,7 @@ mod:command("lom",mod:localize("echo_team_loadout_brief"),function(...)
 		end
 	end
 end)
-local function get_charas(str)
-	local count = 0
-	if str then
-		for chara in string.gmatch(str,"[%.%w ]") do
-			count = count + 1
-		end
-	end
-	return count
-end
+
 
 -- Define rows
 mod.scoreboard_rows = {
@@ -906,6 +916,27 @@ mod.scoreboard_rows = {
 		is_text = true,
 		validation = "ASC",
 	},
+	{name = "row_scoreboard_weapon_Melee_perk",
+		text = "row_scoreboard_perk",
+		group = "offense",
+		setting = "Loadout_weapons_perk",
+		is_text = true,
+		validation = "ASC",
+	},
+	{name = "row_scoreboard_weapon_Melee_blessing_1",
+		text = "row_scoreboard_blessing",
+		group = "offense",
+		setting = "Loadout_weapons_blessing",
+		is_text = true,
+		validation = "ASC",
+	},
+	{name = "row_scoreboard_weapon_Melee_blessing_2",
+		text = "row_scoreboard_blank",
+		group = "offense",
+		setting = "Loadout_weapons_blessing",
+		is_text = true,
+		validation = "ASC",
+	},
 	{name = "row_scoreboard_weapon_Range_1",
 		text = "row_scoreboard_weapon_range",
 		group = "offense",
@@ -917,6 +948,27 @@ mod.scoreboard_rows = {
 		text = "row_scoreboard_blank",
 		group = "offense",
 		setting = "Loadout_weapons",
+		is_text = true,
+		validation = "ASC",
+	},
+	{name = "row_scoreboard_weapon_Range_perk",
+		text = "row_scoreboard_perk",
+		group = "offense",
+		setting = "Loadout_weapons_perk",
+		is_text = true,
+		validation = "ASC",
+	},
+	{name = "row_scoreboard_weapon_Range_blessing_1",
+		text = "row_scoreboard_blessing",
+		group = "offense",
+		setting = "Loadout_weapons_blessing",
+		is_text = true,
+		validation = "ASC",
+	},
+	{name = "row_scoreboard_weapon_Range_blessing_2",
+		text = "row_scoreboard_blank",
+		group = "offense",
+		setting = "Loadout_weapons_blessing",
 		is_text = true,
 		validation = "ASC",
 	},
@@ -936,21 +988,32 @@ mod.scoreboard_rows = {
 		validation = "ASC",
 	},
 }
-mod.remainder = {
-	["zh-cn"] = 3,
-	ja = 3,
-}
+
 mod.scoreboard_weaponname = function(profile,weapon_type)
 	local disname = weapon_display_name(profile,weapon_type)
 	local length = string.len(disname)
 	local line = {" "," "}
+	local all_remainders = {
+			["zh-cn"] = 3,
+			ja = 3,
+		}
+	local function get_charas(str)
+		local count = 0
+		if str then
+			for chara in string.gmatch(str,"[%.%w ]") do
+				count = count + 1
+			end
+		end
+		return count
+	end
+	
 	if length >= (mod.endview_scoreboard_length or 30) then
 		length = math.floor(length / 2)
-		if mod.remainder[lid] then
+		if all_remainders[lid] then
 			local charas = get_charas(string.sub(disname,1,length))
-			local remainder = (length - charas) % mod.remainder[lid]
+			local remainder = (length - charas) % all_remainders[lid]
 			if remainder > 0 then
-				length = length + mod.remainder[lid] - remainder
+				length = length + all_remainders[lid] - remainder
 			end
 		end
 		line[1] = string.sub(disname,1,length)
@@ -960,35 +1023,60 @@ mod.scoreboard_weaponname = function(profile,weapon_type)
 	end
 	return line
 end
-mod:hook_safe(CLASS.EndView, "on_enter", function(...)
-	if scoreboard then
-		local players = Managers.player and Managers.player:players()
-		if players then
-			mod:set("Loadout_weapons",mod:get("endview_scoreboard_weapons"))
-			mod:set("Loadout_feat",mod:get("endview_scoreboard_feat"))
-			mod:set("Loadout_scoreboard_blank",mod:get("endview_scoreboard_blank"))
-			for k,player in pairs(players) do
-				local profile = player._profile
-				local account_id = player:account_id() or player:name()
-				local human = player:is_human_controlled()
-				for k,weapon_type in pairs({"Melee","Range"}) do
-					local line = {" "," "}
-					if human then
-						line = mod.scoreboard_weaponname(profile,weapon_type)
+
+mod.update_scoreboard = function(t)
+	if t == "on" then
+		if scoreboard then
+			local players = Managers.player and Managers.player:players()
+			if players then
+				local update_weapon = mod:get("endview_scoreboard_weapons")
+				mod:set("Loadout_weapons",update_weapon)
+				mod:set("Loadout_weapons_perk",update_weapon and mod:get("endview_scoreboard_weapons_perk"))
+				mod:set("Loadout_weapons_blessing",update_weapon and mod:get("endview_scoreboard_weapons_blessing"))
+				mod:set("Loadout_feat",mod:get("endview_scoreboard_feat"))
+				mod:set("Loadout_scoreboard_blank",mod:get("endview_scoreboard_blank"))
+				for k,player in pairs(players) do
+					local profile = player._profile
+					local account_id = player:account_id() or player:name()
+					local human = player:is_human_controlled()
+					for k,weapon_type in pairs({"Melee","Range"}) do
+						local line = {"",""}
+						local traits_text = {perk = {"",""},blessing = {"",""}}
+						if human then
+							local traits = {perk = perk_blessing(profile,weapon_type,"perks"),blessing = perk_blessing(profile,weapon_type,"traits")}
+							line = mod.scoreboard_weaponname(profile,weapon_type)
+							for i = 1,2 do
+								for k,v in pairs(traits) do
+									if v[i] ~= " " then
+										traits_text[k][i] = string.format("%s(%s)",v[i],v[i + 2])
+									end
+								end
+							end
+							traits_text.perk = traits_text.perk[1]..(traits_text.perk[2] ~= "" and " "..traits_text.perk[2] or "")
+						end
+						scoreboard:update_stat("row_scoreboard_weapon_"..weapon_type.."_perk",account_id,traits_text.perk)
+						for i =1,2 do
+							scoreboard:update_stat(string.format("row_scoreboard_weapon_%s_%s",weapon_type,i), account_id, line[i])
+							scoreboard:update_stat(string.format("row_scoreboard_weapon_%s_blessing_%s",weapon_type,i), account_id, traits_text.blessing[i])
+						end
 					end
-					for i =1,2 do
-						scoreboard:update_stat(string.format("row_scoreboard_weapon_%s_%s",weapon_type,i), account_id, line[i])
-					end
+					local feats = human and player_feats(profile) or " "
+					scoreboard:update_stat("row_scoreboard_player_feat", account_id, feats)
+					scoreboard:update_stat("row_scoreboard_blank_1", account_id, " ")
 				end
-				local feats = human and player_feats(profile) or " "
-				scoreboard:update_stat("row_scoreboard_player_feat", account_id, feats)
-				scoreboard:update_stat("row_scoreboard_blank_1", account_id, " ")
 			end
 		end
+	elseif t == "off" then
+		mod:set("Loadout_weapons",false)
+		mod:set("Loadout_weapons_perk",false)
+		mod:set("Loadout_weapons_blessing",false)
+		mod:set("Loadout_feat",false)
+		mod:set("Loadout_scoreboard_blank",false)
 	end
+end
+mod:hook_safe(CLASS.EndView, "on_enter", function(...)
+	mod.update_scoreboard("on")
 end)
 mod:hook_safe(CLASS.EndView, "on_exit", function(...)
-	mod:set("Loadout_weapons",false)
-	mod:set("Loadout_feat",false)
-	mod:set("Loadout_scoreboard_blank",false)
+	mod.update_scoreboard("off")
 end)
