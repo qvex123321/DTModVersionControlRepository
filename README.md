@@ -11,7 +11,7 @@
 1. 下載此repository(使用git pull或是下載為zip檔)並覆蓋原先的mods資料夾
 2. 回到遊戲根目錄執行"toggle_darktide_mods.bat"
 
-## 如何更新 How to uninstall
+## 如何解除安裝 How to uninstall
 1. 到遊戲根目錄執行"toggle_darktide_mods.bat"
 2. 待該執行檔跳出"Game has been succuessfully unpatched"表示解除安裝完成
 
