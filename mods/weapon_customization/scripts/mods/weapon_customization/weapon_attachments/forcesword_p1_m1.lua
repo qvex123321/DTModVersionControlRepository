@@ -173,7 +173,7 @@ local functions = {
             {id = "force_sword_hilt_07",      name = "Hilt 7"},
             {id = "force_sword_hilt_08",      name = "Hilt 8"},
             {id = "force_sword_hilt_09",      name = "Hilt 9"},
-            {id = "force_sword_hilt_10",      name = "Hilt 10"},
+            {id = "force_sword_hilt_07",      name = "Hilt 7"},
         }
     end,
     hilt_models = function(parent, angle, move, remove)

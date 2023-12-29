@@ -53,6 +53,7 @@ local FlashlightTemplates = mod:original_require("scripts/settings/equipment/fla
     local managers = Managers
     local CLASS = CLASS
     local RESOLUTION_LOOKUP = RESOLUTION_LOOKUP
+    local wc_perf = wc_perf
 --#endregion
 
 -- ##### ┌┬┐┌─┐┌┬┐┌─┐ #################################################################################################
@@ -185,7 +186,7 @@ FlashlightExtension.delete = function(self)
     self.initialized = false
     self.on = false
     -- Unregister events
-    managers.event:unregister(self, "weapon_customization_settings_changed")
+    -- managers.event:unregister(self, "weapon_customization_settings_changed")
     -- Unset
     self:set_light(false, false)
     
@@ -260,6 +261,7 @@ FlashlightExtension.update_husk = function(self, dt, t)
 end
 
 FlashlightExtension.update = function(self, dt, t)
+    local perf = wc_perf.start("FlashlightExtension.update", 2)
     local first_person = self:get_first_person()
     if self.initialized then
         self:update_husk(dt, t)
@@ -279,6 +281,7 @@ FlashlightExtension.update = function(self, dt, t)
     end
     -- Relay to sub extensions
     FlashlightExtension.super.update(self, dt, t)
+    wc_perf.stop(perf)
 end
 
 FlashlightExtension.update_flicker = function(self, dt, t)
@@ -553,5 +556,12 @@ end
 mod.get_flashlight_template = function(self, flashlight_name)
     if flashlight_name then return self.flashlight_templates[flashlight_name] end
 end
+
+mod:hook_require("scripts/settings/equipment/flashlight_templates", function(instance)
+    for name, template in pairs(instance) do
+        template.light.first_person.cast_shadows = mod:get("mod_option_flashlight_shadows")
+        template.light.third_person.cast_shadows = mod:get("mod_option_flashlight_shadows")
+    end
+end)
 
 return FlashlightExtension
