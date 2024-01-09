@@ -5,14 +5,14 @@ local mod = get_mod("weapon_customization")
 -- ##### ┴  └─┘┴└─└  └─┘┴└─┴ ┴┴ ┴┘└┘└─┘└─┘ ############################################################################
 
 --#region local functions
-	local string = string
-	local string_find = string.find
-	local tostring = tostring
-	local pairs = pairs
-	local managers = Managers
 	local type = type
+	local pairs = pairs
 	local table = table
+	local string = string
+	local tostring = tostring
+	local managers = Managers
 	local table_sort = table.sort
+	local string_find = string.find
 --#endregion
 
 -- ##### ┌┬┐┌─┐┌┬┐┌─┐ #################################################################################################

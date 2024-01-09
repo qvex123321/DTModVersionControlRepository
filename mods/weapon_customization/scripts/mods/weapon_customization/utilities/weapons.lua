@@ -11,17 +11,17 @@ local FixedFrame = mod:original_require("scripts/utilities/fixed_frame")
 -- ##### ┴  └─┘┴└─└  └─┘┴└─┴ ┴┴ ┴┘└┘└─┘└─┘ ############################################################################
 
 --#region local functions
-    local table = table
+	local math = math
+	local table = table
+	local pairs = pairs
+	local string = string
+	local tostring = tostring
+	local managers = Managers
+	local script_unit = ScriptUnit
+	local string_find = string.find
+	local math_random = math.random
 	local table_contains = table.contains
-    local string = string
-    local string_find = string.find
-    local math = math
-    local math_random = math.random
-    local math_random_array_entry = math.random_array_entry
-    local tostring = tostring
-    local pairs = pairs
-    local script_unit = ScriptUnit
-    local managers = Managers
+	local math_random_array_entry = math.random_array_entry
 --#endregion
 
 -- ##### ┌┬┐┌─┐┌┬┐┌─┐ #################################################################################################
@@ -132,25 +132,25 @@ mod.randomize_weapon = function(self, item)
     return random_attachments
 end
 
--- Get currently wielded weapon
-mod.get_wielded_weapon = function(self)
-	if self.initialized then
-		local inventory_component = self.weapon_extension._inventory_component
-		local weapons = self.weapon_extension._weapons
-		return self.weapon_extension:_wielded_weapon(inventory_component, weapons)
-	end
-end
+-- -- Get currently wielded weapon
+-- mod.get_wielded_weapon = function(self)
+-- 	if self.initialized then
+-- 		local inventory_component = self.weapon_extension._inventory_component
+-- 		local weapons = self.weapon_extension._weapons
+-- 		return self.weapon_extension:_wielded_weapon(inventory_component, weapons)
+-- 	end
+-- end
 
--- Get wielded slot
-mod.get_wielded_slot = function(self)
-	local inventory_component = self.weapon_extension._inventory_component
-	return inventory_component.wielded_slot
-end
+-- -- Get wielded slot
+-- mod.get_wielded_slot = function(self)
+-- 	local inventory_component = self.weapon_extension._inventory_component
+-- 	return inventory_component.wielded_slot
+-- end
 
--- Get wielded 3p unit
-mod.get_wielded_weapon_3p = function(self)
-	return self.visual_loadout_extension:unit_3p_from_slot("slot_secondary")
-end
+-- -- Get wielded 3p unit
+-- mod.get_wielded_weapon_3p = function(self)
+-- 	return self.visual_loadout_extension:unit_3p_from_slot("slot_secondary")
+-- end
 
 -- Get equipped weapon from gear id
 mod.get_weapon_from_gear_id = function(self, from_gear_id)

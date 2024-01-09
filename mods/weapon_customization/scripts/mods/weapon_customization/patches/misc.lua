@@ -4,26 +4,29 @@ local mod = get_mod("weapon_customization")
 -- ##### ├┬┘├┤ │─┼┐│ ││├┬┘├┤  #########################################################################################
 -- ##### ┴└─└─┘└─┘└└─┘┴┴└─└─┘ #########################################################################################
 
+local PlayerCharacterLoopingParticleAliases = mod:original_require("scripts/settings/particles/player_character_looping_particle_aliases")
+
 -- ##### ┌─┐┌─┐┬─┐┌─┐┌─┐┬─┐┌┬┐┌─┐┌┐┌┌─┐┌─┐ ############################################################################
 -- ##### ├─┘├┤ ├┬┘├┤ │ │├┬┘│││├─┤││││  ├┤  ############################################################################
 -- ##### ┴  └─┘┴└─└  └─┘┴└─┴ ┴┴ ┴┘└┘└─┘└─┘ ############################################################################
 
 --#region local functions
-    local table = table
-    local table_contains = table.contains
     local Unit = Unit
-    local unit_debug_name = Unit.debug_name
-    local unit_alive = Unit.alive
-    local unit_set_local_position = Unit.set_local_position
-    local unit_local_position = Unit.local_position
-    local string = string
-    local string_find = string.find
-    local vector3 = Vector3
-    local vector3_box = Vector3Box
+    local table = table
     local pairs = pairs
     local CLASS = CLASS
     local Level = Level
+    local string = string
+    local vector3 = Vector3
+    local unit_alive = Unit.alive
+    local vector3_box = Vector3Box
+    local string_find = string.find
     local level_units = Level.units
+    local NetworkLookup = NetworkLookup
+    local table_contains = table.contains
+    local unit_debug_name = Unit.debug_name
+    local unit_local_position = Unit.local_position
+    local unit_set_local_position = Unit.set_local_position
 --#endregion
 
 -- ##### ┌┬┐┌─┐┌┬┐┌─┐ #################################################################################################
@@ -36,20 +39,76 @@ local REFERENCE = "weapon_customization"
 -- ##### ├┤ ┌┴┬┘  └─┐│ ││ │├┬┘│  ├┤ └─┐ ###############################################################################
 -- ##### └  ┴ └─  └─┘└─┘└─┘┴└─└─┘└─┘└─┘ ###############################################################################
 
+-- local tostring = tostring
+
+-- mod:hook(CLASS.World, "find_particles_variable", function(func, world, particle_name, variable_name, ...)
+--     local variable_id = func(world, particle_name, variable_name, ...)
+--     mod:echot("particle_name: "..tostring(particle_name).." variable_name: "..tostring(variable_name))
+--     return variable_id
+-- end)
+
+-- mod:hook(CLASS.World, "set_particles_variable", function(func, world, variable_id, value, ...)
+--     local res = func(world, variable_id, value, ...)
+--     mod:echot("variable_id: "..tostring(variable_id).." value: "..tostring(value))
+--     return res
+-- end)
+
+-- mod:hook(CLASS.World, "set_particles_material_vector3", function(func, world, effect_id, material_name, variable_name, vector_value, ...)
+--     local res = func(world, effect_id, material_name, variable_name, vector_value, ...)
+--     mod:echot("material: "..tostring(material_name).." variable: "..tostring(variable_name).." value: "..tostring(vector_value))
+--     return res
+-- end)
+
+-- mod:hook(CLASS.World, "set_particles_material_color", function(func, world, effect_id, material_name, value, ...)
+--     local res = func(world, effect_id, material_name, value, ...)
+--     mod:echot("effect_id: "..tostring(effect_id).." material: "..tostring(material_name).." value: "..tostring(value))
+--     return res
+-- end)
+
+-- mod:hook(CLASS.PlayerUnitFxExtension, "_update_looping_particle_variables", function(func, self, dt, t, ...)
+--     func(self, dt, t, ...)
+--     local looping_particle_variables_context = self._looping_particles_variables_context
+--     for alias, data in pairs(self._looping_particles) do
+--         local particle_config = PlayerCharacterLoopingParticleAliases[alias]
+--         local variables = particle_config.variables
+--         local id = data.id
+--         if variables and id then
+--             local num_variables = #variables
+--             for i = 1, num_variables do
+--                 local variable_config = variables[i]
+--                 local variable_name = variable_config.variable_name
+--                 local variable_type = variable_config.variable_type
+--                 mod:echot("name: "..tostring(variable_name).." type: "..tostring(variable_type))
+--             end
+--         end
+--     end
+-- end)
+
+mod:hook(CLASS.PlayerHuskVisualLoadoutExtension, "rpc_player_equip_item_from_profile_to_slot", function(func, self, channel_id, go_id, slot_id, item_id, ...)
+	local slot_name = NetworkLookup.player_inventory_slot_names[slot_id]
+	local player = self._player
+	local peer_id = player:peer_id()
+	local local_player_id = player:local_player_id()
+	local package_synchronizer_client = self._package_synchronizer_client
+	local profile = package_synchronizer_client:cached_profile(peer_id, local_player_id)
+	local visual_loadout = profile.visual_loadout
+	local item = visual_loadout[slot_name]
+	local optional_existing_unit_3p = nil
+	self:_equip_item_to_slot(slot_name, item, optional_existing_unit_3p)
+end)
+
 mod:hook(CLASS.PlayerUnitFxExtension, "_register_sound_source", function(func, self, sources, source_name, parent_unit, attachments, node_name, ...)
-    local _attachments = nil
     if attachments and mod:find_node_in_attachments(parent_unit, node_name, attachments) then
-        _attachments = attachments
+        return func(self, sources, source_name, parent_unit, attachments, node_name, ...)
     end
-    return func(self, sources, source_name, parent_unit, _attachments, node_name, ...)
+    return func(self, sources, source_name, parent_unit, nil, 1, ...)
 end)
 
 mod:hook(CLASS.PlayerUnitFxExtension, "_register_vfx_spawner", function(func, self, spawners, spawner_name, parent_unit, attachments, node_name, should_add_3p_node, ...)
-    local _attachments = nil
     if attachments and mod:find_node_in_attachments(parent_unit, node_name, attachments) then
-        _attachments = attachments
+        return func(self, spawners, spawner_name, parent_unit, attachments, node_name, should_add_3p_node, ...)
     end
-    return func(self, spawners, spawner_name, parent_unit, _attachments, node_name, should_add_3p_node, ...)
+    return func(self, spawners, spawner_name, parent_unit, nil, 1, should_add_3p_node, ...)
 end)
 
 -- ##### ┬ ┬┬  ┬ ┬┌─┐┬─┐┬  ┌┬┐ ########################################################################################

@@ -12,22 +12,17 @@ local SoundEventAliases = mod:original_require("scripts/settings/sound/player_ch
 
 --#region local functions
     local Unit = Unit
+    local vector3 = Vector3
     local unit_alive = Unit.alive
+    local Quaternion = Quaternion
+    local vector3_box = Vector3Box
+    local quaternion_to_vector = Quaternion.to_vector
+    local quaternion_from_vector = Quaternion.from_vector
     local unit_set_local_position = Unit.set_local_position
     local unit_set_local_rotation = Unit.set_local_rotation
-    local vector3 = Vector3
-    local vector3_box = Vector3Box
-    local Quaternion = Quaternion
-    local quaternion_from_euler_angles_xyz = Quaternion.from_euler_angles_xyz
     local quaternion_to_euler_angles_xyz = Quaternion.to_euler_angles_xyz
     local quaternion_from_euler_angles_xyz = Quaternion.from_euler_angles_xyz
-    local quaternion_to_vector = function(quaternion)
-        local x, y, z = quaternion_to_euler_angles_xyz(quaternion)
-        return vector3(x, y, z)
-    end
-    local quaternion_from_vector = function(vector)
-        return quaternion_from_euler_angles_xyz(vector[1], vector[2], vector[3])
-    end
+    local quaternion_from_euler_angles_xyz = Quaternion.from_euler_angles_xyz
 --#endregion
 
 -- ##### ┌┬┐┌─┐┌┬┐┌─┐ #################################################################################################
@@ -178,7 +173,7 @@ mod.visible_equipment_offsets = {
             backpack = {position = vector3_box(.4, .25, -.225), rotation = vector3_box(120, -95, 90), scale = vector3_box(1, 1, 1),
                 step_move = vector3_box(-.01, .0125, 0), step_rotation = vector3_box(5, -2.5, 5)},
             loading = mod.visible_equipment_loading_offsets.melee_medium,
-            step_sounds = {"wwise/events/weapon/play_ogryn_knife_equip", "wwise/events/weapon/play_combat_knife_equip_var_3"},
+            step_sounds = {SoundEventAliases.sfx_equip.events.ogryn_combatblade_p1_m1, SoundEventAliases.sfx_equip_03.events.combatknife_p1_m2},
         },
         WEAPON_RANGED = {
             default = {position = vector3_box(.3, .22, .125), rotation = vector3_box(200, -10, 90), scale = vector3_box(1, 1, 1),
@@ -301,7 +296,8 @@ mod.visible_equipment_offsets = {
             backpack = {position = vector3_box(.3, .22, .25), rotation = vector3_box(240, 10, 90), scale = vector3_box(1, 1, 1),
                 step_move = vector3_box(-.01, 0, 0), step_rotation = vector3_box(2.5, -2.5, 0)},
             loading = mod.visible_equipment_loading_offsets.default,
-            step_sounds = {SoundEventAliases.sfx_weapon_locomotion.events.flamer_p1_m1},
+            -- step_sounds = {SoundEventAliases.sfx_weapon_locomotion.events.flamer_p1_m1},
+            step_sounds = {SoundEventAliases.sfx_ads_up.events.default},
         },
         stubrevolver_p1_m1 = {
             default = {position = vector3_box(-.01, .2, .1), rotation = vector3_box(30, -10, 90), scale = vector3_box(1, 1, 1),
@@ -380,7 +376,7 @@ mod.visible_equipment_offsets = {
             backpack = {position = vector3_box(.5, .25, -.225), rotation = vector3_box(120, -95, 90), scale = vector3_box(1, 1, 1),
                 step_move = vector3_box(-.01, .0125, 0), step_rotation = vector3_box(5, -2.5, 5)},
             loading = mod.visible_equipment_loading_offsets.melee_medium,
-            step_sounds = {"wwise/events/weapon/play_ogryn_knife_equip", "wwise/events/weapon/play_combat_knife_equip_var_3"},
+            step_sounds = {SoundEventAliases.sfx_equip.events.ogryn_combatblade_p1_m1, SoundEventAliases.sfx_equip_03.events.combatknife_p1_m2},
         }
     --#endregion
 }

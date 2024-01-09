@@ -1,5 +1,11 @@
 local mod = get_mod("weapon_customization")
 
+-- ##### ┬─┐┌─┐┌─┐ ┬ ┬┬┬─┐┌─┐ #########################################################################################
+-- ##### ├┬┘├┤ │─┼┐│ ││├┬┘├┤  #########################################################################################
+-- ##### ┴└─└─┘└─┘└└─┘┴┴└─└─┘ #########################################################################################
+
+local _autogun_p1_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/functions/autogun_p1_m1")
+
 -- ##### ┌┬┐┌─┐┌┬┐┌─┐ #################################################################################################
 -- #####  ││├─┤ │ ├─┤ #################################################################################################
 -- ##### ─┴┘┴ ┴ ┴ ┴ ┴ #################################################################################################
@@ -74,7 +80,10 @@ return {
             {id = "grip_09",      name = "Braced Autogun 1"},
             {id = "grip_10",      name = "Braced Autogun 2"},
             {id = "grip_11",      name = "Braced Autogun 3"},
+            {id = "grip_31",      name = "Braced Autogun 4"},
+            {id = "grip_32",      name = "Braced Autogun 5"},
             {id = "grip_12",      name = "Headhunter Autogun"},
+            {id = "grip_30",      name = "Boltgun Pistol 1"},
             {id = "grip_13",      name = "Boltgun 1"},
             {id = "grip_14",      name = "Boltgun 2"},
             {id = "grip_15",      name = "Boltgun 3"},
@@ -82,6 +91,7 @@ return {
             {id = "grip_19",      name = "Laspistol 1"},
             {id = "grip_20",      name = "Laspistol 2"},
             {id = "grip_21",      name = "Laspistol 3"},
+            {id = "grip_33",      name = "Laspistol 4"},
             {id = "grip_22",      name = "Lasgun 1"},
             {id = "grip_23",      name = "Lasgun 2"},
             {id = "grip_24",      name = "Lasgun 3"},
@@ -90,10 +100,6 @@ return {
             {id = "grip_27",      name = "Flamer 1"},
             {id = "grip_28",      name = "Flamer 2"},
             {id = "grip_29",      name = "Flamer 3"},
-            {id = "grip_30",      name = "Boltgun Pistol 1"},
-            {id = "grip_31",      name = "Braced Autogun 4"},
-            {id = "grip_32",      name = "Braced Autogun 5"},
-            {id = "grip_33",      name = "Laspistol 4"},
         }
         if default == nil then default = true end
         if default then return table.icombine(
