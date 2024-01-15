@@ -1008,6 +1008,8 @@ end)
 mod:hook(CLASS.UIWeaponSpawner, "_despawn_weapon", function(func, self, ...)
     -- Mod
 	mod:ui_weapon_spawner_despawn_weapon(self)
+    -- -- Camera
+	-- mod.customization_camera:set(false, false)
     -- Original function
 	func(self, ...)
 end)

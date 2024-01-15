@@ -84,6 +84,13 @@ local REFERENCE = "weapon_customization"
 --     end
 -- end)
 
+mod:hook(CLASS.MissionIntroView, "init", function(func, self, settings, context, ...)
+    -- Pass input
+    self._pass_input = true
+    -- Original function
+    func(self, settings, context, ...)
+end)
+
 mod:hook(CLASS.PlayerHuskVisualLoadoutExtension, "rpc_player_equip_item_from_profile_to_slot", function(func, self, channel_id, go_id, slot_id, item_id, ...)
 	local slot_name = NetworkLookup.player_inventory_slot_names[slot_id]
 	local player = self._player

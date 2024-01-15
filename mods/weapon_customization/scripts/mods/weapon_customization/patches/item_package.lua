@@ -466,19 +466,20 @@ mod.setup_item_definitions = function(self, master_items)
         local master_items = master_items or MasterItems.get_cached()
         if master_items then
             self:persistent_table(REFERENCE).item_definitions = table_clone_instance(master_items)
-            -- -- Bulwark shield
-            -- local definitions = self:persistent_table(REFERENCE).item_definitions
-            -- -- if not definitions[bulwark_shield_string] then
-            --     local bulwark_shield_string = "content/items/weapons/player/melee/ogryn_bulwark_shield_01"
-            --     local bulwark_shield_unit = "content/weapons/enemy/shields/bulwark_shield_01/bulwark_shield_01"
-            --     definitions[bulwark_shield_string] = table_clone(definitions["content/items/weapons/player/melee/ogryn_slabshield_p1_m1"])
-            --     local bulwark_shield = definitions[bulwark_shield_string]
-            --     bulwark_shield.name = bulwark_shield_string
-            --     bulwark_shield.base_unit = bulwark_shield_unit
-            --     bulwark_shield.resource_dependencies = {
-            --         [bulwark_shield_unit] = true,
-            --     }
-            -- -- end
+            -- Bulwark shield
+            local definitions = self:persistent_table(REFERENCE).item_definitions
+            local bulwark_shield_string = "content/items/weapons/player/melee/ogryn_bulwark_shield_01"
+            if not definitions[bulwark_shield_string] then
+                local bulwark_shield_unit = "content/weapons/enemy/shields/bulwark_shield_01/bulwark_shield_01"
+                local slab_shield_string = "content/items/weapons/player/melee/ogryn_slabshield_p1_m1"
+                definitions[bulwark_shield_string] = table_clone(definitions[slab_shield_string])
+                local bulwark_shield = definitions[bulwark_shield_string]
+                bulwark_shield.name = bulwark_shield_string
+                bulwark_shield.base_unit = bulwark_shield_unit
+                bulwark_shield.resource_dependencies = {
+                    [bulwark_shield_unit] = true,
+                }
+            end
         end
     end
 end
