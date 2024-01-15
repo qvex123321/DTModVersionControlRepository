@@ -183,7 +183,7 @@ mod.localization_templates = {
 	loc_keys = {"loc_trait_bespoke_stacking_increase_impact_on_hit_desc",},
 	locales = {"en",},
 	handle_func = function(locale, value)
-	return "{#color(255, 255, 140)}+{impact:%s}{#reset()} " .. impact_color_rgb .. " for {#color(255, 255, 140)}{time:%s}{#reset()} seconds on Hit. Stacks {#color(255, 255, 140)}{stacks:%s}{#reset()} times." end}, -- colors s->seconds
+	return "{#color(255, 255, 140)}+{impact:%s}{#reset()} " .. impact_color_rgb .. " for  {#color(255, 155, 55)}3.5{#reset()} seconds on Hit. Stacks {#color(255, 255, 140)}{stacks:%s}{#reset()} times." end}, -- colors s->seconds -- {time:%s}=1.5
 -- {	id = "trait_bespoke_7_ext_en", -- Devastating Strike
 	-- loc_keys = {"loc_trait_bespoke_infinite_melee_cleave_on_crit",},
 	-- locales = {"en",},
@@ -379,7 +379,7 @@ mod.localization_templates = {
 	loc_keys = {"loc_trait_bespoke_power_bonus_scaled_on_stamina_desc",},
 	locales = {"en",},
 	handle_func = function(locale, value)
-	return "Up to {#color(255, 255, 140)}+{power_level:%s}{#reset()} " .. power_color_rgb .. ", as " .. stamina_color_rgb .. " depletes. Stacks {#color(255, 155, 55)}5{#reset()} times." .. power_note_color_rgb end}, -- colors Note!
+	return "When your " .. stamina_color_rgb .. " is reduced by {#color(255, 155, 55)}20%{#reset()}, you gain a Stack of " .. power_color_rgb .. ", up to {#color(255, 155, 55)}5{#reset()} Stacks, which add up to {#color(255, 255, 140)}+{power_level:%s}{#reset()} " .. power_color_rgb .. "." .. power_note_color_rgb end}, -- colors Note!
 -- {	id = "trait_bespoke_26_ext_en", -- Headtaker
 	-- loc_keys = {"loc_trait_bespoke_increase_power_on_hit",},
 	-- locales = {"en",},
@@ -774,7 +774,7 @@ mod.localization_templates = {
 	loc_keys = {"loc_trait_bespoke_followup_shots_ranged_weakspot_damage_desc",},
 	locales = {"en",},
 	handle_func = function(locale, value)
-	return "{#color(255, 255, 140)}+{damage:%s}{#reset()} " .. weakspot4_color_rgb .. " on Second, Third and Fourth shots in a Salvo." end}, -- colors -- "on Third and Fourth shots" to "on Second, Third and Fourth"
+	return "{#color(255, 255, 140)}+{damage:%s}{#reset()} " .. weakspot4_color_rgb .. " on Second, Third and Fourth shots in a Salvo. {#color(255, 155, 55)}Damage is 2.5 times higher.{#reset()}" end}, -- colors -- "on Third and Fourth shots" to "on Second, Third and Fourth"
 -- {	id = "trait_bespoke_64_ext_en", -- Fire Frenzy
 	-- loc_keys = {"loc_trait_bespoke_increase_close_damage_on_close_kill",},
 	-- locales = {"en",},
@@ -784,7 +784,7 @@ mod.localization_templates = {
 	loc_keys = {"loc_trait_bespoke_increase_close_damage_on_close_kill_desc",},
 	locales = {"en",},
 	handle_func = function(locale, value)
-	return "Gain {#color(255, 255, 140)}+{close_damage:%s}{#reset()} " .. damage_color_rgb .. " at a distance of up to {#color(255, 155, 55)}8{#reset()} meters for {#color(255, 255, 140)}{time:%s}{#reset()} seconds. Stacks {#color(255, 255, 140)}{stacks:%s}{#reset()} times." end}, -- colors Note!
+	return "You gain {#color(255, 255, 140)}+{close_damage:%s}{#reset()} " .. damage_color_rgb .. " for {#color(255, 255, 140)}{time:%s}{#reset()} seconds after killing an enemy at a distance of up to {#color(255, 155, 55)}8{#reset()} meters. Stacks {#color(255, 255, 140)}{stacks:%s}{#reset()} times." end}, -- colors Note!
 -- {	id = "trait_bespoke_65_ext_en", -- Deathspitter
 	-- loc_keys = {"loc_trait_bespoke_increase_power_on_close_kill",},
 	-- locales = {"en",},
@@ -836,7 +836,7 @@ mod.localization_templates = {
 	loc_keys = {"loc_trait_bespoke_first_shot_ammo_cost_reduction_desc",},
 	locales = {"en",},
 	handle_func = function(locale, value)
-	return "You use only {#color(255, 255, 140)}{ammo:%s}{#reset()} of your Ammo after not firing for {#color(255, 255, 140)}{time:%s}{#reset()} seconds." end}, -- rewrite colors s->seconds -- +{ammo:%s} Reduced Ammo use after not shooting for {time:%s} seconds.
+	return "You only use {#color(255, 255, 140)}{ammo:%s}{#reset()} of your Ammo per shot every {#color(255, 255, 140)}{time:%s}{#reset()} seconds." end}, -- rewrite colors s->seconds -- +{ammo:%s} Reduced Ammo use after not shooting for {time:%s} seconds.
 -- {	id = "trait_bespoke_70_ext_en", -- Infernus
 	-- loc_keys = {"loc_trait_bespoke_burninating_on_crit",},
 	-- locales = {"en",},
@@ -1167,7 +1167,7 @@ mod.localization_templates = {
 	loc_keys = {"loc_trait_bespoke_ammo_refill_from_reserve_on_crit_desc",},
 	locales = {"en",},
 	handle_func = function(locale, value)
-	return "{#color(255, 255, 140)}+{bullet_amount:%s}{#reset()} bullets loaded from Reserve on " .. crit_hit_color_rgb .. "." end}, -- colors
+	return "{#color(255, 255, 140)}+{bullet_amount:%s}{#reset()} bullets loaded from Reserve on " .. crit_hit_color_rgb .. ". {#color(255, 35, 5)}Gives only half the ammo!{#reset()}" end}, -- colors
 -- {	id = "trait_bespoke_99_ext_en", -- Roaring Advance
 	-- loc_keys = {"loc_trait_bespoke_movement_speed_on_continuous_fire",},
 	-- locales = {"en",},
@@ -1209,7 +1209,7 @@ mod.localization_templates = {
 	loc_keys = {"loc_trait_bespoke_armor_rending_bayonette_desc",},
 	locales = {"en",},
 	handle_func = function(locale, value)
-	return "Target receives {#color(255, 255, 140)}{stacks:%s}{#reset()} stacks of {#color(255, 255, 140)}+2.{rending:%s}{#reset()} " .. brittleness_color_rgb .. " on weapon Special Hit. Lasts {#color(255, 255, 140)}{time:%s}{#reset()} seconds." .. brittleness_note_color_rgb end}, -- colors s->seconds
+	return "Target receives {#color(255, 255, 140)}{stacks:%s}{#reset()} stacks of {#color(255, 255, 140)}+2.{rending:%s}{#reset()} " .. brittleness_color_rgb .. " on weapon Special Hit. Lasts {#color(255, 255, 140)}{time:%s}{#reset()} seconds. " .. brittleness_note_color_rgb end}, -- colors s->seconds
 -- {	id = "trait_bespoke_103_ext_en", -- Born in blood
 	-- loc_keys = {"loc_trait_bespoke_toughness_on_close_range_kills",},
 	-- locales = {"en",},
