@@ -20,7 +20,6 @@ NumericUI
 hub_hotkey_menus
 PsykaniumInvHotkey
 ChatBlock
-MutePerilSounds
 pickup_notif_tweaker
 book_finder
 reveal_blessings
