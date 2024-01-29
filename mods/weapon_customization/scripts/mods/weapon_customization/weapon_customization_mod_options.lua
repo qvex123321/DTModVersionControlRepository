@@ -66,25 +66,16 @@ function mod.update_option(setting_id)
 					end
 				end
 			end
-			-- if data_option.sub_widgets and #data_option.sub_widgets > 0 then
-			-- 	for _, sub_widget in pairs(data_option.sub_widgets) do
-			-- 		mod.update_option(sub_widget.setting_id)
-			-- 	end
-			-- end
 		end
 	end
 end
 
 function mod.update_options(obj)
 	local obj = obj or WeaponCustomizationData.options.widgets
-	-- mod:echot("update options")
 	for _, option in pairs(obj) do
 		mod.update_option(option.setting_id)
-		if option.sub_widgets then --and #option.sub_widgets > 0 then
+		if option.sub_widgets then
 			mod.update_options(option.sub_widgets)
-			-- for _, sub_widget in pairs(option.sub_widgets) do
-			-- 	mod.update_options(sub_widget)
-			-- end
 		end
 	end
 end

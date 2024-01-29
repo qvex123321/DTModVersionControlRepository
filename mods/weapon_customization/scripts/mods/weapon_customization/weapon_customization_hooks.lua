@@ -465,7 +465,7 @@ mod:hook(CLASS.CameraManager, "post_update", function(func, self, dt, t, viewpor
     local current_node = self:_current_node(camera_nodes)
     local root_unit = current_node:root_unit()
     -- Sights
-    mod:execute_extension(root_unit, "sight_system", "update_zoom")
+    mod:execute_extension(root_unit, "sight_system", "update_zoom", viewport_name)
 end)
 
 mod:hook(CLASS.CameraManager, "shading_callback", function(func, self, world, shading_env, viewport, default_shading_environment_resource, ...)

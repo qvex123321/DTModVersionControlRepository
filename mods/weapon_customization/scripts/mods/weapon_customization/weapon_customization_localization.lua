@@ -60,6 +60,10 @@ return {
 		ru = "Включить отладку",
 		["zh-cn"] = "调试",
 	},
+	demo_mode = {
+		en = "Demo Mode",
+		de = "Demo Modus",
+	},
 	-- ##### ┌┬┐┬┌─┐┌─┐ ###############################################################################################
 	-- ##### ││││└─┐│   ###############################################################################################
 	-- ##### ┴ ┴┴└─┘└─┘ ###############################################################################################
@@ -310,6 +314,14 @@ return {
 		de = "Randomisierung der Waffen der anderen Spieler",
 		ru = "Создавать случайные варианты оружия у других игроков",
 		["zh-cn"] = "随机化其他玩家的武器",
+	},
+	mod_option_randomization_reward = {
+		en = "Rewards",
+		de = "Belohnungen",
+	},
+	mod_option_randomization_reward_tooltip = {
+		en = "Randomize mission reward weapons",
+		de = "Randomisierung der Missions-Belohnungs Waffen",
 	},
 	mod_option_randomization_bayonet = {
 		en = "Bayonet",

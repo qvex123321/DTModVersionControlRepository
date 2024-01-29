@@ -60,14 +60,14 @@ table.insert(options.options.widgets, create_option_set("toughness", "ui_difficu
 table.insert(options.options.widgets, create_option_set("weakspot", "green_yellow"))
 
 --[[
-	default color - "text_default"
+	default color - "terminal_text_body"
 	My color list:
 		bleed_text_colour = "ui_zealot"
 		brittleness_text_colour = "medium_orchid"
 		burn_text_colour = "sienna"
 		cleave_text_colour = "player_slot_2_bright"
 		crit_text_colour = "citadel_yriel_yellow"
-		damage_text_colour = "firebrick"
+		damage_text_colour = "citadel_jokaero_orange"
 		finesse_text_colour = "dodger_blue"
 		hit_mass_text_colour = "item_rarity_dark_2"
 		impact_text_colour = "sea_green"
@@ -77,7 +77,7 @@ table.insert(options.options.widgets, create_option_set("weakspot", "green_yello
 		rending_text_colour = "violet"
 		soulblaze_text_colour = "ui_toughness_default"
 		stagger_text_colour = "terminal_background_selected"
-		stamina_text_colour = "old_lace"
+		stamina_text_colour = "light_salmon"
 		toughness_text_colour = "ui_difficulty_1"
 		weakspot_text_colour = "green_yellow"
 ]]

@@ -10,6 +10,7 @@ local mod = get_mod("weapon_customization")
 	local UIWidget = mod:original_require("scripts/managers/ui/ui_widget")
 	local MasterItems = mod:original_require("scripts/backend/master_items")
 	local UIRenderer = mod:original_require("scripts/managers/ui/ui_renderer")
+	local UIScenegraph = mod:original_require("scripts/managers/ui/ui_scenegraph")
 	local WorldRenderUtils = mod:original_require("scripts/utilities/world_render")
 	local UISoundEvents = mod:original_require("scripts/settings/ui/ui_sound_events")
 	local ScriptGui = mod:original_require("scripts/foundation/utilities/script_gui")
@@ -95,9 +96,11 @@ local mod = get_mod("weapon_customization")
 	local math_easeInCubic = math.easeInCubic
 	local world_unlink_unit = World.unlink_unit
 	local math_easeOutCubic = math.easeOutCubic
+	local RESOLUTION_LOOKUP = RESOLUTION_LOOKUP
 	local quaternion_forward = Quaternion.forward
 	local quaternion_unbox = quaternion_box.unbox
 	local world_destroy_unit = World.destroy_unit
+	local ShadingEnvironment = ShadingEnvironment
 	local quaternion_multiply = Quaternion.multiply
 	local matrix4x4_transform = Matrix4x4.transform
 	local unit_local_position = Unit.local_position
@@ -126,7 +129,9 @@ local mod = get_mod("weapon_customization")
 	local math_round_with_precision = math.round_with_precision
 	local script_unit_has_extension = script_unit.has_extension
 	local script_unit_add_extension = script_unit.add_extension
+	local shading_environment_scalar = ShadingEnvironment.scalar
 	local script_unit_remove_extension = script_unit.remove_extension
+	local shading_environment_set_scalar = ShadingEnvironment.set_scalar
 	local quaternion_from_euler_angles_xyz = Quaternion.from_euler_angles_xyz
 --#endregion
 
@@ -151,19 +156,24 @@ local mod = get_mod("weapon_customization")
 	local LANGUAGE_ID = Application.user_setting("language_id")
 	local MK = mod:localize("mod_attachment_mk")
 	local KASR = mod:localize("mod_attachment_kasr")
+	local MOVE_DURATION_OUT = .5
+	local MOVE_DURATION_IN = 1
+	local RESET_WAIT_TIME = 5
+	local SOUND_DURATION = .5
+	local WEAPON_PART_ANIMATION_TIME = .75
 
-	mod.bar_breakdown_widgets = {}
-	mod.bar_breakdown_widgets_by_name = {}
+	-- mod.bar_breakdown_widgets = {}
+	-- mod.bar_breakdown_widgets_by_name = {}
 	mod.original_weapon_settings = {}
 	mod.changed_weapon_settings = {}
-	mod.move_duration_out = .5
-	mod.move_duration_in = 1
-	mod.reset_wait_time = 5
+	-- mod.move_duration_out = .5
+	-- mod.move_duration_in = 1
+	-- mod.reset_wait_time = 5
 	mod.weapon_changed = nil
-	mod.sound_duration = .5
-	mod.weapon_part_animation_time = .75
+	-- mod.sound_duration = .5
+	-- mod.weapon_part_animation_time = .75
 	mod.cosmetics_view = nil
-	mod.mesh_positions = {}
+	-- mod.mesh_positions = {}
 	mod.dropdown_positions = {}
 	mod.spawned_attachments = {}
 	mod.attachment_preview_count = 0
@@ -238,6 +248,8 @@ mod.start_weapon_move = function(self, position, no_reset)
 
 	-- mod.customization_camera:move(position)
 
+	if self.demo then return end
+
 	if position then
 		self.move_position = position
 		self.do_move = true
@@ -250,7 +262,7 @@ end
 
 mod.play_zoom_sound = function(self, t, sound)
 	if not self.sound_end or t >= self.sound_end then
-		self.sound_end = t + self.sound_duration
+		self.sound_end = t + SOUND_DURATION
 		self.cosmetics_view:_play_sound(sound)
 	end
 end
@@ -317,16 +329,19 @@ mod.load_new_attachment = function(self, item, attachment_slot, attachment, no_u
 end
 
 -- Change light positions
-mod.set_light_positions = function(self, ui_weapon_spawner)
+mod.set_light_positions = function(self)
 	if self.preview_lights then
 		for _, unit_data in pairs(self.preview_lights) do
 			-- Get default position
 			local default_position = vector3_unbox(unit_data.position)
 			-- Get difference to link unit position
-			local link_difference = vector3_unbox(ui_weapon_spawner._link_unit_base_position) - vector3_unbox(ui_weapon_spawner._link_unit_position)
-			-- Position with offset
-			local light_position = vector3(default_position[1], default_position[2] - link_difference[2], default_position[3])
-			unit_set_local_position(unit_data.unit, 1, light_position)
+			local weapon_spawner = self.cosmetics_view._weapon_preview._ui_weapon_spawner
+			if weapon_spawner then
+				local link_difference = vector3_unbox(weapon_spawner._link_unit_base_position) - vector3_unbox(weapon_spawner._link_unit_position)
+				-- Position with offset
+				local light_position = vector3(default_position[1], default_position[2] - link_difference[2], default_position[3])
+				unit_set_local_position(unit_data.unit, 1, light_position)
+			end
 		end
 	end
 end
@@ -334,8 +349,6 @@ end
 mod.unit_hide_meshes = function(self, unit, hide)
 	if unit and unit_alive(unit) then
 		local num_meshes = unit_num_meshes(unit)
-		-- if hide then mod:echo("hide unit: "..tostring(unit)) end
-		-- if not hide then mod:echo("show unit: "..tostring(unit)) end
 		if num_meshes and num_meshes > 0 then
 			for i = 1, num_meshes do
 				unit_set_mesh_visibility(unit, i, not hide)
@@ -436,7 +449,6 @@ mod.update_attachment_previews = function(self, dt, t)
 
 					self.spawned_attachments_last_position[unit] = self.spawned_attachments_target_position[unit] or self.attachment_slot_positions[6]
 					self.spawned_attachments_target_position[unit] = target_position
-					-- mod:echo("target: "..tostring(vector3_unbox(target_position)))
 
 					self.attachment_index_updated[unit] = self.attachment_preview_index
 					self.spawned_attachments_timer[unit] = t + 1
@@ -558,7 +570,6 @@ mod.create_attachment_array = function(self, item, attachment_slot)
 				local attachment_name = attachment_unit and unit_get_data(attachment_unit, "attachment_name")
 				local attachment_data = attachment_name and mod.attachment_models[self.cosmetics_view._item_name][attachment_name]
 				local movement = attachment_data and attachment_data.remove and vector3_unbox(attachment_data.remove) or vector3_zero()
-				-- mod:echo("set position")
 				self:setup_attachment_slot_positions()
 				self:load_attachment_packages(item, attachment_slot)
 				self:unit_hide_meshes(attachment_unit, true)
@@ -614,7 +625,7 @@ mod:hook(CLASS.UIWeaponSpawner, "update", function(func, self, dt, t, input_serv
 
 	-- self._rotation_angle = current_rotation
 
-	if self._reference_name ~= "WeaponIconUI" and mod.cosmetics_view then
+	if self._reference_name ~= "WeaponIconUI" and mod.cosmetics_view and not self.demo then
 
 		if mod:get("mod_option_carousel") then
 			mod:try_spawning_previews()
@@ -629,18 +640,18 @@ mod:hook(CLASS.UIWeaponSpawner, "update", function(func, self, dt, t, input_serv
 			local link_unit = weapon_spawn_data.link_unit
 			local position = vector3_unbox(self._link_unit_position)
 			local animation_speed = mod:get("mod_option_weapon_build_animation_speed")
-			local animation_time = mod.weapon_part_animation_time
+			local animation_time = WEAPON_PART_ANIMATION_TIME
 			local item_unit_3p = weapon_spawn_data.item_unit_3p
 
 			-- Camera movement
-			if mod.do_move and mod:get("mod_option_camera_zoom") and not self.demo then
+			if mod.do_move and mod:get("mod_option_camera_zoom") then
 				if mod.move_position then
 					local last_move_position = mod.last_move_position and vector3_unbox(mod.last_move_position) or vector3_zero()
 					local move_position = vector3_unbox(mod.move_position)
 					if not mod:vector3_equal(last_move_position, move_position) then
 						mod.new_position = vector3_box(vector3_unbox(self._link_unit_base_position) + move_position)
-						mod.move_end = t + mod.move_duration_in
-						mod.current_move_duration = mod.move_duration_in
+						mod.move_end = t + MOVE_DURATION_IN
+						mod.current_move_duration = MOVE_DURATION_IN
 						mod.last_move_position = mod.move_position
 						mod:play_zoom_sound(t, UISoundEvents.apparel_zoom_in)
 					end
@@ -649,8 +660,8 @@ mod:hook(CLASS.UIWeaponSpawner, "update", function(func, self, dt, t, input_serv
 					local move_position = vector3_unbox(self._link_unit_base_position)
 					if not mod:vector3_equal(move_position, last_move_position) then
 						mod.new_position = self._link_unit_base_position
-						mod.move_end = t + mod.move_duration_out
-						mod.current_move_duration = mod.move_duration_out
+						mod.move_end = t + MOVE_DURATION_OUT
+						mod.current_move_duration = MOVE_DURATION_OUT
 						mod.last_move_position = vector3_zero()
 						mod:play_zoom_sound(t, UISoundEvents.apparel_zoom_out)
 					end
@@ -676,7 +687,7 @@ mod:hook(CLASS.UIWeaponSpawner, "update", function(func, self, dt, t, input_serv
 					if link_unit and unit_alive(link_unit) then
 						mod.link_unit_position = vector3_box(unit_local_position(link_unit, 1))
 					end
-					if mod.current_move_duration == mod.move_duration_in and not mod:vector3_equal(vector3_unbox(mod.new_position), vector3_zero()) then
+					if mod.current_move_duration == MOVE_DURATION_IN and not mod:vector3_equal(vector3_unbox(mod.new_position), vector3_zero()) then
 						mod.do_reset = true
 					end
 				end
@@ -711,10 +722,10 @@ mod:hook(CLASS.UIWeaponSpawner, "update", function(func, self, dt, t, input_serv
 			end
 
 			-- Reset
-			if mod.do_reset and not mod.dropdown_open and not self.demo then
-				mod.reset_start = t + mod.reset_wait_time
+			if mod.do_reset and not mod.dropdown_open then
+				mod.reset_start = t + RESET_WAIT_TIME
 				mod.do_reset = nil
-			elseif mod.reset_start and t >= mod.reset_start and not mod.dropdown_open and not self.demo then
+			elseif mod.reset_start and t >= mod.reset_start and not mod.dropdown_open then
 				if mod.move_position then
 					mod:play_zoom_sound(t, UISoundEvents.apparel_zoom_out)
 				end
@@ -723,7 +734,7 @@ mod:hook(CLASS.UIWeaponSpawner, "update", function(func, self, dt, t, input_serv
 				mod.reset_start = nil
 				self._default_rotation_angle = 0
 				mod._last_rotation_angle = 0
-			elseif mod.reset_start and mod.dropdown_open and not self.demo then
+			elseif mod.reset_start and mod.dropdown_open then
 				mod.reset_start = mod.reset_start + dt
 			end
 
@@ -771,14 +782,6 @@ mod:hook(CLASS.UIWeaponSpawner, "_spawn_weapon", function(func, self, item, link
 		local link_unit = weapon_spawn_data.link_unit
 
 		mod.weapon_spawning = true
-
-		-- local has_outline_system = managers.state.extension and managers.state.extension:has_system("outline_system")
-		-- if has_outline_system then
-		-- 	local outline_system = managers.state.extension:system("outline_system")
-		-- 	outline_system:on_add_extension(self._world, weapon_spawn_data.item_unit_3p, "PlayerUnitOutlineExtension", {})
-		-- 	outline_system:add_outline(weapon_spawn_data.item_unit_3p, "default_outlines_always")
-		-- 	mod:echot("bla")
-		-- end
 
 		unit_set_unit_visibility(weapon_spawn_data.item_unit_3p, true, true)
 
@@ -849,7 +852,7 @@ mod:hook(CLASS.UIWeaponSpawner, "_spawn_weapon", function(func, self, item, link
 			mod:set_light_positions(self)
 		end
 
-		Unit.set_vector3_for_materials(weapon_spawn_data.item_unit_3p, "stimmed_color", vector3(1, 0, 0), true)
+		-- Unit.set_vector3_for_materials(weapon_spawn_data.item_unit_3p, "stimmed_color", vector3(1, 0, 0), true)
 
 		local slot_infos = mod:persistent_table(REFERENCE).attachment_slot_infos
 		slot_infos[mod.cosmetics_view._slot_info_id].unit_default_position = slot_infos[mod.cosmetics_view._slot_info_id].unit_default_position or {}
@@ -912,10 +915,6 @@ mod.get_changed_weapon_settings = function(self)
 	end
 end
 
--- ##### ┬ ┬┬  ┌─┐┬ ┬┌┐┌┌─┐┌┬┐┬┌─┐┌┐┌┌─┐ ##############################################################################
--- ##### │ ││  ├┤ │ │││││   │ ││ ││││└─┐ ##############################################################################
--- ##### └─┘┴  └  └─┘┘└┘└─┘ ┴ ┴└─┘┘└┘└─┘ ##############################################################################
-
 mod.check_unsaved_changes = function(self, no_animation)
 	if table_size(self.original_weapon_settings) > 0 then
 		if self.cosmetics_view._gear_id then
@@ -956,12 +955,25 @@ mod.check_unsaved_changes = function(self, no_animation)
 	end
 end
 
+-- ##### ┬ ┬┬  ┌─┐┬ ┬┌┐┌┌─┐┌┬┐┬┌─┐┌┐┌┌─┐ ##############################################################################
+-- ##### │ ││  ├┤ │ │││││   │ ││ ││││└─┐ ##############################################################################
+-- ##### └─┘┴  └  └─┘┘└┘└─┘ ┴ ┴└─┘┘└┘└─┘ ##############################################################################
+
 mod.cb_on_demo_pressed = function(self)
-	self.demo = not self.demo
-	self.demo_time = 1
+	self.demo = true
+	self.demo_time = .5
 	self.demo_timer = 0
+	self:persistent_table(REFERENCE).keep_all_packages = true
 	self.cosmetics_view:_cb_on_ui_visibility_toggled("entry_"..tostring(3))
-	self:start_weapon_move(vector3_box(vector3(-.15, -1, 0)))
+	-- self:start_weapon_move(vector3_box(vector3(-.15, -1, 0)))
+	local ui_weapon_spawner = self.cosmetics_view._weapon_preview._ui_weapon_spawner
+	ui_weapon_spawner._link_unit_position = vector3_box(vector3_unbox(ui_weapon_spawner._link_unit_base_position) + vector3(-.2, -2, 0))
+	mod.link_unit_position = ui_weapon_spawner._link_unit_position
+	local weapon_spawn_data = ui_weapon_spawner._weapon_spawn_data
+	if weapon_spawn_data then
+		local link_unit = weapon_spawn_data.link_unit
+		unit_set_local_position(link_unit, 1, vector3_unbox(ui_weapon_spawner._link_unit_position))
+	end
 end
 
 mod.cb_on_randomize_pressed = function(self, skip_animation)
@@ -1432,7 +1444,8 @@ mod.hide_custom_widgets = function(self, hide)
 		end
 		self.cosmetics_view._widgets_by_name.reset_button.visible = not hide
 		self.cosmetics_view._widgets_by_name.randomize_button.visible = not hide
-		self.cosmetics_view._widgets_by_name.demo_button.visible = false --not hide
+		local demo_mode = mod:get("demo_mode")
+		self.cosmetics_view._widgets_by_name.demo_button.visible = demo_mode and not hide
     end
 end
 
@@ -1601,12 +1614,19 @@ mod.get_dropdown_positions = function(self)
 				local attachment_slot = string_gsub(scenegraph_name, "_pivot", "")
 				local scenegraph_entry = self.cosmetics_view._ui_scenegraph[scenegraph_name]
 				local entry = self.dropdown_positions[attachment_slot] or {}
+
+				local ui_scenegraph = self.cosmetics_view._ui_scenegraph
+				local scale = RESOLUTION_LOOKUP.scale
+				local world_position = UIScenegraph.world_position(ui_scenegraph, scenegraph_name)
+				local size_width, size_height = UIScenegraph.get_size(ui_scenegraph, scenegraph_name, scale)
+
 				if scenegraph_entry.position[1] > screen_width / 2 then
-					entry[1] = scenegraph_entry.world_position[1]
+					entry[1] = world_position[1] * scale
 				else
-					entry[1] = scenegraph_entry.world_position[1] + grid_size[1]
+					entry[1] = world_position[1] * scale + size_width * scale
 				end
-				entry[2] = scenegraph_entry.position[2] + dropdown_height
+				-- entry[1] = world_position[1] * scale + size_width * scale
+				entry[2] = world_position[2] * scale + (dropdown_height * scale) / 2
 				entry[3] = entry[3] or false
 				self.dropdown_positions[attachment_slot] = entry
 			end
@@ -1638,6 +1658,7 @@ mod.init_custom_weapon_zoom = function(self)
 end
 
 mod.reset_stuff = function(self)
+	self:persistent_table(REFERENCE).keep_all_packages = false
 	self.demo = nil
 	self.move_position = nil
 	self.new_position = nil
@@ -1943,7 +1964,6 @@ mod:hook(CLASS.InventoryWeaponCosmeticsView, "init", function(func, self, settin
 
 	-- Events
 	self.hide_ui = function(self, hide)
-		-- mod:echot("hide ui: "..tostring(hide))
 		mod.cosmetics_view._visibility_toggled_on =  hide
 		mod.cosmetics_view:_cb_on_ui_visibility_toggled("entry_"..tostring(3))
 		-- -- Hide UI
@@ -1974,6 +1994,7 @@ end)
 mod:hook(CLASS.InventoryWeaponCosmeticsView, "on_enter", function(func, self, ...)
     func(self, ...)
 
+	-- mod:persistent_table(REFERENCE).temp_gear_settings[self._gear_id] = {}
 	mod:remove_extension(mod.player_unit, "visible_equipment_system")
 
 	-- Fetch instance
@@ -1995,8 +2016,30 @@ mod:hook(CLASS.InventoryWeaponCosmeticsView, "on_enter", function(func, self, ..
     mod:hide_custom_widgets(true)
 	mod:resolve_no_support(self._selected_item)
 	mod:load_attachment_sounds(self._selected_item)
-	-- mod:resolve_auto_equips(self._selected_item)
 	mod:create_bar_breakdown_widgets()
+
+	-- Auto equip
+	for attachment_slot, value in pairs(mod.changed_weapon_settings) do
+		if not mod.add_custom_attachments[attachment_slot] then
+			mod:resolve_auto_equips(self._selected_item, "default")
+		end
+	end
+	for attachment_slot, value in pairs(mod.changed_weapon_settings) do
+		if mod.add_custom_attachments[attachment_slot] then
+			mod:resolve_auto_equips(self._selected_item, "default")
+		end
+	end
+	-- Special
+	for attachment_slot, value in pairs(mod.changed_weapon_settings) do
+		if mod.add_custom_attachments[attachment_slot] then
+			mod:resolve_special_changes(self._selected_item, "default")
+		end
+	end
+	for attachment_slot, value in pairs(mod.changed_weapon_settings) do
+		if not mod.add_custom_attachments[attachment_slot] then
+			mod:resolve_special_changes(self._selected_item, "default")
+		end
+	end
 
 	self._item_grid._widgets_by_name.grid_divider_top.visible = false
 	self._item_grid._widgets_by_name.grid_divider_bottom.visible = false
@@ -2110,6 +2153,32 @@ end)
 
 mod:hook(CLASS.InventoryWeaponCosmeticsView, "on_exit", function(func, self, ...)
 
+	-- mod:persistent_table(REFERENCE).temp_gear_settings[self._gear_id] = nil
+
+	mod:get_changed_weapon_settings()
+	-- Auto equip
+	for attachment_slot, value in pairs(mod.changed_weapon_settings) do
+		if not mod.add_custom_attachments[attachment_slot] then
+			mod:resolve_auto_equips(self._selected_item, "default")
+		end
+	end
+	for attachment_slot, value in pairs(mod.changed_weapon_settings) do
+		if mod.add_custom_attachments[attachment_slot] then
+			mod:resolve_auto_equips(self._selected_item, "default")
+		end
+	end
+	-- Special
+	for attachment_slot, value in pairs(mod.changed_weapon_settings) do
+		if mod.add_custom_attachments[attachment_slot] then
+			mod:resolve_special_changes(self._selected_item, "default")
+		end
+	end
+	for attachment_slot, value in pairs(mod.changed_weapon_settings) do
+		if not mod.add_custom_attachments[attachment_slot] then
+			mod:resolve_special_changes(self._selected_item, "default")
+		end
+	end
+
 	mod:reset_stuff()
 	
 	local weapon_spawner = self._weapon_preview._ui_weapon_spawner
@@ -2212,7 +2281,6 @@ mod:hook(CLASS.InventoryWeaponCosmeticsView, "cb_on_equip_pressed", function(fun
 		-- mod.changed_weapon = self._selected_item
 		-- mod.weapon_changed = true
 
-		-- mod:echot("equip pressed! #################")
 
 		managers.ui:item_icon_updated(self._selected_item)
 		managers.event:trigger("event_item_icon_updated", self._selected_item)
@@ -2332,6 +2400,29 @@ mod:hook(CLASS.InventoryWeaponCosmeticsView, "cb_switch_tab", function(func, sel
 			mod:get_changed_weapon_settings()
 			mod:update_equip_button()
 			mod:update_reset_button()
+
+			-- Auto equip
+			for attachment_slot, value in pairs(mod.changed_weapon_settings) do
+				if not mod.add_custom_attachments[attachment_slot] then
+					mod:resolve_auto_equips(self._selected_item, "default")
+				end
+			end
+			for attachment_slot, value in pairs(mod.changed_weapon_settings) do
+				if mod.add_custom_attachments[attachment_slot] then
+					mod:resolve_auto_equips(self._selected_item, "default")
+				end
+			end
+			-- Special
+			for attachment_slot, value in pairs(mod.changed_weapon_settings) do
+				if mod.add_custom_attachments[attachment_slot] then
+					mod:resolve_special_changes(self._selected_item, "default")
+				end
+			end
+			for attachment_slot, value in pairs(mod.changed_weapon_settings) do
+				if not mod.add_custom_attachments[attachment_slot] then
+					mod:resolve_special_changes(self._selected_item, "default")
+				end
+			end
 		else
 			local t = managers.time:time("main")
 			mod.reset_start = t
@@ -2702,16 +2793,47 @@ mod:hook_require("scripts/ui/views/inventory_weapon_cosmetics_view/inventory_wea
 
 end)
 
+-- mod:hook(CLASS.ViewElementInventoryWeaponPreview, "init", function(func, self, parent, draw_layer, start_scale, context, ...)
+-- 	context.ignore_blur = true
+-- 	func(self, parent, draw_layer, start_scale, context, ...)
+-- end)
+
+-- mod:hook(CLASS.ViewElementInventoryWeaponPreview, "_set_background_blur", function(func, self, fraction, ...)
+-- 	local max_value = 0.25
+-- 	local reference_name = self._reference_name
+-- 	local world_name = reference_name .. "_ui_background_world"
+-- 	local viewport_name = reference_name .. "_ui_background_world_viewport"
+
+-- 	-- WorldRenderUtils.enable_world_fullscreen_blur(world_name, viewport_name, max_value * fraction)
+-- end)
+
+-- mod:hook(CLASS.ViewElementInventoryWeaponPreview, "cb_background_shading_callback", function(func, self, world, shading_env, viewport, default_shading_environment_name, ...)
+-- 	func(self, world, shading_env, viewport, default_shading_environment_name, ...)
+
+-- 	shading_environment_set_scalar(shading_env, "dof_enabled", 1)
+--     shading_environment_set_scalar(shading_env, "dof_focal_distance", .5)
+--     shading_environment_set_scalar(shading_env, "dof_focal_region", 50)
+--     shading_environment_set_scalar(shading_env, "dof_focal_region_start", -1)
+--     shading_environment_set_scalar(shading_env, "dof_focal_region_end", 49)
+--     shading_environment_set_scalar(shading_env, "dof_focal_near_scale", self.dof_near_scale)
+--     shading_environment_set_scalar(shading_env, "dof_focal_far_scale", .5)
+-- end)
+
 mod:hook_require("scripts/ui/view_elements/view_element_inventory_weapon_preview/view_element_inventory_weapon_preview_settings", function(instance)
 	instance.shading_environment = "content/shading_environments/ui/ui_item_preview"
+	-- instance.shading_environment = "content/shading_environments/ui/vendor_cosmetics_preview_gear" -> crash
+	-- instance.shading_environment = "content/shading_environments/ui/main_menu"
+	-- instance.shading_environment = "content/shading_environments/ui/mission_board" -> crash
 	-- instance.shading_environment = "content/shading_environments/ui_default"
 	-- instance.shading_environment = "content/shading_environments/ui/portrait"
 	-- instance.shading_environment = "content/shading_environments/ui/weapon_icons"
 	-- instance.shading_environment = "content/shading_environments/ui/ui_popup_background"
 	-- instance.shading_environment = "content/shading_environments/ui/inventory"
+	-- instance.weapon_spawn_depth = 1
 	-- instance.shading_environment = "content/shading_environments/ui/barber" -> crash
 	-- instance.shading_environment = "content/shading_environments/ui/barber_character_appearance" -> crash
 	-- instance.shading_environment = "content/shading_environments/ui/inventory"
+	-- instance.shading_environment = "content/shading_environments/ui/lobby" -> crash
 	-- instance.weapon_spawn_depth = 3
 end)
 

@@ -46,7 +46,6 @@ local WeaponBuildAnimation = class("WeaponBuildAnimation")
 -- ##### └─┘└─┘ ┴ └─┘┴   ##############################################################################################
 
 WeaponBuildAnimation.init = function(self)
-    -- mod:echot("init")
     -- Data
     self.animations = {}
 	self.animation_time = .75
@@ -312,8 +311,6 @@ WeaponBuildAnimation.update = function(self, dt, t)
                             local no_animation = attachment_data and attachment_data.no_animation
 
                             if entry.detach_only then
-                                -- mod:echo("detach only")
-                                -- mod:unit_hide_meshes(unit, true)
                                 if self.wobble then
                                     entry.end_time = t + (self.animation_time / this_animation_speed)
                                     entry.type = "wobble_detach"

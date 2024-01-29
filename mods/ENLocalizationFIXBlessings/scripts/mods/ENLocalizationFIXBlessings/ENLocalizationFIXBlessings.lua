@@ -4,9 +4,13 @@ local InputUtils = require("scripts/managers/input/input_utils")
 
 --[[ Thanks to Ovenproof! Moving the Use button.
 	--self._widgets_by_name.equip_button.offset[1] = -622 ]]
--- mod:hook_safe(CLASS.InventoryWeaponsView, "on_enter", function (self)
-	-- self._widgets_by_name.equip_button.offset = {-622,20,0}
--- end)
+mod:hook_safe(CLASS.InventoryWeaponsView, "on_enter", function (self)
+	self._widgets_by_name.equip_button.offset = {-622,20,0}
+end)
+
+mod:hook_safe(CLASS.MarksVendorView, "on_enter", function (self)
+	self._widgets_by_name.purchase_button.offset = {-622,20,0}
+end)
 
 --[[ Thanks to Fracticality!
 local InputUtils = require("scripts/managers/input/input_utils")
@@ -183,7 +187,7 @@ mod.localization_templates = {
 	loc_keys = {"loc_trait_bespoke_stacking_increase_impact_on_hit_desc",},
 	locales = {"en",},
 	handle_func = function(locale, value)
-	return "{#color(255, 255, 140)}+{impact:%s}{#reset()} " .. impact_color_rgb .. " for  {#color(255, 155, 55)}3.5{#reset()} seconds on Hit. Stacks {#color(255, 255, 140)}{stacks:%s}{#reset()} times." end}, -- colors s->seconds -- {time:%s}=1.5
+	return "{#color(255, 255, 140)}+{impact:%s}{#reset()} " .. impact_color_rgb .. " for {#color(255, 155, 55)}3.5{#reset()} seconds on Hit. Stacks {#color(255, 255, 140)}{stacks:%s}{#reset()} times." end}, -- colors s->seconds -- {time:%s}=1.5
 -- {	id = "trait_bespoke_7_ext_en", -- Devastating Strike
 	-- loc_keys = {"loc_trait_bespoke_infinite_melee_cleave_on_crit",},
 	-- locales = {"en",},
@@ -794,7 +798,7 @@ mod.localization_templates = {
 	loc_keys = {"loc_trait_bespoke_increase_power_on_close_kill_desc",},
 	locales = {"en",},
 	handle_func = function(locale, value)
-	return "{#color(255, 255, 140)}+{power_level:%s}{#reset()} " .. power_color_rgb .. " at a distance of up to {#color(255, 155, 55)}8{#reset()} meters for {#color(255, 255, 140)}{time:%s}{#reset()} seconds. Stacks {#color(255, 155, 55)}5{#reset()} times." .. power_note_color_rgb end}, -- colors Note!
+	return "{#color(255, 255, 140)}+{power_level:%s}{#reset()} " .. power_color_rgb .. " on Kill at a distance of up to {#color(255, 155, 55)}8{#reset()} meters for {#color(255, 255, 140)}{time:%s}{#reset()} seconds. Stacks {#color(255, 155, 55)}5{#reset()} times." .. power_note_color_rgb end}, -- colors Note!
 {	id = "trait_bespoke_66_ext_en", -- Hit & Run
 	loc_keys = {"loc_trait_bespoke_count_as_dodge_vs_ranged_on_close_kill",},
 	locales = {"en",},

@@ -1,67 +1,73 @@
 local mod = get_mod("weapon_customization")
 
--- ##### ┌┬┐┌─┐┌┬┐┌─┐ #################################################################################################
--- #####  ││├─┤ │ ├─┤ #################################################################################################
--- ##### ─┴┘┴ ┴ ┴ ┴ ┴ #################################################################################################
-
-local REFERENCE = "weapon_customization"
-local OPTION_RANDOMIZE_PLAYERS = "mod_option_randomization_players"
-local OPTION_RANDOMIZE_STORE = "mod_option_randomization_store"
-
--- Persistent values
-mod:persistent_table(REFERENCE, {
-	-- Flashlight
-	flashlight_on = false,
-	-- Items
-	item_definitions = nil,
-	composite_items = {},
-	-- Equipment
-	attachment_slot_infos = {},
-	weapon_templates = {},
-	temp_gear_settings = {},
-	extensions = {
-		dependencies = {},
-	},
-	-- Pakcages
-	loaded_packages = {
-		visible_equipment = {},
-		view_weapon_sounds = {},
-		needed = {},
-		customization = {},
-	},
-	used_packages = {
-		visible_equipment = {},
-		view_weapon_sounds = {},
-		needed = {},
-		attachments = {},
-		hub = {},
-		customization = {},
-	},
-	prevent_unload = {},
-	keep_all_packages = nil,
-	-- Performance
-	performance = {
-		measurements = {},
-		result_cache = {},
-	},
-})
-
 -- ##### ┌─┐┌─┐┬─┐┌─┐┌─┐┬─┐┌┬┐┌─┐┌┐┌┌─┐┌─┐ ############################################################################
 -- ##### ├─┘├┤ ├┬┘├┤ │ │├┬┘│││├─┤││││  ├┤  ############################################################################
 -- ##### ┴  └─┘┴└─└  └─┘┴└─┴ ┴┴ ┴┘└┘└─┘└─┘ ############################################################################
 
 --#region local functions
 	local Unit = Unit
+	local math = math
+	local pairs = pairs
+	local CLASS = CLASS
 	local tostring = tostring
 	local managers = Managers
+	local math_uuid = math.uuid
 	local unit_alive = Unit.alive
 	local script_unit = ScriptUnit
+--#endregion
+
+-- ##### ┌┬┐┌─┐┌┬┐┌─┐ #################################################################################################
+-- #####  ││├─┤ │ ├─┤ #################################################################################################
+-- ##### ─┴┘┴ ┴ ┴ ┴ ┴ #################################################################################################
+
+--#region Data
+	local REFERENCE = "weapon_customization"
+	local OPTION_RANDOMIZE_PLAYERS = "mod_option_randomization_players"
+	local OPTION_RANDOMIZE_STORE = "mod_option_randomization_store"
+	-- Persistent values
+	mod:persistent_table(REFERENCE, {
+		-- Flashlight
+		flashlight_on = false,
+		-- Items
+		item_definitions = nil,
+		composite_items = {},
+		-- Equipment
+		attachment_slot_infos = {},
+		weapon_templates = {},
+		temp_gear_settings = {},
+		extensions = {
+			dependencies = {},
+		},
+		-- Pakcages
+		loaded_packages = {
+			visible_equipment = {},
+			view_weapon_sounds = {},
+			needed = {},
+			customization = {},
+		},
+		used_packages = {
+			visible_equipment = {},
+			view_weapon_sounds = {},
+			needed = {},
+			attachments = {},
+			hub = {},
+			customization = {},
+		},
+		prevent_unload = {},
+		keep_all_packages = nil,
+		-- Performance
+		performance = {
+			measurements = {},
+			result_cache = {},
+		},
+	})
 --#endregion
 
 -- ##### ┬┌┐┌┬┌┬┐┬┌─┐┬  ┬┌─┐┌─┐ #######################################################################################
 -- ##### │││││ │ │├─┤│  │┌─┘├┤  #######################################################################################
 -- ##### ┴┘└┘┴ ┴ ┴┴ ┴┴─┘┴└─┘└─┘ #######################################################################################
 
+-- Initialize mod
 mod.init = function(self)
 	local player_manager = managers.player
 	self.player = player_manager:local_player(1)
@@ -72,6 +78,7 @@ mod.init = function(self)
 	self.initialized = true
 end
 
+-- Uninitialize mod
 mod.deinit = function(self)
 	self.initialized = false
 end
@@ -135,6 +142,10 @@ mod.on_unload = function(exit_game)
 	if exit_game then mod:console_output() end
 end
 
+-- ##### ┌─┐┬  ┬┌─┐┌┐┌┌┬┐┌─┐ ##########################################################################################
+-- ##### ├┤ └┐┌┘├┤ │││ │ └─┐ ##########################################################################################
+-- ##### └─┘ └┘ └─┘┘└┘ ┴ └─┘ ##########################################################################################
+
 -- Player visual extension initialized
 mod.on_player_unit_loaded = function(self, player_unit)
 	self:init()
@@ -157,48 +168,53 @@ end
 -- ##### ├┬┘├┤ │─┼┐│ ││├┬┘├┤  #########################################################################################
 -- ##### ┴└─└─┘└─┘└└─┘┴┴└─└─┘ #########################################################################################
 
--- Patches
-mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/patches/extensions")
--- Utilities
-mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/utilities/common")
-mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/utilities/weapons")
-mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/utilities/performance")
-mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/utilities/attachments")
--- Patches
-mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/patches/hud")
-mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/patches/misc")
-mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/patches/icons")
-mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/patches/item_package")
-mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/patches/master_items")
-mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/patches/input_service")
-mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/patches/randomization")
-mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/patches/weapon_templates")
-mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/patches/visual_loadout_customization")
+--#region Require
+	-- Patches
+	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/patches/extensions")
+	-- Utilities
+	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/utilities/common")
+	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/utilities/weapons")
+	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/utilities/performance")
+	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/utilities/attachments")
+	-- Patches
+	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/patches/hud")
+	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/patches/misc")
+	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/patches/icons")
+	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/patches/item_package")
+	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/patches/master_items")
+	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/patches/input_service")
+	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/patches/randomization")
+	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/patches/weapon_templates")
+	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/patches/visual_loadout_customization")
 
--- Definitions
-mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_customization_anchors")
--- Extensions
-mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/extensions/extension_base")
-mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/extensions/sight_extension")
-mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/extensions/battery_extension")
-mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/extensions/dependency_extension")
-mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/extensions/flashlight_extension")
-mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/extensions/weapon_dof_extension")
-mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/extensions/laser_pointer_extension")
-mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/extensions/sway_animation_extension")
-mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/extensions/crouch_animation_extension")
-mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/extensions/weapon_animation_extension")
-mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/extensions/visible_equipment_extension")
--- Import mod files
-mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_customization_view")
-mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_customization_hooks")
-mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_customization_debug")
-mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/composite")
-mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_customization_mod_options")
--- mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_customization_bolt_pistol")
--- mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_customization_daemon_host")
+	-- Definitions
+	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_customization_anchors")
+	-- Extensions
+	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/extensions/extension_base")
+	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/extensions/sight_extension")
+	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/extensions/battery_extension")
+	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/extensions/dependency_extension")
+	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/extensions/flashlight_extension")
+	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/extensions/weapon_dof_extension")
+	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/extensions/laser_pointer_extension")
+	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/extensions/sway_animation_extension")
+	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/extensions/crouch_animation_extension")
+	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/extensions/weapon_animation_extension")
+	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/extensions/visible_equipment_extension")
+	-- Import mod files
+	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_customization_view")
+	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_customization_hooks")
+	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_customization_debug")
+	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/composite")
+	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_customization_mod_options")
+	-- mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_customization_bolt_pistol")
+	-- mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_customization_daemon_host")
+--#endregion
 
+-- Packages
 mod:load_needed_packages()
+
+-- Find unused attachments
 -- mod:find_attachment_entries()
 
 -- Reinitialize on mod reload
