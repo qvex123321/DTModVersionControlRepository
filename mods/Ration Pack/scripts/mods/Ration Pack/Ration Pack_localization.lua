@@ -19,4 +19,9 @@ return {
 		["zh-cn"] = "显示颜色",
 		ru = "Показывать цвета",
 	},
+  show_medicae_radius = {
+    en = "Show Medicae radius and remaining",
+    ru = "Показывать радиус и оставшееся время аптечки",
+    ["zh-cn"] = "显示医疗箱范围和剩余信息",
+    }
 }
