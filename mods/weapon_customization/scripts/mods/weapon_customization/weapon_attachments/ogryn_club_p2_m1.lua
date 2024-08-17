@@ -4,19 +4,21 @@ local mod = get_mod("weapon_customization")
 -- ##### ├┬┘├┤ │─┼┐│ ││├┬┘├┤  #########################################################################################
 -- ##### ┴└─└─┘└─┘└└─┘┴┴└─└─┘ #########################################################################################
 
-local _common = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/common")
-local _common_melee = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/common_melee")
+--#region Require
+    local _common = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/common")
+    local _common_melee = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/common_melee")
+    local _ogryn_club_p2_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/functions/ogryn_club_p2_m1")
+--#endregion
 
 -- ##### ┌┬┐┌─┐┌┬┐┌─┐ #################################################################################################
 -- #####  ││├─┤ │ ├─┤ #################################################################################################
 -- ##### ─┴┘┴ ┴ ┴ ┴ ┴ #################################################################################################
 
-local _item = "content/items/weapons/player"
-local _item_melee = _item.."/melee"
-
-local _small_shafts = "small_shaft_01|small_shaft_02|small_shaft_03|small_shaft_04|small_shaft_05|small_shaft_06"
-local _small_heads = "small_head_01|small_head_02|small_head_03|small_head_04|small_head_05|small_head_06"
-local _bodies = "body_01|body_02|body_03|body_04|body_05"
+--#region Data
+    local _small_shafts = "small_shaft_01|small_shaft_02|small_shaft_03|small_shaft_04|small_shaft_05|small_shaft_06"
+    local _small_heads = "small_head_01|small_head_02|small_head_03|small_head_04|small_head_05|small_head_06"
+    local _bodies = "body_01|body_02|body_03|body_04|body_05"
+--#endregion
 
 -- ##### ┌─┐┌─┐┬─┐┌─┐┌─┐┬─┐┌┬┐┌─┐┌┐┌┌─┐┌─┐ ############################################################################
 -- ##### ├─┘├┤ ├┬┘├┤ │ │├┬┘│││├─┤││││  ├┤  ############################################################################
@@ -27,54 +29,19 @@ local _bodies = "body_01|body_02|body_03|body_04|body_05"
     local string_find = string.find
     local vector3_box = Vector3Box
     local table = table
-    local pairs = pairs
-    local ipairs = ipairs
-    local type = type
 --#endregion
-
--- ##### ┌─┐┬ ┬┌┐┌┌─┐┌┬┐┬┌─┐┌┐┌┌─┐ ####################################################################################
--- ##### ├┤ │ │││││   │ ││ ││││└─┐ ####################################################################################
--- ##### └  └─┘┘└┘└─┘ ┴ ┴└─┘┘└┘└─┘ ####################################################################################
-
-local functions = {
-    body_attachments = function(default)
-        local attachments = {
-            {id = "body_01",   name = "Body 1"},
-            {id = "body_02",   name = "Body 2"},
-            {id = "body_03",   name = "Body 3"},
-            {id = "body_04",   name = "Body 4"},
-            {id = "body_05",   name = "Body 5"},
-        }
-        if default == nil then default = true end
-        if default then return table.icombine(
-            {{id = "body_default", name = mod:localize("mod_attachment_default")}},
-            attachments)
-        else return attachments end
-    end,
-    body_models = function(parent, angle, move, remove, type, no_support, automatic_equip, hide_mesh, mesh_move, special_resolve)
-        if mesh_move == nil then mesh_move = false end
-        return table.model_table({
-            {name = "body_default", model = ""},
-            {name = "body_01",      model = _item_melee.."/full/ogryn_club_pipe_full_01"},
-            {name = "body_02",      model = _item_melee.."/full/ogryn_club_pipe_full_02"},
-            {name = "body_03",      model = _item_melee.."/full/ogryn_club_pipe_full_03"},
-            {name = "body_04",      model = _item_melee.."/full/ogryn_club_pipe_full_04"},
-            {name = "body_05",      model = _item_melee.."/full/ogryn_club_pipe_full_05"},
-            {name = "body_none",    model = _item_melee.."/ogryn_powermaul_p1_empty"},
-        }, parent, angle, move, remove, type or "body", no_support, automatic_equip, hide_mesh, mesh_move, special_resolve)
-    end,
-}
 
 -- ##### ┌┬┐┌─┐┌─┐┬┌┐┌┬┌┬┐┬┌─┐┌┐┌┌─┐ ##################################################################################
 -- #####  ││├┤ ├┤ │││││ │ ││ ││││└─┐ ##################################################################################
 -- ##### ─┴┘└─┘└  ┴┘└┘┴ ┴ ┴└─┘┘└┘└─┘ ##################################################################################
 
+local changes = {}
 return table.combine(
-    functions,
+    _ogryn_club_p2_m1,
     {
         attachments = {
             -- Native
-            body = functions.body_attachments(),
+            body = _ogryn_club_p2_m1.body_attachments(),
             -- Melee
             shaft = _common_melee.human_power_maul_shaft_attachments(),
             head = _common_melee.human_power_maul_head_attachments(),
@@ -85,41 +52,50 @@ return table.combine(
         },
         models = table.combine(
             -- Native
-            functions.body_models(nil, 0, vector3_box(0, 0, 0), vector3_box(0, 0, -.2), nil, nil, nil, nil, nil, function(gear_id, item, attachment)
-                local changes = {}
+            _ogryn_club_p2_m1.body_models(nil, 0, vector3_box(0, 0, 0), vector3_box(0, 0, -.2), nil, nil, nil, nil, nil, function(gear_id, item, attachment, attachment_list)
+                changes = {}
+                local shaft = attachment_list and attachment_list["shaft"] or mod.gear_settings:get(item, "shaft")
+                local head = attachment_list and attachment_list["head"] or mod.gear_settings:get(item, "head")
+                local body = attachment_list and attachment_list["body"] or mod.gear_settings:get(item, "body")
                 if attachment ~= "body_none" then
-                    if mod:get_gear_setting(gear_id, "shaft", item) ~= "shaft_default" then changes["shaft"] = "shaft_default" end
-                    if mod:get_gear_setting(gear_id, "head", item) ~= "head_default" then changes["head"] = "head_default" end
+                    if shaft ~= "shaft_default" then changes["shaft"] = "shaft_default" end
+                    if head ~= "head_default" then changes["head"] = "head_default" end
                 elseif attachment == "body_none" then
-                    if mod:get_gear_setting(gear_id, "shaft", item) == "shaft_default" then changes["shaft"] = _small_shafts end
-                    if mod:get_gear_setting(gear_id, "head", item) == "head_default" then changes["head"] = _small_heads end
+                    if shaft == "shaft_default" then changes["shaft"] = _small_shafts end
+                    if head == "head_default" then changes["head"] = _small_heads end
                 end
                 return changes
             end),
             -- Melee
-            _common_melee.human_power_maul_shaft_models("body", 0, vector3_box(0, 0, 0), vector3_box(0, 0, -.2), nil, nil, nil, nil, nil, function(gear_id, item, attachment)
-                local changes = {}
+            _common_melee.human_power_maul_shaft_models("body", 0, vector3_box(0, 0, 0), vector3_box(0, 0, -.2), nil, nil, nil, nil, nil, function(gear_id, item, attachment, attachment_list)
+                changes = {}
+                local shaft = attachment_list and attachment_list["shaft"] or mod.gear_settings:get(item, "shaft")
+                local head = attachment_list and attachment_list["head"] or mod.gear_settings:get(item, "head")
+                local body = attachment_list and attachment_list["body"] or mod.gear_settings:get(item, "body")
                 if string_find(attachment, "default") then
-                    if mod:get_gear_setting(gear_id, "shaft", item) ~= "shaft_default" then changes["shaft"] = "shaft_default" end
-                    if mod:get_gear_setting(gear_id, "head", item) ~= "head_default" then changes["head"] = "head_default" end
-                    if mod:get_gear_setting(gear_id, "body", item) == "body_none" then changes["body"] = _bodies end
+                    if shaft ~= "shaft_default" then changes["shaft"] = "shaft_default" end
+                    if head ~= "head_default" then changes["head"] = "head_default" end
+                    if body == "body_none" then changes["body"] = _bodies end
                 else
-                    if mod:get_gear_setting(gear_id, "shaft", item) == "shaft_default" then changes["shaft"] = _small_shafts end
-                    if mod:get_gear_setting(gear_id, "head", item) == "head_default" then changes["head"] = _small_heads end
-                    if mod:get_gear_setting(gear_id, "body", item) ~= "body_none" then changes["body"] = "body_none" end
+                    if shaft == "shaft_default" then changes["shaft"] = _small_shafts end
+                    if head == "head_default" then changes["head"] = _small_heads end
+                    if body ~= "body_none" then changes["body"] = "body_none" end
                 end
                 return changes
             end),
-            _common_melee.human_power_maul_head_models("shaft", 0, vector3_box(0, 0, 0), vector3_box(0, 0, .2), nil, nil, nil, nil, nil, function(gear_id, item, attachment)
-                local changes = {}
+            _common_melee.human_power_maul_head_models("shaft", 0, vector3_box(0, 0, 0), vector3_box(0, 0, .2), nil, nil, nil, nil, nil, function(gear_id, item, attachment, attachment_list)
+                changes = {}
+                local shaft = attachment_list and attachment_list["shaft"] or mod.gear_settings:get(item, "shaft")
+                local head = attachment_list and attachment_list["head"] or mod.gear_settings:get(item, "head")
+                local body = attachment_list and attachment_list["body"] or mod.gear_settings:get(item, "body")
                 if string_find(attachment, "default") then
-                    if mod:get_gear_setting(gear_id, "shaft", item) ~= "shaft_default" then changes["shaft"] = "shaft_default" end
-                    if mod:get_gear_setting(gear_id, "head", item) ~= "head_default" then changes["head"] = "head_default" end
-                    if mod:get_gear_setting(gear_id, "body", item) == "body_none" then changes["body"] = _bodies end
+                    if shaft ~= "shaft_default" then changes["shaft"] = "shaft_default" end
+                    if head ~= "head_default" then changes["head"] = "head_default" end
+                    if body == "body_none" then changes["body"] = _bodies end
                 else
-                    if mod:get_gear_setting(gear_id, "shaft", item) == "shaft_default" then changes["shaft"] = _small_shafts end
-                    if mod:get_gear_setting(gear_id, "head", item) == "head_default" then changes["head"] = _small_heads end
-                    if mod:get_gear_setting(gear_id, "body", item) ~= "body_none" then changes["body"] = "body_none" end
+                    if shaft == "shaft_default" then changes["shaft"] = _small_shafts end
+                    if head == "head_default" then changes["head"] = _small_heads end
+                    if body ~= "body_none" then changes["body"] = "body_none" end
                 end
                 return changes
             end),

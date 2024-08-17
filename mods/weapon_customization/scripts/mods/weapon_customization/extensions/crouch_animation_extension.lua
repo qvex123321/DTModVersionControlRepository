@@ -23,7 +23,6 @@ local mod = get_mod("weapon_customization")
     local table = table
     local World = World
     local Camera = Camera
-    local wc_perf = wc_perf
     local vector3 = Vector3
     local managers = Managers
     local math_abs = math.abs
@@ -91,6 +90,7 @@ local CrouchAnimationExtension = class("CrouchAnimationExtension", "WeaponCustom
 -- Initialize
 CrouchAnimationExtension.init = function(self, extension_init_context, unit, extension_init_data)
     CrouchAnimationExtension.super.init(self, extension_init_context, unit, extension_init_data)
+    self.position = vector3_box(vector3_zero())
     -- Events
     managers.event:register(self, "weapon_customization_settings_changed", "on_settings_changed")
     -- Settings
@@ -165,14 +165,12 @@ end
 
 -- Update
 CrouchAnimationExtension.update = function(self, dt, t)
-    local perf = wc_perf.start("CrouchAnimationExtension.update", 2)
     if self.initialized and self.on and self:get_first_person() then
         self:update_character_state()
         if not self:is_braced() then
             self:update_animation(dt, t)
         end
     end
-    wc_perf.stop(perf)
 end
 
 -- Update animation
@@ -227,8 +225,7 @@ CrouchAnimationExtension.update_animation = function(self, dt, t)
         end
 
         -- Save values
-        self.position = vector3_box(position)
-        self.rotation = quaternion_box(rotation)
+        self.position:store(position)
 
         -- Set position and rotation
         self:set_position_and_rotation(position, rotation)
@@ -236,7 +233,7 @@ CrouchAnimationExtension.update_animation = function(self, dt, t)
 end
 
 CrouchAnimationExtension.set_position_and_rotation = function(self, offset_position, offset_rotation)
-    if offset_position and offset_rotation then
+    if offset_position and offset_rotation and self.first_person_unit and unit_alive(self.first_person_unit) then
         local position = unit_local_position(self.first_person_unit, 1)
         local rotation = unit_local_rotation(self.first_person_unit, 1)
         -- Rotation
@@ -244,8 +241,9 @@ CrouchAnimationExtension.set_position_and_rotation = function(self, offset_posit
         -- Position
         local mat = quaternion_matrix4x4(rotation)
         local rotated_pos = matrix4x4_transform(mat, offset_position)
+        -- mod:info("CrouchAnimationExtension.set_position_and_rotation: "..tostring(self.first_person_unit))
         unit_set_local_position(self.first_person_unit, 1, position + rotated_pos)
-        world_update_unit_and_children(self.world, self.first_person_unit)
+        -- world_update_unit_and_children(self.world, self.first_person_unit)
     end
 end
 
@@ -266,7 +264,7 @@ CrouchAnimationExtension.crosshair_position = function(self, hud_element_crossha
         
         -- Adjust position
         local offset_position = self.position and vector3_unbox(self.position) or vector3_zero()
-        -- mod:echot("self.position: "..tostring(self.position), 2)
+        -- mod:echo("self.position: "..tostring(self.position), 2)
         local mat = quaternion_matrix4x4(shoot_rotation)
         local rotated_pos = matrix4x4_transform(mat, offset_position)
 

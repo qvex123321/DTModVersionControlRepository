@@ -6,6 +6,7 @@ local mod = get_mod("weapon_customization")
 
 --#region Require
 	local ItemMaterialOverrides = mod:original_require("scripts/settings/equipment/item_material_overrides/item_material_overrides")
+	local VisualLoadoutCustomization = mod:original_require("scripts/extension_systems/visual_loadout/utilities/visual_loadout_customization")
 --#endregion
 
 -- ##### ┌─┐┌─┐┬─┐┌─┐┌─┐┬─┐┌┬┐┌─┐┌┐┌┌─┐┌─┐ ############################################################################
@@ -16,18 +17,19 @@ local mod = get_mod("weapon_customization")
 	local Unit = Unit
 	local Mesh = Mesh
 	local type = type
-	local table = table
+	-- local table = table
 	local World = World
 	local pairs = pairs
 	local CLASS = CLASS
 	local color = Color
+	local Level = Level
 	local string = string
 	local rawget = rawget
-	local Level = Level
 	local vector2 = Vector2
 	local vector3 = Vector3
 	local managers= Managers
 	local log_info = Log.info
+	local callback = callback
 	local tonumber = tonumber
 	local unit_node = Unit.node
 	local unit_mesh = Unit.mesh
@@ -41,15 +43,17 @@ local mod = get_mod("weapon_customization")
 	local string_gsub = string.gsub
 	local string_find = string.find
 	local vector3_one = vector3.one
+	local level_units = Level.units
 	local table_remove = table.remove
 	local table_append = table.append
 	local string_split = string.split
 	local vector3_zero = vector3.zero
 	local matrix4x4_box = Matrix4x4Box
-	local level_units = Level.units
 	local unit_set_data = Unit.set_data
+	local unit_get_data = Unit.get_data
 	local unit_has_node = Unit.has_node
 	local table_contains = table.contains
+	local quaternion_box = QuaternionBox
 	local unit_debug_name = Unit.debug_name
 	local unit_local_pose = Unit.local_pose
 	local unit_world_pose = Unit.world_pose
@@ -69,6 +73,7 @@ local mod = get_mod("weapon_customization")
 	local mesh_local_position = Mesh.local_position
 	local world_spawn_unit_ex = World.spawn_unit_ex
 	local unit_set_local_scale = Unit.set_local_scale
+	local table_clone_instance = table.clone_instance
 	local quaternion_matrix4x4 = Quaternion.matrix4x4
 	local unit_set_unit_culling = Unit.set_unit_culling
 	local unit_set_local_position = Unit.set_local_position
@@ -76,6 +81,7 @@ local mod = get_mod("weapon_customization")
 	local lod_group_add_lod_object = LODGroup.add_lod_object
 	local unit_set_mesh_visibility = Unit.set_mesh_visibility
 	local unit_set_unit_visibility = Unit.set_unit_visibility
+	local unit_force_stream_meshes = Unit.force_stream_meshes
 	local lod_object_set_static_select = LODObject.set_static_select
 	local Unit_set_scalar_for_materials = Unit.set_scalar_for_materials
 	local Unit_set_vector2_for_materials = Unit.set_vector2_for_materials
@@ -94,9 +100,15 @@ local mod = get_mod("weapon_customization")
 
 --#region Data
 	local REFERENCE = "weapon_customization"
+	local WEAPON_MELEE = "WEAPON_MELEE"
+    local WEAPON_RANGED = "WEAPON_RANGED"
 --#endregion
 
 mod.mesh_positions = {}
+mod.mesh_positions_changed = {}
+
+mod.visual_loadout_customization_stream_complete = function(self)
+end
 
 -- ##### ┌─┐┬ ┬┌┐┌┌─┐┌┬┐┬┌─┐┌┐┌┌─┐ ####################################################################################
 -- ##### ├┤ │ │││││   │ ││ ││││└─┐ ####################################################################################
@@ -111,25 +123,33 @@ mod:hook_require("scripts/extension_systems/visual_loadout/utilities/visual_load
 	}
 
 	instance.spawn_item_attachments = function(item_data, override_lookup, attach_settings, item_unit, optional_map_attachment_name_to_unit, optional_extract_attachment_units_bind_poses, optional_mission_template)
-		local item_name = mod:item_name_from_content_string(item_data.name)
+		local item_name = mod.gear_settings:short_name(item_data.name)
 		local attachments = item_data.attachments
-		local gear_id = mod:get_gear_id(item_data)
-		local slot_info_id = mod:get_slot_info_id(item_data)
-		local in_possesion_of_player = mod:is_owned_by_player(item_data)
+		local gear_id = mod.gear_settings:item_to_gear_id(item_data)
+		local slot_info_id = mod.gear_settings:slot_info_id(item_data)
+		local visible_equipment_system_option = mod:get("mod_option_visible_equipment")
+		local hub = not mod:is_in_hub() or not mod:get("mod_option_visible_equipment_disable_in_hub")
+        local in_possesion_of_player = mod.gear_settings:player_item(item_data) or (visible_equipment_system_option and hub)
 		local attachment_slot_info = {}
+		local weapon_item = item_data.item_type == "WEAPON_MELEE" or item_data.item_type == "WEAPON_RANGED"
+
+		local player_item = item_data.item_list_faction == "Player"
 		
-		if item_unit and attachments and gear_id and in_possesion_of_player and not mod:is_premium_store_item() then
+		if gear_id and item_unit and attachments and weapon_item and player_item and in_possesion_of_player and not mod:is_premium_store_item() then
 			mod:setup_item_definitions()
 
-			-- Add flashlight slot
-			mod:_add_custom_attachments(item_data, attachments)
+			-- -- Resolve issues
+            -- mod.gear_settings:resolve_issues(item_data)
+
+			-- Add custom attachments
+			mod.gear_settings:_add_custom_attachments(item_data, attachments)
 			
 			-- Overwrite attachments
-			mod:_overwrite_attachments(item_data, attachments)
+			mod.gear_settings:_overwrite_attachments(item_data, attachments)
 		end
 
 		-- mod:echo(item_name)
-		-- mod:debug_attachments(item_data, attachments, {"combataxe_p3_m3"}, nil, true)
+		-- mod:debug_attachments(item_data, attachments, {"powersword_p1_m1", "powersword_p1_m2"}, nil, true)
 
 		--#region Original
 			local attachment_units, attachment_units_bind_poses, attachment_name_to_unit  = nil, nil, nil
@@ -162,7 +182,7 @@ mod:hook_require("scripts/extension_systems/visual_loadout/utilities/visual_load
 
 		-- ############################################################################################################
 
-		if attachment_units and item_unit and attachments and gear_id and not mod:is_premium_store_item() then
+		if gear_id and attachment_units and item_unit and attachments and weapon_item and player_item and not mod:is_premium_store_item() and in_possesion_of_player then
 
 			unit_set_data(item_unit, "attachment_units", attachment_units)
 
@@ -179,34 +199,49 @@ mod:hook_require("scripts/extension_systems/visual_loadout/utilities/visual_load
 			slot_infos[slot_info_id].unit_mesh_rotation =		slot_infos[slot_info_id].unit_mesh_rotation or {}
 			slot_infos[slot_info_id].unit_mesh_index = 			slot_infos[slot_info_id].unit_mesh_index or {}
 			slot_infos[slot_info_id].unit_default_position = 	slot_infos[slot_info_id].unit_default_position or {}
+			slot_infos[slot_info_id].unit_default_rotation = 	slot_infos[slot_info_id].unit_default_rotation or {}
+			slot_infos[slot_info_id].unit_changed_position = 	slot_infos[slot_info_id].unit_changed_position or {}
+			slot_infos[slot_info_id].unit_changed_rotation = 	slot_infos[slot_info_id].unit_changed_rotation or {}
 			slot_infos[slot_info_id].attachment_slot_to_unit["root"] = item_unit
 			slot_infos[slot_info_id].unit_to_attachment_slot[item_unit] = "root"
 			slot_infos[slot_info_id].unit_to_attachment_name[item_unit] = "root"
 
 			-- Set root default position
 			slot_infos[slot_info_id].unit_default_position["root"] = vector3_box(unit_local_position(item_unit, 1))
+			unit_set_data(item_unit, "default_position", vector3_box(unit_local_position(item_unit, 1)))
 
 			-- Set unit default positions
 			for _, unit in pairs(attachment_units) do
 				slot_infos[slot_info_id].unit_default_position[unit] = vector3_box(unit_local_position(unit, 1))
+				unit_set_data(unit, "default_position", vector3_box(unit_local_position(unit, 1)))
+				slot_infos[slot_info_id].unit_default_rotation[unit] = QuaternionBox(Unit.local_rotation(unit, 1))
+				unit_set_data(unit, "default_rotation", QuaternionBox(Unit.local_rotation(unit, 1)))
 			end
 
 			-- Iterate attachment units
-			for _, unit in pairs(attachment_units) do
+			for slot_index, unit in pairs(attachment_units) do
+
 				local unit_name = unit_debug_name(unit)
 				local anchor = nil
 
 				-- Set unit mesh default positions
 				mod.mesh_positions[unit] = mod.mesh_positions[unit] or {}
-			    local num_meshes = unit_num_meshes(unit)
-			    for i = 1, num_meshes do
-			        mod.mesh_positions[unit][i] = vector3_box(mesh_local_position(unit_mesh(unit, i)))
-			    end
+				local num_meshes = unit_num_meshes(unit)
+				for i = 1, num_meshes do
+					mod.mesh_positions[unit][i] = vector3_box(mesh_local_position(unit_mesh(unit, i)))
+					unit_set_data(unit, "mesh_positions", i, vector3_box(mesh_local_position(unit_mesh(unit, i))))
+				end
 
 				-- Handle positioning and setup infos
 				if slot_infos[slot_info_id] then
-					local attachment_name = slot_infos[slot_info_id].unit_to_attachment_name[unit]
-					local attachment_slot = slot_infos[slot_info_id].unit_to_attachment_slot[unit]
+					-- local attachment_name = slot_infos[slot_info_id].unit_to_attachment_name[unit]
+					local attachment_name = Unit.get_data(unit, "attachment_name")
+					if attachment_name then unit_set_data(item_unit, attachment_name, unit) end
+					-- local attachment_slot = slot_infos[slot_info_id].unit_to_attachment_slot[unit]
+					local attachment_slot = Unit.get_data(unit, "attachment_slot")
+					if attachment_slot then unit_set_data(item_unit, attachment_slot, unit) end
+					unit_set_data(item_unit, "attachment_slots", slot_index, attachment_slot)
+
 					local attachment_data = attachment_name and mod.attachment_models[item_name] and mod.attachment_models[item_name][attachment_name]
 					local parent_name = attachment_data and attachment_data.parent and attachment_data.parent
 					local parent_node = attachment_data and attachment_data.parent_node and attachment_data.parent_node or 1
@@ -214,10 +249,11 @@ mod:hook_require("scripts/extension_systems/visual_loadout/utilities/visual_load
 					-- Root movement
 					local root_movement = attachment_data and attachment_data.move_root or false
 					slot_infos[slot_info_id].unit_root_movement[unit] = root_movement
+					unit_set_data(unit, "root_movement", root_movement)
 
 					-- Anchor
 					anchor = mod.anchors[item_name] and mod.anchors[item_name][attachment_name]
-					anchor = mod:_apply_anchor_fixes(item_data, unit) or anchor
+					anchor = mod.gear_settings:apply_fixes(item_data, unit) or anchor
 
 					-- if self:is_composite_item(item_data.name) then
 					-- 	-- anchor = item_data.anchors[attachment_slot] or anchor
@@ -241,10 +277,15 @@ mod:hook_require("scripts/extension_systems/visual_loadout/utilities/visual_load
 
 					-- Setup data
 					slot_infos[slot_info_id].unit_mesh_move[unit] = mesh_move
+					unit_set_data(unit, "mesh_move", mesh_move)
 					slot_infos[slot_info_id].unit_mesh_position[unit] = anchor and anchor.mesh_position
+					unit_set_data(unit, "mesh_position", anchor and anchor.mesh_position or {})
 					slot_infos[slot_info_id].unit_mesh_rotation[unit] = anchor and anchor.mesh_rotation
+					unit_set_data(unit, "mesh_rotation", anchor and anchor.mesh_rotation or {})
 					slot_infos[slot_info_id].unit_mesh_index[unit] = anchor and anchor.mesh_index
+					unit_set_data(unit, "mesh_index", anchor and anchor.mesh_index or {})
 					slot_infos[slot_info_id].unit_root_position[unit] = anchor and anchor.root_position
+					unit_set_data(unit, "root_position", anchor and anchor.root_position or {})
 
 					-- Anchor found?
 					if anchor then
@@ -252,6 +293,8 @@ mod:hook_require("scripts/extension_systems/visual_loadout/utilities/visual_load
 						if unit and unit_alive(unit) then
 							-- Link to parent
 							if not anchor.offset then
+								Unit.set_data(unit, "parent_unit", parent)
+								Unit.set_data(unit, "parent_node", parent_node)
 								world_unlink_unit(attach_settings.world, unit)
 								world_link_unit(attach_settings.world, unit, 1, parent, parent_node)
 							end
@@ -287,7 +330,11 @@ mod:hook_require("scripts/extension_systems/visual_loadout/utilities/visual_load
 								unit_set_local_scale(unit, node, scale)
 							end
 
-							unit_set_unit_visibility(unit, true, true)
+							-- local visible = false
+							local visible = table.contains(mod.attachment_slots_always_sheathed, attachment_slot) and false or true
+        					-- Unit.set_unit_visibility(spawned_unit, visible, true)
+							-- if not visible then mod:echo("lol: "..tostring(attachment_slot)) end
+							unit_set_unit_visibility(unit, visible, true)
 
 							if anchor.data then
 								for name, value in pairs(anchor.data) do
@@ -300,6 +347,24 @@ mod:hook_require("scripts/extension_systems/visual_loadout/utilities/visual_load
 			end
 
 			for _, unit in pairs(attachment_units) do
+				-- Set unit mesh default positions
+				mod.mesh_positions_changed[unit] = mod.mesh_positions_changed[unit] or {}
+				local num_meshes = unit_num_meshes(unit)
+				for i = 1, num_meshes do
+					mod.mesh_positions_changed[unit][i] = vector3_box(mesh_local_position(unit_mesh(unit, i)))
+					unit_set_data(unit, "mesh_positions_changed", i, vector3_box(mesh_local_position(unit_mesh(unit, i))))
+				end
+			end
+
+			-- Set unit changed positions
+			for _, unit in pairs(attachment_units) do
+				slot_infos[slot_info_id].unit_changed_position[unit] = vector3_box(unit_local_position(unit, 1))
+				unit_set_data(unit, "changed_position", vector3_box(unit_local_position(unit, 1)))
+				slot_infos[slot_info_id].unit_changed_rotation[unit] = QuaternionBox(Unit.local_rotation(unit, 1))
+				unit_set_data(unit, "changed_rotation", QuaternionBox(Unit.local_rotation(unit, 1)))
+			end
+
+			for _, unit in pairs(attachment_units) do
 				local anchor = nil
 				-- Handle positioning and setup infos
 				if slot_infos[slot_info_id] then
@@ -308,7 +373,7 @@ mod:hook_require("scripts/extension_systems/visual_loadout/utilities/visual_load
 					-- Hide meshes
 					local hide_mesh = attachment_data and attachment_data.hide_mesh
 					-- Get fixes
-					local fixes = mod:_apply_anchor_fixes(item_data, unit)
+					local fixes = mod.gear_settings:apply_fixes(item_data, unit)
 					hide_mesh = fixes and fixes.hide_mesh or hide_mesh
 					-- Check hide mesh
 					if hide_mesh then
@@ -335,7 +400,47 @@ mod:hook_require("scripts/extension_systems/visual_loadout/utilities/visual_load
 					end
 				end
 			end
+
+			local weapon_size = mod:weapon_size(attachment_units)
+			Unit.set_data(item_unit, "weapon_size", weapon_size)
+			-- mod:echo("weapon_size: "..tostring(weapon_size))
 		end
+
+		-- if attachment_units and mod:has_premium_skin(item_data) and attach_settings then
+		-- 	mod:echo("premium skin - glow")
+		-- 	-- local particle_name = "content/fx/particles/interacts/servoskull_visibility_hover"
+		-- 	-- local particle_name = "content/fx/particles/enemies/red_glowing_eyes"
+		-- 	-- local particle_name = "content/fx/particles/abilities/psyker_warp_charge_shout"
+		-- 	-- local particle_name = "content/fx/particles/enemies/buff_stummed";
+		-- 	local particle_name = "content/fx/particles/abilities/chainlightning/protectorate_chainlightning_hands_charge";
+		-- 	local color = color(255, 255, 0, 0)
+		-- 	-- local intensity = 10
+		-- 	local world_scale = vector3(.1, .1, .1)
+		-- 	local unit = item_unit
+		-- 	-- for _, unit in pairs(attachment_units) do
+		-- 		if unit and unit_alive(unit) then
+		-- 			local world_position = Unit.world_position(unit, 1)
+		-- 			local world_rotation = Unit.world_rotation(unit, 1)
+		-- 			local particle_id = World.create_particles(attach_settings.world, particle_name, world_position, world_rotation, world_scale)
+		-- 			local unit_world_pose = Unit.world_pose(unit, 1)
+		-- 			-- Matrix4x4.set_translation(unit_world_pose, vector3(0, distance, 0))
+		-- 			Matrix4x4.set_scale(unit_world_pose, vector3(.1, .1, .1))
+		-- 			World.link_particles(attach_settings.world, particle_id, unit, 1, Matrix4x4.identity(), "destroy")
+		-- 			World.set_particles_use_custom_fov(attach_settings.world, particle_id, true)
+		-- 			unit_set_data(unit, "premium_particle", particle_id)
+		-- 			-- World.set_particles_material_vector3(attach_settings.world, particle_id, "eye_socket", "material_variable_21872256", vector3(1, 0, 0))
+		-- 			-- World.set_particles_material_vector3(attach_settings.world, particle_id, "eye_glow", "trail_color", vector3(0, 0, 0))
+		-- 			-- World.set_particles_material_vector3(attach_settings.world, particle_id, "eye_flash_init", "material_variable_21872256", vector3(0, 0, 0))
+		-- 			-- Unit.set_vector3_for_materials(unit, "stimmed_color", color, true)
+		-- 			-- Unit.set_scalar_for_materials(unit, "emissive_intensity_lumen", intensity)
+		-- 			-- Unit.set_scalar_for_materials(unit, "increase_color", 2)
+		-- 			-- if attach_settings.character_unit then
+		-- 			-- 	-- "content/fx/particles/interacts/servoskull_visibility_hover"
+		-- 			-- 	mod:echo("character")
+		-- 			-- end
+		-- 		end
+		-- 	-- end
+		-- end
 	
 		-- Return original values
 		return attachment_units, attachment_name_to_unit, attachment_units_bind_poses
@@ -347,8 +452,8 @@ mod:hook_require("scripts/extension_systems/visual_loadout/utilities/visual_load
 
 	instance.spawn_item = function(item_data, attach_settings, parent_unit, optional_map_attachment_name_to_unit, optional_extract_attachment_units_bind_poses, optional_mission_template)
 		local weapon_skin = instance._validate_item_name(item_data.slot_weapon_skin)
-		local gear_id = mod:get_gear_id(item_data)
-		local in_possesion_of_player = mod:is_owned_by_player(item_data)
+		local gear_id = mod.gear_settings:item_to_gear_id(item_data)
+		local in_possesion_of_player = mod.gear_settings:player_item(item_data)
 		local in_store = mod:is_store_item(item_data)
 
 		if type(weapon_skin) == "string" then
@@ -358,6 +463,14 @@ mod:hook_require("scripts/extension_systems/visual_loadout/utilities/visual_load
 		local item_unit, bind_pose = instance.spawn_base_unit(item_data, attach_settings, parent_unit, optional_mission_template, in_possesion_of_player)
 		local skin_overrides = instance.generate_attachment_overrides_lookup(item_data, weapon_skin, in_possesion_of_player)
 		local attachment_units, attachment_name_to_unit, attachment_units_bind_poses = instance.spawn_item_attachments(item_data, skin_overrides, attach_settings, item_unit, optional_map_attachment_name_to_unit, optional_extract_attachment_units_bind_poses, optional_mission_template)
+
+		local callback = callback(mod, "visual_loadout_customization_stream_complete")
+		Unit.force_stream_meshes(item_unit, callback, true)
+		if attachment_units then
+			for _, unit in pairs(attachment_units) do
+				Unit.force_stream_meshes(item_unit, callback, true)
+			end
+		end
 	
 		instance.apply_material_overrides(item_data, item_unit, parent_unit, attach_settings)
 	
@@ -525,6 +638,8 @@ mod:hook_require("scripts/extension_systems/visual_loadout/utilities/visual_load
 		attachment_slot_info.unit_to_attachment_name[spawned_unit] = attachment_name
 		Unit.set_data(spawned_unit, "attachment_name", attachment_name)
 		Unit.set_data(spawned_unit, "attachment_slot", attachment_slot)
+		Unit.set_data(spawned_unit, "parent_unit", parent_unit)
+		Unit.set_data(spawned_unit, "parent_node", attach_node_index)
 	
 		--#region Original
 			local item_type = item_data.item_type
@@ -558,7 +673,7 @@ mod:hook_require("scripts/extension_systems/visual_loadout/utilities/visual_load
 		
 				if backpack_offset_node_index then
 					local backpack_offset_v3 = vector3(0, backpack_offset, 0)
-		
+					-- mod:info("instance._spawn_attachment: "..tostring(parent_unit))
 					unit_set_local_position(parent_unit, backpack_offset_node_index, backpack_offset_v3)
 				end
 			end
@@ -622,18 +737,27 @@ mod:hook_require("scripts/extension_systems/visual_loadout/utilities/visual_load
 	end
 
 	instance.generate_attachment_overrides_lookup = function (item_data, override_item_data, in_possesion_of_player)
-		if override_item_data then
+
+		local visible_equipment_system_option = mod:get("mod_option_visible_equipment")
+		local hub = not mod:is_in_hub() or not mod:get("mod_option_visible_equipment_disable_in_hub")
+		local in_possesion_of_player = mod.gear_settings:player_item(item_data) or (visible_equipment_system_option and hub)
+		-- local player_item = item_data.item_list_faction == "Player"
+
+		if override_item_data and in_possesion_of_player then
 			local attachments = override_item_data.attachments
-			local gear_id = mod:get_gear_id(item_data)
+			local gear_id = mod.gear_settings:item_to_gear_id(item_data)
 
 			if gear_id and not mod:is_premium_store_item() then
 				mod:setup_item_definitions()
 
-				-- Add flashlight slot
-				mod:_add_custom_attachments(item_data, attachments)
+				-- -- Resolve issues
+				-- mod.gear_settings:resolve_issues(item_data)
+
+				-- Add custom attachments
+				mod.gear_settings:_add_custom_attachments(item_data, attachments)
 				
 				-- Overwrite attachments
-				mod:_overwrite_attachments(item_data, attachments)
+				mod.gear_settings:_overwrite_attachments(item_data, attachments)
 			end
 		end
 

@@ -5,17 +5,20 @@ local mod = get_mod("weapon_customization")
 -- ##### ┴  └─┘┴└─└  └─┘┴└─┴ ┴┴ ┴┘└┘└─┘└─┘ ############################################################################
 
 --#region Local functions
+    local Unit = Unit
     local math = math
     local world = World
     local pairs = pairs
     local class = class
     local vector3 = Vector3
-    local wc_perf = wc_perf
     local math_abs = math.abs
     local managers = Managers
+    local unit_alive = Unit.alive
     local script_unit = ScriptUnit
     local vector3_zero = vector3.zero
+    local unit_get_data = Unit.get_data
     local world_physics_world = world.physics_world
+    local unit_data_table_size = Unit.data_table_size
     local script_unit_extension = script_unit.extension
     local script_unit_has_extension = script_unit.has_extension
     local script_unit_add_extension = script_unit.add_extension
@@ -37,7 +40,6 @@ mod.systems = {
     SightExtension            = "sight_system",
     VisibleEquipmentExtension = "visible_equipment_system",
     WeaponAnimationExtension  = "weapon_animation_system",
-    DependencyExtension       = "dependency_system",
 }
 mod.extensions = {
     flashlight_system        = "FlashlightExtension",
@@ -48,7 +50,6 @@ mod.extensions = {
     sight_system             = "SightExtension",
     visible_equipment_system = "VisibleEquipmentExtension",
     weapon_animation_system  = "WeaponAnimationExtension",
-    dependency_system        = "DependencyExtension",
 }
 
 -- ##### ┌┐ ┌─┐┌─┐┌─┐  ┌─┐─┐ ┬┌┬┐┌─┐┌┐┌┌─┐┬┌─┐┌┐┌ #####################################################################
@@ -56,8 +57,6 @@ mod.extensions = {
 -- ##### └─┘┴ ┴└─┘└─┘  └─┘┴ └─ ┴ └─┘┘└┘└─┘┴└─┘┘└┘ #####################################################################
 
 local WeaponCustomizationExtension = class("WeaponCustomizationExtension")
-
-WeaponCustomizationExtension.perf = wc_perf
 
 -- ##### ┌─┐┌─┐┌┬┐┬ ┬┌─┐ ##############################################################################################
 -- ##### └─┐├┤  │ │ │├─┘ ##############################################################################################
@@ -70,6 +69,7 @@ WeaponCustomizationExtension.init = function(self, extension_init_context, unit,
     self.player = extension_init_data.player
     self.player_unit = extension_init_data.player_unit
     self.is_local_unit = extension_init_data.is_local_unit
+    self.ranged_weapon = extension_init_data.ranged_weapon
 
     self.visual_loadout_extension = script_unit_extension(self.player_unit, "visual_loadout_system")
     self.fx_extension = script_unit_extension(self.player_unit, "fx_system")
@@ -112,11 +112,9 @@ end
 
 -- Update
 WeaponCustomizationExtension.update = function(self, ...)
-    local perf = wc_perf.start("WeaponCustomizationExtension.update", 2)
     for system, extension in pairs(self.sub_extensions) do
         mod:execute_extension(self.player_unit, system, "update", ...)
     end
-    wc_perf.stop(perf)
 end
 
 -- ##### ┌─┐┬  ┬┌─┐┌┐┌┌┬┐┌─┐ ##########################################################################################

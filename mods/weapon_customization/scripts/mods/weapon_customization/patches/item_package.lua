@@ -4,8 +4,10 @@ local mod = get_mod("weapon_customization")
 -- ##### ├┬┘├┤ │─┼┐│ ││├┬┘├┤  #########################################################################################
 -- ##### ┴└─└─┘└─┘└└─┘┴┴└─└─┘ #########################################################################################
 
-local ItemPackage = mod:original_require("scripts/foundation/managers/package/utilities/item_package")
-local MasterItems = mod:original_require("scripts/backend/master_items")
+--#region Performance
+    local ItemPackage = mod:original_require("scripts/foundation/managers/package/utilities/item_package")
+    local MasterItems = mod:original_require("scripts/backend/master_items")
+--#endregion
 
 -- ##### ┌─┐┌─┐┬─┐┌─┐┌─┐┬─┐┌┬┐┌─┐┌┐┌┌─┐┌─┐ ############################################################################
 -- ##### ├─┘├┤ ├┬┘├┤ │ │├┬┘│││├─┤││││  ├┤  ############################################################################
@@ -13,15 +15,17 @@ local MasterItems = mod:original_require("scripts/backend/master_items")
 
 --#region Local functions
     local Log = Log
+    local Xbox = Xbox
     local type = type
     local table = table
     local pairs = pairs
     local CLASS = CLASS
+    local IS_XBS = IS_XBS
     local rawget = rawget
     local string = string
-    local wc_perf = wc_perf
     local managers = Managers
     local tostring = tostring
+    local callback = callback
     local log_error = Log.error
     local table_size = table.size
     local script_unit = ScriptUnit
@@ -41,101 +45,18 @@ local MasterItems = mod:original_require("scripts/backend/master_items")
 -- #####  ││├─┤ │ ├─┤ #################################################################################################
 -- ##### ─┴┘┴ ┴ ┴ ┴ ┴ #################################################################################################
 
-local REFERENCE = "weapon_customization"
+--#region Data
+    local REFERENCE = "weapon_customization"
+    local WEAPON_MELEE = "WEAPON_MELEE"
+    local WEAPON_RANGED = "WEAPON_RANGED"
+    local OPTION_VISIBLE_EQUIPMENT = "mod_option_visible_equipment"
+    local OPTION_VISIBLE_EQUIPMENT_NO_HUB = "mod_option_visible_equipment_disable_in_hub"
+    local gear_id_inc = 1
+--#endregion
 
--- ##### ┬┌┬┐┌─┐┌┬┐  ┌─┐┌─┐┌─┐┬┌─┌─┐┌─┐┌─┐  ┌─┐┌─┐┌┬┐┌─┐┬ ┬ ###########################################################
--- ##### │ │ ├┤ │││  ├─┘├─┤│  ├┴┐├─┤│ ┬├┤   ├─┘├─┤ │ │  ├─┤ ###########################################################
--- ##### ┴ ┴ └─┘┴ ┴  ┴  ┴ ┴└─┘┴ ┴┴ ┴└─┘└─┘  ┴  ┴ ┴ ┴ └─┘┴ ┴ ###########################################################
-
-mod.in_queue = function(self, package_name)
-    local package_manager = managers.package
-    if package_manager and package_manager._queue_order then
-        for _, queued_package_data in pairs(package_manager._queue_order) do
-            if queued_package_data.package_name == package_name then
-                -- mod:echot("package "..tostring(package_name).." is in queue")
-                return true
-            end
-        end
-    end
-    return false
-end
-
-mod.can_package_be_unloaded = function(self, package_name)
-    -- Check package name
-    if not string_find(package_name, "content/weapons/player") then return true end
-    -- Check registered packages
-    local used_packages = self:persistent_table(REFERENCE).used_packages
-    for _, USED_PACKAGES in pairs(used_packages) do
-        if USED_PACKAGES[package_name] then
-            return false
-        end
-    end
-    -- Check attachment packages
-    local GLOBAL_ARRAY = self:persistent_table(REFERENCE).extensions.dependencies
-    for dependency_extension, _ in pairs(GLOBAL_ARRAY) do
-        local dependencies = dependency_extension:get_dependencies()
-        if dependencies and #dependencies > 0 then
-            for _, this_package_name in pairs(dependencies) do
-                if this_package_name == package_name then
-                    return false
-                end
-            end
-        end
-    end
-    -- Cosmetic view
-    if mod.cosmetics_view then return false end
-    -- Temp trinket fix
-    if string_find(package_name, "trinket") then return false end
-    -- Tempt random fix
-    if self:persistent_table(REFERENCE).keep_all_packages then return false end
-
-    local package_manager = managers.package
-    -- Is loading
-    if package_manager:is_loading_now(package_name) or package_manager:is_loading(package_name) then return false end
-    -- -- Unload
-    -- if not package_manager:can_unload(package_name) then return false end
-    -- Queue
-    if mod:in_queue(package_name) then return false end
-    return true
-end
-
-mod:hook(CLASS.MispredictPackageHandler, "_unload_item_packages", function(func, self, item, ...)
-	local dependencies = ItemPackage.compile_item_instance_dependencies(item, self._item_definitions, nil, self._mission)
-	for package_name, _ in pairs(dependencies) do
-        if self._loaded_packages and self._loaded_packages[package_name] then
-            local loaded_packages = self._loaded_packages[package_name]
-            local load_id = table_remove(loaded_packages, #loaded_packages)
-            managers.package:release(load_id)
-            if table_is_empty(loaded_packages) then
-                self._loaded_packages[package_name] = nil
-            end
-        else
-            mod:print("MispredictPackageHandler - not loaded "..tostring(package_name))
-        end
-	end
-end)
-
-mod:hook(CLASS.MispredictPackageHandler, "destroy", function(func, self, ...)
-    for fixed_frame, items in pairs(self._pending_unloads) do
-		for i = 1, #items do
-			local item = items[i]
-			self:_unload_item_packages(item)
-		end
-	end
-
-    -- Unload rest
-    if self._loaded_packages then
-        for package_name, load_ids in pairs(self._loaded_packages) do
-            for _, load_id in pairs(load_ids) do
-                managers.package:release(load_id)
-                mod:print("MispredictPackageHandler - unloaded left over "..tostring(package_name))
-            end
-        end
-    end
-
-	self._pending_unloads = nil
-	self._loaded_packages = nil
-end)
+-- ##### ┌─┐┬  ┌─┐┌┐ ┌─┐┬    ┌─┐┬ ┬┌┐┌┌─┐┌┬┐┬┌─┐┌┐┌┌─┐ ################################################################
+-- ##### │ ┬│  │ │├┴┐├─┤│    ├┤ │ │││││   │ ││ ││││└─┐ ################################################################
+-- ##### └─┘┴─┘└─┘└─┘┴ ┴┴─┘  └  └─┘┘└┘└─┘ ┴ ┴└─┘┘└┘└─┘ ################################################################
 
 mod.setup_item_definitions = function(self, master_items)
     if self:persistent_table(REFERENCE).item_definitions == nil then
@@ -160,51 +81,117 @@ mod.setup_item_definitions = function(self, master_items)
     end
 end
 
-mod:hook(CLASS.PackageSynchronizerClient, "_update_unload_delayer", function(func, self, dt, ...)
-    return
-end)
+-- ##### ┌─┐┬  ┌─┐┌─┐┌─┐  ┌─┐─┐ ┬┌┬┐┌─┐┌┐┌┌─┐┬┌─┐┌┐┌ ##################################################################
+-- ##### │  │  ├─┤└─┐└─┐  ├┤ ┌┴┬┘ │ ├┤ │││└─┐││ ││││ ##################################################################
+-- ##### └─┘┴─┘┴ ┴└─┘└─┘  └─┘┴ └─ ┴ └─┘┘└┘└─┘┴└─┘┘└┘ ##################################################################
 
-mod:hook(CLASS.PackageManager, "release", function(func, self, id, ...)
-	local load_call_item = self._load_call_data[id]
-	local package_name = load_call_item.package_name
-    local load_call_list = self._package_to_load_call_item[package_name]
+mod:hook_require("scripts/foundation/managers/package/utilities/item_package", function(instance)
 
-    -- Unload if possible
-    local keep_all = mod:persistent_table(REFERENCE).keep_all_packages
-    local can_unload = mod:can_package_be_unloaded(package_name) and not keep_all
-    if can_unload or self._shutdown_has_started or #load_call_list > 1 then
-        func(self, id, ...)
-    else
-        if mod:persistent_table(REFERENCE).prevent_unload[package_name] then
-            mod:persistent_table(REFERENCE).prevent_unload[package_name] = mod:persistent_table(REFERENCE).prevent_unload[package_name] + 1
-        else
-            mod:persistent_table(REFERENCE).prevent_unload[package_name] = 1
-        end
-        mod:print("prevented package "..tostring(package_name).." from unloading")
-    end
-end)
-
-mod:hook_require("scripts/foundation/managers/package/utilities/item_package", function(ItemPackage)
-
-    mod:hook(ItemPackage, "compile_item_instance_dependencies", function(func, item, items_dictionary, out_result, optional_mission_template, ...)
-
-        if item and item.attachments then
-            ItemPackage.item = item
-
-            local gear_id = mod:get_gear_id(item)
-
-            if gear_id and not mod:is_premium_store_item() then
-                mod:setup_item_definitions()
-
-                -- Add flashlight slot
-                mod:_add_custom_attachments(item, item.attachments)
-                
-                -- Overwrite attachments
-                mod:_overwrite_attachments(item, item.attachments)
+    instance.add_custom_resources = function(self, item, out_result)
+        local result = out_result or {}
+        -- Setup master items backup
+        mod:setup_item_definitions()
+        -- Check item
+        if item and item.name then
+            -- Get item name
+            local item_name = mod.gear_settings:short_name(item.name)
+            -- Iter attachment slots
+            for _, attachment_slot in pairs(mod.attachment_slots) do
+                -- Get attachment
+                local attachment = mod.gear_settings:get(item, attachment_slot)
+                -- Get item data
+                local item_data = attachment and mod.attachment_models[item_name]
+                -- Get attachment data
+                local attachment_data = item_data and item_data[attachment]
+                -- Get model
+                local model = attachment_data and attachment_data.model
+                -- Get original item
+                local original_item = model and mod:persistent_table(REFERENCE).item_definitions[model]
+                -- Check original item and dependencies
+                if original_item and original_item.resource_dependencies then
+                    -- Iterate dependencies
+                    for resource, _ in pairs(original_item.resource_dependencies) do
+                        -- Add resource
+                        result[resource] = true
+                    end
+                end
             end
         end
 
-        return func(item, items_dictionary, out_result, optional_mission_template, ...)
+        return result
+    end
+
+    mod:hook(instance, "compile_item_instance_dependencies", function(func, item, items_dictionary, out_result, optional_mission_template, ...)
+
+        -- local player_item = item.item_list_faction == "Player"
+        local weapon_item = item.item_type == WEAPON_MELEE or item.item_type == WEAPON_RANGED
+        local visible_equipment_system_option = mod:get("mod_option_visible_equipment")
+		local hub = not mod:is_in_hub() or not mod:get("mod_option_visible_equipment_disable_in_hub")
+		local in_possesion_of_player = mod.gear_settings:player_item(item) or (visible_equipment_system_option and hub)
+
+        -- Check item and attachments
+        if item and item.attachments and not mod:is_premium_store_item() and weapon_item and in_possesion_of_player then
+
+            -- Add custom attachments
+            mod.gear_settings:_add_custom_attachments(item, item.attachments)
+            
+            -- Overwrite attachments
+            mod.gear_settings:_overwrite_attachments(item, item.attachments)
+
+        end
+
+        local result = func(item, items_dictionary, out_result, optional_mission_template, ...)
+
+        if item and item.attachments and not mod:is_premium_store_item() and weapon_item then
+
+            -- Add custom resources
+            result = instance:add_custom_resources(item, result)
+
+        end
+
+        -- Return dependencies
+        return result
+
     end)
 
+end)
+
+-- ##### ┌┬┐┬┌─┐┌─┐┬─┐┌─┐┌┬┐┬┌─┐┌┬┐  ┌─┐┌─┐┌─┐┬┌─┌─┐┌─┐┌─┐  ┬ ┬┌─┐┌┐┌┌┬┐┬  ┌─┐┬─┐ #####################################
+-- ##### ││││└─┐├─┘├┬┘├┤  ││││   │   ├─┘├─┤│  ├┴┐├─┤│ ┬├┤   ├─┤├─┤│││ │││  ├┤ ├┬┘ #####################################
+-- ##### ┴ ┴┴└─┘┴  ┴└─└─┘─┴┘┴└─┘ ┴   ┴  ┴ ┴└─┘┴ ┴┴ ┴└─┘└─┘  ┴ ┴┴ ┴┘└┘─┴┘┴─┘└─┘┴└─ #####################################
+
+mod:hook(CLASS.MispredictPackageHandler, "_unload_item_packages", function(func, self, item, ...)
+	local dependencies = ItemPackage.compile_item_instance_dependencies(item, self._item_definitions, nil, self._mission)
+	for package_name, _ in pairs(dependencies) do
+        if self._loaded_packages and self._loaded_packages[package_name] then
+            local loaded_packages = self._loaded_packages[package_name]
+            local load_id = table_remove(loaded_packages, #loaded_packages)
+            managers.package:release(load_id)
+            if table_is_empty(loaded_packages) then
+                self._loaded_packages[package_name] = nil
+            end
+        else
+            mod:print("MispredictPackageHandler - not loaded "..tostring(package_name))
+        end
+	end
+end)
+
+mod:hook(CLASS.MispredictPackageHandler, "destroy", function(func, self, ...)
+    for fixed_frame, items in pairs(self._pending_unloads) do
+		for i = 1, #items do
+			local item = items[i]
+			self:_unload_item_packages(item)
+		end
+	end
+    -- Unload rest
+    if self._loaded_packages then
+        for package_name, load_ids in pairs(self._loaded_packages) do
+            for _, load_id in pairs(load_ids) do
+                managers.package:release(load_id)
+                mod:print("MispredictPackageHandler - unloaded left over "..tostring(package_name))
+            end
+        end
+    end
+	self._pending_unloads = nil
+	self._loaded_packages = nil
 end)

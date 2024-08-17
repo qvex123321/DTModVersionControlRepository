@@ -1,12 +1,12 @@
-local mod = get_mod("ENLocalizationFIXBlessings")
+local mod = get_mod("ENLocalizationFIXAIO")
 local InputUtils = require("scripts/managers/input/input_utils")
 
 local localizations = {
 	mod_name = {
-		en = "Enhanced Descriptions - Weapon Blessings",
+		en = "Enhanced Descriptions - All in one",
 	},
 	mod_description = {
-		en = "Enhanced Descriptions - fixes and additions to game descriptions. A module with descriptions of Weapon Blessings.\nIf you enable this module together with the main ENLocalizationFIX mod, then will work the edits of the mod that is in the list above. {#color(255, 54, 54)}It's better not to do this to avoid glitches and crashes!{#reset()}",
+		en = "Enhanced Descriptions — fixes and additions to game descriptions. Merged mod. Included TALENTS, CURIOS, WEAPON PERKS and BLESSINGS.",
 	},
 
 	bleed_colour = {
@@ -18,6 +18,12 @@ local localizations = {
 	burn_colour = {
 		en = "Burn",
 	},
+	combat_ability_colour = {
+		en = "Combat Ability",
+	},
+	corruption_colour = {
+		en = "Corruption",
+	},
 	cleave_colour = {
 		en = "Cleave",
 	},
@@ -27,8 +33,26 @@ local localizations = {
 	damage_colour = {
 		en = "Damage",
 	},
+	electrocuted_colour = {
+		en = "Electrocuted",
+	},
+	fnp_colour = {
+		en = "Feel No Pain",
+	},
 	finesse_colour = {
 		en = "Finesse",
+	},
+	focus_colour = {
+		en = "Focus",
+	},
+	focust_colour = {
+		en = "Focus Target",
+	},
+	fury_colour = {
+		en = "Fury",
+	},
+	health_colour = {
+		en = "Health / Wound",
 	},
 	hit_mass_colour = {
 		en = "Hit Mass",
@@ -36,11 +60,26 @@ local localizations = {
 	impact_colour = {
 		en = "Impact",
 	},
+	luckyb_colour = {
+		en = "Lucky bullet",
+	},
+	meleespec_colour = {
+		en = "Melee Specialist",
+	},
+	momentum_colour = {
+		en = "Momentum",
+	},
 	peril_colour = {
 		en = "Peril",
 	},
 	power_colour = {
 		en = "Power",
+	},
+	precision_colour = {
+		en = "Precision",
+	},
+	rangedspec_colour = {
+		en = "Ranged Specialist",
 	},
 	rending_colour = {
 		en = "Rending",
@@ -54,8 +93,20 @@ local localizations = {
 	stamina_colour = {
 		en = "Stamina",
 	},
+	stealth_colour = {
+		en = "Stealth",
+	},
 	toughness_colour = {
 		en = "Toughness",
+	},
+	trample_colour = {
+		en = "Trample",
+	},
+	variables_colour = {
+		en = "Variables",
+	},
+	warning_colour = {
+		en = "Warning",
 	},
 	weakspot_colour = {
 		en = "Weak Spot",
@@ -95,19 +146,35 @@ end
 addLocalisation(localizations, "bleed")
 addLocalisation(localizations, "brittleness")
 addLocalisation(localizations, "burn")
+addLocalisation(localizations, "combat_ability")
+addLocalisation(localizations, "corruption")
 addLocalisation(localizations, "cleave")
 addLocalisation(localizations, "crit")
 addLocalisation(localizations, "damage")
+addLocalisation(localizations, "fnp")
 addLocalisation(localizations, "finesse")
+addLocalisation(localizations, "focus")
+addLocalisation(localizations, "focust")
+addLocalisation(localizations, "fury")
+addLocalisation(localizations, "health")
 addLocalisation(localizations, "hit_mass")
 addLocalisation(localizations, "impact")
+addLocalisation(localizations, "luckyb")
+addLocalisation(localizations, "meleespec")
+addLocalisation(localizations, "momentum")
 addLocalisation(localizations, "peril")
 addLocalisation(localizations, "power")
+addLocalisation(localizations, "precision")
+addLocalisation(localizations, "rangedspec")
 addLocalisation(localizations, "rending")
 addLocalisation(localizations, "soulblaze")
 addLocalisation(localizations, "stagger")
 addLocalisation(localizations, "stamina")
+addLocalisation(localizations, "stealth")
 addLocalisation(localizations, "toughness")
+addLocalisation(localizations, "trample")
+addLocalisation(localizations, "variables")
+addLocalisation(localizations, "warning")
 addLocalisation(localizations, "weakspot")
 addLocalisation(localizations, "note")
 

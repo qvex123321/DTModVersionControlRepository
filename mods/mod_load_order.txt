@@ -21,7 +21,6 @@ hub_hotkey_menus
 PsykaniumInvHotkey
 ChatBlock
 pickup_notif_tweaker
-book_finder
 reveal_blessings
 BetterMelk
 buy_until_rating
@@ -49,4 +48,4 @@ MergedTalentStats
 ScoreboardTagCounter
 StimmsPickupIcon
 InspectFromSocial
-
+CollectibleFinder

@@ -21,7 +21,6 @@ local Sway = mod:original_require("scripts/utilities/sway")
     local table = table
     local World = World
     local Camera = Camera
-    local wc_perf = wc_perf
     local vector3 = Vector3
     local managers = Managers
     local math_abs = math.abs
@@ -69,6 +68,7 @@ local Sway = mod:original_require("scripts/utilities/sway")
 
 local SLOT_SECONDARY = "slot_secondary"
 local SWAY_OPTION = "mod_option_misc_sway"
+local SWAY_OPTION_AIM = "mod_option_misc_sway_aim"
 local CROSSHAIR_POSITION_LERP_SPEED = 35
 
 -- ##### ┌─┐┬ ┬┌─┐┬ ┬  ┌─┐┌┐┌┬┌┬┐┌─┐┌┬┐┬┌─┐┌┐┌  ┌─┐─┐ ┬┌┬┐┌─┐┌┐┌┌─┐┬┌─┐┌┐┌ ############################################
@@ -87,6 +87,9 @@ SwayAnimationExtension.init = function(self, extension_init_context, unit, exten
 
     managers.event:register(self, "weapon_customization_settings_changed", "on_settings_changed")
 
+    self.position = vector3_box(vector3_zero())
+    self.rotate_animation = vector3_box(vector3_zero())
+
     self:on_settings_changed()
 
     self.initialized = true
@@ -104,6 +107,7 @@ end
 
 SwayAnimationExtension.on_settings_changed = function(self)
     self.on = mod:get(SWAY_OPTION)
+    self.on_aim = mod:get(SWAY_OPTION_AIM)
 end
 
 SwayAnimationExtension.on_wield_slot = function(self, slot)
@@ -142,11 +146,9 @@ end
 
 -- Update
 SwayAnimationExtension.update = function(self, dt, t)
-    local perf = wc_perf.start("SwayAnimationExtension.update", 2)
     if self.initialized and self.on and self:get_first_person() then
         self:update_animation(dt, t)
     end
-    wc_perf.stop(perf)
 end
 
 -- Update animation
@@ -156,7 +158,7 @@ SwayAnimationExtension.update_animation = function(self, dt, t)
     
 
     local not_aiming_or_braced = not self:is_aiming() or self:is_braced()
-    if self.initialized and self:get_first_person() and not_aiming_or_braced then
+    if self.initialized and self:get_first_person() and (not_aiming_or_braced or self.on_aim) and self.first_person_unit and unit_alive(self.first_person_unit) then
         -- Get rotation
         local original_rotation = unit_local_rotation(self.first_person_unit, 1)
         local last_player_rotation = self.last_real_rotation and quaternion_unbox(self.last_real_rotation) or original_rotation
@@ -195,17 +197,24 @@ SwayAnimationExtension.update_animation = function(self, dt, t)
         new_rotation = Quaternion.multiply(quaternion_from_vector(rotation), new_euler_rotation)
         new_position = position + vector3(current[3] * .75, 0, current[1]) * .05
 
-        self.position = vector3_box(new_position)
-        self.rotation = quaternion_box(new_rotation)
+        self.position:store(new_position)
 
         self:set_position_and_rotation(new_position, new_rotation)
 
-        self.rotate_animation = vector3_box(current)
+        self.rotate_animation:store(current)
     end
 end
 
+SwayAnimationExtension.offset_position = function(self)
+    return self.position
+end
+
+SwayAnimationExtension.offset_rotation = function(self)
+    return self.rotate_animation
+end
+
 SwayAnimationExtension.set_position_and_rotation = function(self, offset_position, offset_rotation)
-    if offset_position and offset_rotation then
+    if offset_position and offset_rotation and self.first_person_unit and unit_alive(self.first_person_unit) then
         local position = unit_local_position(self.first_person_unit, 1)
         local rotation = unit_local_rotation(self.first_person_unit, 1)
         -- Rotation
@@ -213,8 +222,9 @@ SwayAnimationExtension.set_position_and_rotation = function(self, offset_positio
         -- Position
         local mat = quaternion_matrix4x4(rotation)
         local rotated_pos = matrix4x4_transform(mat, offset_position)
+        -- mod:info("SwayAnimationExtension.set_position_and_rotation: "..tostring(self.first_person_unit))
         unit_set_local_position(self.first_person_unit, 1, position + rotated_pos)
-        world_update_unit_and_children(self.world, self.first_person_unit)
+        -- world_update_unit_and_children(self.world, self.first_person_unit)
     end
 end
 

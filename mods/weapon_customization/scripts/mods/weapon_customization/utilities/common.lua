@@ -1,9 +1,5 @@
 local mod = get_mod("weapon_customization")
 
--- ##### ┬─┐┌─┐┌─┐ ┬ ┬┬┬─┐┌─┐ #########################################################################################
--- ##### ├┬┘├┤ │─┼┐│ ││├┬┘├┤  #########################################################################################
--- ##### ┴└─└─┘└─┘└└─┘┴┴└─└─┘ #########################################################################################
-
 -- ##### ┌─┐┌─┐┬─┐┌─┐┌─┐┬─┐┌┬┐┌─┐┌┐┌┌─┐┌─┐ ############################################################################
 -- ##### ├─┘├┤ ├┬┘├┤ │ │├┬┘│││├─┤││││  ├┤  ############################################################################
 -- ##### ┴  └─┘┴└─└  └─┘┴└─┴ ┴┴ ┴┘└┘└─┘└─┘ ############################################################################
@@ -59,8 +55,10 @@ local mod = get_mod("weapon_customization")
 -- #####  ││├─┤ │ ├─┤ #################################################################################################
 -- ##### ─┴┘┴ ┴ ┴ ┴ ┴ #################################################################################################
 
-local REFERENCE = "weapon_customization"
-local COSMETIC_VIEW = "inventory_cosmetics_view"
+--#region Data
+	local REFERENCE = "weapon_customization"
+	local COSMETIC_VIEW = "inventory_cosmetics_view"
+--#endregion
 
 -- ##### ┌─┐┬ ┬┌┐┌┌─┐┌┬┐┬┌─┐┌┐┌┌─┐ ####################################################################################
 -- ##### ├┤ │ │││││   │ ││ ││││└─┐ ####################################################################################
@@ -70,8 +68,13 @@ mod.world = function(self)
     return managers.world:world("level_world")
 end
 
-mod.physics_world = function(self)
-    return world_physics_world(self:world())
+mod.vector3_equal = function(self, v1, v2)
+	return v1[1] == v2[1] and v1[2] == v2[2] and v1[3] == v2[3]
+end
+
+mod.physics_world = function(self, world)
+	local world = world or self:world()
+    return world_physics_world(world)
 end
 
 mod.wwise_world = function(self, world)
@@ -188,6 +191,12 @@ mod.load_needed_packages = function(self)
 		"content/fx/particles/enemies/sniper_laser_sight",
 		"content/fx/particles/enemies/red_glowing_eyes",
 		"packages/ui/views/splash_view/splash_view",
+		-- "content/fx/particles/interacts/servoskull_visibility_hover",
+		-- "content/fx/particles/abilities/psyker_warp_charge_shout",
+		-- "content/fx/particles/enemies/buff_stummed",
+		-- "content/fx/particles/enemies/corruptor/corruptor_arm_tip",
+		-- "content/fx/particles/weapons/force_staff/force_staff_channel_charge",
+		"content/fx/particles/abilities/chainlightning/protectorate_chainlightning_hands_charge",
 		-- "content/characters/player/human/third_person/animations/lasgun_pistol",
 		-- "content/characters/player/human/first_person/animations/lasgun_pistol",
 		-- "content/characters/player/human/third_person/animations/stubgun_pistol",
@@ -268,6 +277,7 @@ mod.unit_set_local_position_mesh = function(self, slot_info_id, unit, movement)
 		end
 
 		if not mesh_move or unit_and_meshes then
+			-- mod:info("mod.unit_set_local_position_mesh: "..tostring(unit))
 			unit_set_local_position(unit, 1, movement)
 		end
 
@@ -278,7 +288,15 @@ mod.unit_set_local_position_mesh = function(self, slot_info_id, unit, movement)
 			local default_position = root_default_position and vector3_unbox(root_default_position) or vector3_zero()
 			local position = root_position and vector3_unbox(root_position) or vector3_zero()
 			local offset = default_position + position + movement
+			-- mod:info("mod.unit_set_local_position_mesh: "..tostring(root_unit))
 			unit_set_local_position(root_unit, 1, default_position + position + movement)
 		end
+	end
+end
+
+mod.with = function(self, object, callback)
+	if object and callback and type(callback) == "function" then
+		if type(object) == "unit" and not unit_alive(object) then return false end
+		return callback(object)
 	end
 end

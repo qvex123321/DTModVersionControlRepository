@@ -14,34 +14,54 @@ local FlashlightTemplates = mod:original_require("scripts/settings/equipment/fla
 --#region Local functions
     local Unit = Unit
     local math = math
+    local type = type
+    local World = World
     local table = table
     local light = Light
     local pairs = pairs
     local CLASS = CLASS
     local ipairs = ipairs
+    local string = string
     local vector3 = Vector3
-    local wc_perf = wc_perf
     local math_max = math.max
     local tostring = tostring
     local managers = Managers
+    local Matrix4x4 = Matrix4x4
     local unit_alive = Unit.alive
     local unit_light = Unit.light
     local WwiseWorld = WwiseWorld
+    local Quaternion = Quaternion
     local vector3_box = Vector3Box
     local script_unit = ScriptUnit
+    local string_find = string.find
     local table_clone = table.clone
     local math_random = math.random
     local vector3_zero = vector3.zero
+    local vector3_lerp = vector3.lerp
     local unit_get_data = Unit.get_data
+    local quaternion_box = QuaternionBox
     local table_contains = table.contains
     local vector3_unbox = vector3_box.unbox
+    local quaternion_lerp = Quaternion.lerp
+    local math_easeInCubic = math.easeInCubic
     local math_random_seed = math.random_seed
     local light_set_enabled = light.set_enabled
     local RESOLUTION_LOOKUP = RESOLUTION_LOOKUP
+    local quaternion_unbox = quaternion_box.unbox
+    local matrix4x4_transform = Matrix4x4.transform
+    local quaternion_identity = Quaternion.identity
+    local quaternion_multiply = Quaternion.multiply
+    local unit_local_rotation = Unit.local_rotation
+    local unit_local_position = Unit.local_position
     local light_set_intensity = light.set_intensity
+    local quaternion_matrix4x4 = Quaternion.matrix4x4
+    local math_ease_out_elastic = math.ease_out_elastic
     local light_set_ies_profile = light.set_ies_profile
     local light_set_falloff_end = light.set_falloff_end
     local light_set_color_filter = light.set_color_filter
+    local quaternion_from_vector = Quaternion.from_vector
+    local unit_set_local_rotation = Unit.set_local_rotation
+    local unit_set_local_position = Unit.set_local_position
     local light_set_casts_shadows = light.set_casts_shadows
     local light_set_falloff_start = light.set_falloff_start
     local light_set_spot_angle_end = light.set_spot_angle_end
@@ -50,6 +70,7 @@ local FlashlightTemplates = mod:original_require("scripts/settings/equipment/fla
     local light_color_with_intensity = light.color_with_intensity
     local light_set_spot_angle_start = light.set_spot_angle_start
     local wwise_world_make_auto_source = WwiseWorld.make_auto_source
+    local world_update_unit_and_children = World.update_unit_and_children
     local unit_set_vector3_for_materials = Unit.set_vector3_for_materials
     local light_set_volumetric_intensity = light.set_volumetric_intensity
     local wwise_world_trigger_resource_event = WwiseWorld.trigger_resource_event
@@ -65,16 +86,16 @@ local SLOT_SECONDARY = "slot_secondary"
 
 mod.flashlight_templates = {
 	flashlight_01 = table.combine(
-        table_clone(FlashlightTemplates.assault), {battery = {max = 10, interval = .1, drain = .002, charge = .004}}
+        table_clone(FlashlightTemplates.autogun_p1), {battery = {max = 10, interval = .1, drain = .002, charge = .004}}
     ),
 	flashlight_02 = table.combine(
-        table_clone(FlashlightTemplates.default), {battery = {max = 10, interval = .1, drain = .001, charge = .004}}
+        table_clone(FlashlightTemplates.lasgun_p3), {battery = {max = 10, interval = .1, drain = .001, charge = .004}}
     ),
 	flashlight_03 = table.combine(
-        table_clone(FlashlightTemplates.assault), {battery = {max = 10, interval = .1, drain = .004, charge = .004}}
+        table_clone(FlashlightTemplates.autopistol_p1), {battery = {max = 10, interval = .1, drain = .004, charge = .004}}
     ),
 	flashlight_04 = table.combine(
-        table_clone(FlashlightTemplates.default), {battery = {max = 10, interval = .1, drain = .003, charge = .004}}
+        table_clone(FlashlightTemplates.lasgun_p1), {battery = {max = 10, interval = .1, drain = .003, charge = .004}}
     ),
 	laser_pointer = {
 		light = {
@@ -102,7 +123,7 @@ mod.flashlight_templates = {
 			}
 		},
 		battery = {max = 10, interval = .1, drain = .002, charge = .004},
-		flicker = FlashlightTemplates.assault.flicker,
+		flicker = FlashlightTemplates.autogun_p1.flicker,
 	},
 }
 mod.flashlight_templates.flashlight_01.light.first_person.intensity = 10
@@ -130,12 +151,14 @@ FlashlightExtension.init = function(self, extension_init_context, unit, extensio
     -- Get flashlight units 1p / 3p
 	self.flashlight_unit_1p = extension_init_data.flashlight_unit_1p
 	self.flashlight_unit_3p = extension_init_data.flashlight_unit_3p
+    self.animation_move = vector3_box(vector3_zero())
+    self.animation_spin = quaternion_box(quaternion_identity())
     -- Get lights 1p / 3p
     self.light_1p = unit_light(self.flashlight_unit_1p, 1)
     self.light_3p = unit_light(self.flashlight_unit_3p, 1)
     -- Get item
     self.item = extension_init_data.item or self.visual_loadout_extension and self.visual_loadout_extension:item_from_slot(SLOT_SECONDARY)
-    self.gear_id = self.item and mod:get_gear_id(self.item)
+    self.gear_id = self.item and mod.gear_settings:item_to_gear_id(self.item)
     -- Set attachment
     self:set_flashlight_attachment()
     -- Properties
@@ -146,6 +169,9 @@ FlashlightExtension.init = function(self, extension_init_context, unit, extensio
     self.spectated = false
     self.has_flashlight = self.flashlight_attachment ~= nil
     self.flashlight_template = self.flashlight_attachment and mod.flashlight_templates[self.flashlight_attachment]
+    local flashlight = mod.gear_settings:get(self.item, "flashlight", true)
+    local default = mod.gear_settings:default_attachment(self.item, "flashlight") or "default"
+    self._is_modded = flashlight ~= nil and string_find(default, "default")
     -- Set light values 1p / 3p
     if self.has_flashlight and self.flashlight_template then
         self:set_light_values(self.flashlight_unit_1p, self.flashlight_template.light.first_person)
@@ -229,8 +255,8 @@ FlashlightExtension.light = function(self, optional_other_one)
     -- Optional other one
     if optional_other_one then first_person = not first_person end
     -- Return light
-    if first_person then return self.light_1p end
-    return self.light_3p
+    if first_person then return self.flashlight_unit_1p and unit_alive(self.flashlight_unit_1p) and self.light_1p end
+    return self.flashlight_unit_3p and unit_alive(self.flashlight_unit_3p) and self.light_3p
 end
 
 -- ##### ┌─┐┌─┐┌┬┐  ┬  ┬┌─┐┬  ┬ ┬┌─┐┌─┐ ###############################################################################
@@ -246,7 +272,10 @@ FlashlightExtension.is_laser_pointer = function(self)
 end
 
 FlashlightExtension.is_modded = function(self)
-    return mod:get_gear_setting(self.gear_id, "flashlight") ~= nil
+    -- local flashlight = mod.gear_settings:get(self.item, "flashlight", true)
+    -- local default = mod.gear_settings:default_attachment(self.item, "flashlight") or "default"
+    -- return flashlight ~= nil and not string.find(default, "default")
+    return self._is_modded
 end
 
 -- ##### ┬ ┬┌─┐┌┬┐┌─┐┌┬┐┌─┐ ###########################################################################################
@@ -264,11 +293,11 @@ FlashlightExtension.update_husk = function(self, dt, t)
 end
 
 FlashlightExtension.update = function(self, dt, t)
-    local perf = wc_perf.start("FlashlightExtension.update", 2)
     local first_person = self:get_first_person()
     if self.initialized then
         self:update_husk(dt, t)
         self:update_flicker(dt, t)
+        -- self:set_enabled(self.on, false)
         -- Update laser pointer
         mod:execute_extension(self.player_unit, "laser_pointer_system", "update", dt, t)
         -- Check first person change
@@ -279,12 +308,12 @@ FlashlightExtension.update = function(self, dt, t)
         end
         -- Intensity
         self:update_intensity()
+        self:update_animation(dt, t)
         -- Save last first person
         self.last_first_person = first_person
     end
     -- Relay to sub extensions
     FlashlightExtension.super.update(self, dt, t)
-    wc_perf.stop(perf)
 end
 
 FlashlightExtension.update_flicker = function(self, dt, t)
@@ -390,6 +419,7 @@ FlashlightExtension.update_intensity = function(self)
     local light = self:light()
     local template = self:light_template()
     if light and template then
+        light_set_enabled(light, self.on)
         light_set_intensity(light, template.intensity * charge_fraction)
         light_set_spot_angle_start(light, template.spot_angle.min * charge_fraction)
         light_set_spot_angle_end(light, template.spot_angle.max * charge_fraction)
@@ -414,6 +444,21 @@ FlashlightExtension.set_light_values = function(self)
     end
 end
 
+-- FlashlightExtension.sync  = function(self)
+--     local is_in_hub = mod:is_in_hub() or mod:is_in_prologue_hub()
+--     if self.initialized and not is_in_hub then
+
+--         light_set_enabled(light, on)
+--         self.on = not self.on
+--         if self.is_local_unit then
+--             mod:set_flashlight_active(self.on)
+--         end
+--         self:set_light(play_sound, self.on)
+--     end
+--     -- Relay to sub extensions
+--     FlashlightExtension.super.set_enabled(self, self.on)
+-- end
+
 FlashlightExtension.set_enabled  = function(self, optional_value, optional_play_sound)
     local play_sound = optional_play_sound or self.is_local_unit or self.spectated
     local is_in_hub = mod:is_in_hub() or mod:is_in_prologue_hub()
@@ -424,6 +469,7 @@ FlashlightExtension.set_enabled  = function(self, optional_value, optional_play_
             mod:set_flashlight_active(self.on)
         end
         self:set_light(play_sound, self.on)
+        self:play_animation()
     end
     -- Relay to sub extensions
     FlashlightExtension.super.set_enabled(self, self.on)
@@ -451,6 +497,65 @@ FlashlightExtension.set_light = function(self, play_sound, optional_value, optio
             end
         end
     end
+end
+
+FlashlightExtension.play_animation = function(self)
+    local is_aiming = mod:execute_extension(self.player_unit, "sight_system", "is_aiming")
+    local multiplier = is_aiming and .25 or 1
+
+    self.animation_start = mod:game_time()
+    self.animation_state = "move"
+    self.animation_time = .15
+    self.animation_move:store(vector3(0, -.01, -.03) * multiplier)
+    self.animation_spin:store(quaternion_from_vector(vector3(1.5, 1.5, -1.5) * multiplier))
+end
+
+FlashlightExtension.update_animation = function(self, dt, t)
+
+    if self.first_person_unit and unit_alive(self.first_person_unit) then
+
+        local node = Unit.node(self.first_person_unit, "ap_aim")
+        local rotation = unit_local_rotation(self.first_person_unit, node)
+        local rotation_offset = quaternion_identity()
+        local position = unit_local_position(self.first_person_unit, node)
+        local position_offset = vector3_zero()
+
+        if self.animation_state == "move" then
+            if self.animation_start and t - self.animation_start < self.animation_time then
+                local progress = (t - self.animation_start) / self.animation_time
+                local anim_progress = math.ease_in_out_bounce(progress)
+                rotation_offset = quaternion_lerp(quaternion_identity(), quaternion_unbox(self.animation_spin), anim_progress)
+                position_offset = vector3_lerp(vector3_zero(), vector3_unbox(self.animation_move), anim_progress)
+            else
+                rotation_offset = quaternion_unbox(self.animation_spin)
+                position_offset = vector3_unbox(self.animation_move)
+                self.animation_state = "back"
+                self.animation_start = t
+            end
+
+        elseif self.animation_state == "back" then
+            if self.animation_start and t - self.animation_start < self.animation_time then
+                local progress = (t - self.animation_start) / self.animation_time
+                local anim_progress = math_easeInCubic(progress)
+                rotation_offset = quaternion_lerp(quaternion_unbox(self.animation_spin), quaternion_identity(), anim_progress)
+                position_offset = vector3_lerp(vector3_unbox(self.animation_move), vector3_zero(), anim_progress)
+            else
+                self.animation_state = nil
+                self.animation_start = nil
+            end
+
+        end
+
+        local new_rotation = quaternion_multiply(rotation, rotation_offset)
+        unit_set_local_rotation(self.first_person_unit, node, new_rotation)
+        local mat = quaternion_matrix4x4(rotation)
+        local rotated_offset = matrix4x4_transform(mat, position_offset)
+        
+        unit_set_local_position(self.first_person_unit, node, position + rotated_offset)
+        -- world_update_unit_and_children(self.world, self.first_person_unit)
+
+    end
+
 end
 
 -- ##### ┌─┐┬  ┬┌─┐┌┐┌┌┬┐┌─┐ ##########################################################################################
@@ -490,68 +595,11 @@ FlashlightExtension.on_unwield_slot = function(self, slot)
     end
 end
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 -- ##### ┌─┐┬  ┌─┐┌┐ ┌─┐┬   ###########################################################################################
 -- ##### │ ┬│  │ │├┴┐├─┤│   ###########################################################################################
 -- ##### └─┘┴─┘└─┘└─┘┴ ┴┴─┘ ###########################################################################################
 
-mod.is_flashlight_modded = function(self)
+mod.is_flashlight_modded = function(self, item_or_gear_id)
     return self:execute_extension(self.player_unit, "flashlight_system", "is_modded")
 end
 
@@ -572,8 +620,7 @@ mod.flashlight_active = function(self)
 end
 
 mod.has_flashlight = function(self, item)
-    local gear_id = self:get_gear_id(item)
-    local flashlight = gear_id and self:get_gear_setting(gear_id, "flashlight")
+    local flashlight = self.gear_settings:get(item, "flashlight")
     return flashlight and flashlight ~= "laser_pointer"
 end
 
@@ -630,9 +677,11 @@ mod.get_flashlight_template = function(self, flashlight_name)
 end
 
 mod:hook_require("scripts/settings/equipment/flashlight_templates", function(instance)
-    for name, template in pairs(instance) do
-        template.light.first_person.cast_shadows = mod:get("mod_option_flashlight_shadows")
-        template.light.third_person.cast_shadows = mod:get("mod_option_flashlight_shadows")
+    if instance then
+        for name, template in pairs(instance) do
+            template.light.first_person.cast_shadows = mod:get("mod_option_flashlight_shadows")
+            template.light.third_person.cast_shadows = mod:get("mod_option_flashlight_shadows")
+        end
     end
 end)
 

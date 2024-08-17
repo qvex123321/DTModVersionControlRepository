@@ -60,8 +60,6 @@ mod.init = function(self)
 		perk_offset = mod:get("user_perk_offset"),
 		font_size = mod:get("user_bless_perk_font_size")
 	}
-	mod.load_package("packages/ui/views/talents_view/talents_view")
-	mod.SHUD = get_mod("SpectatorHUD") and true
 	scoreboard = get_mod("scoreboard")
 	mod.left_panel_lift = 0 - mod:get("left_panel_lift")
 	mod.lobby_exhibition = { weapon = mod:get("lobby_exhibition_weapons")}
@@ -72,6 +70,7 @@ mod.init = function(self)
 		mod.display.player_Feats_order[i] = mod:get(string.format("player_Feats_order_%s",i))
 		mod.display.player_Feats_default_order = mod.display.player_Feats_order[i] == default_feats_order[i] and mod.display.player_Feats_default_order ~= false
 	end
+	mod.load_package("packages/ui/views/talent_builder_view/talent_builder_view")
 end
 
 local function player_career(profile)
@@ -381,7 +380,7 @@ end
 local function spectating_hud_tactical_overlay()
 	local me = get_local_player()
 	local camera = me.camera_handler
-	if mod.SHUD and (camera._is_hogtied or camera._mode == "dead" or camera._mode == "observer") then
+	if camera and (camera._is_hogtied or camera._mode == "dead" or camera._mode == "observer") then
 		if Managers.input and Managers.input:get_input_service("Ingame") and Managers.input:get_input_service("Ingame"):get("tactical_overlay_hold") then
 			return true
 		end

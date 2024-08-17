@@ -13,7 +13,6 @@ local mod = get_mod("weapon_customization")
     local table = table
     local pairs = pairs
     local class = class
-    local wc_perf = wc_perf
     local managers = Managers
     local tostring = tostring
     local Viewport = Viewport
@@ -32,7 +31,7 @@ local mod = get_mod("weapon_customization")
 -- #####  ││├─┤ │ ├─┤ #################################################################################################
 -- ##### ─┴┘┴ ┴ ┴ ┴ ┴ #################################################################################################
 
---#regin Data
+--#region Data
     local SLOT_PRIMARY = "slot_primary"
     local SLOT_SECONDARY = "slot_secondary"
     local SLOT_UNARMED = "slot_unarmed"
@@ -80,8 +79,8 @@ end
 
 WeaponDOFExtension.set_weapon_values = function(self)
     self.sights = {
-        mod:_recursive_find_attachment(self.ranged_weapon.item.attachments, "sight"),
-        mod:_recursive_find_attachment(self.ranged_weapon.item.attachments, "sight_2"),
+        mod.gear_settings:_recursive_find_attachment(self.ranged_weapon.item.attachments, "sight"),
+        mod.gear_settings:_recursive_find_attachment(self.ranged_weapon.item.attachments, "sight_2"),
     }
     self.sight = self.sights[2] or self.sights[1]
     self.sight_name = self.sights[1] and mod:item_name_from_content_string(self.sights[1].item)
@@ -186,9 +185,10 @@ end
 -- ##### └─┘┴  ─┴┘┴ ┴ ┴ └─┘ ###########################################################################################
 
 WeaponDOFExtension.update = function(self, dt, t)
-    local no_aim = not self:is_aiming() and self.no_aim
-    local scope = self:is_aiming() and self:is_sniper_or_scope() and self.scope
-    local sight = self:is_aiming() and self:is_sight() and self.sight
+    local is_aiming = self:is_aiming()
+    local no_aim = not is_aiming and self.no_aim
+    local scope = is_aiming and self:is_sniper_or_scope() and self.scope
+    local sight = is_aiming and self:is_sight() and self.sight
     local slot = self.wielded_slot and (self.wielded_slot.name == SLOT_SECONDARY or self.wielded_slot.name == SLOT_PRIMARY)
 
     if slot and (self._is_aiming ~= self.last_aiming or self.dirty) then
@@ -218,7 +218,7 @@ WeaponDOFExtension.update = function(self, dt, t)
     end
 
     if self.do_lerp then
-        local time = self:is_aiming() and self.start_time or self.reset_time
+        local time = is_aiming and self.start_time or self.reset_time
         self.lerp_timer = t + time
         self.do_lerp = nil
     elseif self.lerp_timer and t < self.lerp_timer then
@@ -247,3 +247,5 @@ WeaponDOFExtension.apply_weapon_dof = function(self, shading_env)
     shading_environment_set_scalar(shading_env, "dof_focal_near_scale", self.dof_near_scale)
     shading_environment_set_scalar(shading_env, "dof_focal_far_scale", .5)
 end
+
+return WeaponDOFExtension

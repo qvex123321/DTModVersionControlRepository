@@ -5,6 +5,7 @@ local mod = get_mod("weapon_customization")
 -- ##### ┴  └─┘┴└─└  └─┘┴└─┴ ┴┴ ┴┘└┘└─┘└─┘ ############################################################################
 
 --#region local functions
+	local Unit = Unit
 	local type = type
 	local pairs = pairs
 	local table = table
@@ -13,6 +14,7 @@ local mod = get_mod("weapon_customization")
 	local managers = Managers
 	local table_sort = table.sort
 	local string_find = string.find
+	local unit_get_child_units = Unit.get_child_units
 --#endregion
 
 -- ##### ┌┬┐┌─┐┌┬┐┌─┐ #################################################################################################
@@ -95,17 +97,20 @@ end
 -- #####  ┴ └─┘└─┘ ┴   ┴┘└┘─┴┘└─┘┴ └─ #################################################################################
 
 mod.test_index = 1
+mod.test_float = 0
 mod.inc_test_index = function()
 	mod.test_index = mod.test_index + 1
-	mod:echo(tostring(mod.test_index))
+	mod.test_float = mod.test_float + .01
+	mod:echo("index: "..tostring(mod.test_index).." float: "..tostring(mod.test_float))
+end
+mod.dec_test_index = function()
+	mod.test_index = mod.test_index - 1
+	mod.test_float = mod.test_float - .01
+	mod:echo("index: "..tostring(mod.test_index).." float: "..tostring(mod.test_float))
 end
 
 mod.clear_chat = function()
 	managers.event:trigger("event_clear_notifications")
-end
-
-mod.dump_perf = function()
-	mod:dtf(mod:persistent_table(REFERENCE).performance.result_cache, "perf_results", 10)
 end
 
 --  Debug
@@ -118,37 +123,61 @@ mod.print = function(self, message, skip)
 	-- if self._debug and not skip then self:info(message) end
 end
 
+mod.debug_stingray_objects = function(self)
+	self:dtf(Unit, "Unit", 10)
+end
+
+mod._recursive_get_child_units = function(self, unit, slot_info_id, out_units)
+	local slot_info_id = slot_info_id or self.cosmetics_view._slot_info_id
+	local slot_infos = mod:persistent_table(REFERENCE).attachment_slot_infos
+	local attachment_slot_info = slot_infos[slot_info_id]
+	if attachment_slot_info then
+		local attachment_slot = attachment_slot_info.unit_to_attachment_slot[unit]
+		local text = attachment_slot and attachment_slot or unit
+		out_units[text] = {}
+		local children = unit_get_child_units(unit)
+		if children then
+			for _, child in pairs(children) do
+				self:_recursive_get_child_units(child, out_units[text])
+			end
+		end
+	end
+end
+
+mod.map_out_unit = function(self, unit)
+	local map = {}
+	self:_recursive_get_child_units(unit, map)
+	self:dtf(map, "map", 20)
+end
+
 -- ##### ┌┬┐┌─┐┌┐ ┬ ┬┌─┐  ┬┌┬┐┌─┐┌┬┐  ┌─┐┌┬┐┌┬┐┌─┐┌─┐┬ ┬┌┬┐┌─┐┌┐┌┌┬┐┌─┐ ###############################################
 -- #####  ││├┤ ├┴┐│ ││ ┬  │ │ ├┤ │││  ├─┤ │  │ ├─┤│  ├─┤│││├┤ │││ │ └─┐ ###############################################
 -- ##### ─┴┘└─┘└─┘└─┘└─┘  ┴ ┴ └─┘┴ ┴  ┴ ┴ ┴  ┴ ┴ ┴└─┘┴ ┴┴ ┴└─┘┘└┘ ┴ └─┘ ###############################################
 
-mod.console_output = function(self)
-	self:info("####################################################################################################")
-	self:info("###################################### Weapon Customization ########################################")
-	self:info("####################################################################################################")
-	self:info("Highest Processing Times")
-	local processing = {}
-	local performance = mod:persistent_table(REFERENCE).performance
-	for name, t in pairs(performance.result_cache) do
-		table_sort(t, function(a, b) return a > b end)
-		processing[name] = t[1]
-		self:info(tostring(name).." ("..tostring(#t)..") "..tostring(t[1]).."ms")
+mod.generate_console_title = function(self, text)
+	local title = text or " Weapon Customization "..tostring(mod.version).." "
+	local title_length = string.len(title)
+	local fill = 100 - title_length
+	for i = 1, fill / 2, 1 do
+		title = "#"..title
 	end
-	self:info("####################################################################################################")
-	local prevented = mod:persistent_table(REFERENCE).prevent_unload
-	local total = 0
-	for name, count in pairs(prevented) do
-		total = total + count
+	local title_length = string.len(title)
+	for i = title_length, 99, 1 do
+		title = title.."#"
 	end
-	self:info("Packages prevented from unloading "..tostring(total))
-	if self._debug then
-		for name, count in pairs(prevented) do
-			self:info(tostring(name).." "..tostring(count).." times")
-		end
+	return title
+end
+
+mod.console_init = function(self)
+	if not mod:persistent_table(REFERENCE).console_init then
+		local title = self:generate_console_title(" Weapon Customization "..tostring(mod.version).." initialized! ")
+
+		self:info("####################################################################################################")
+		self:info(title)
+		self:info("####################################################################################################")
+		
+		mod:persistent_table(REFERENCE).console_init = true
 	end
-	self:info("####################################################################################################")
-	self:info("###################################### Weapon Customization ########################################")
-	self:info("####################################################################################################")
 end
 
 mod.debug_attachments = function(self, item_data, attachments, weapon_name_or_table, overwrite, full, depth)
