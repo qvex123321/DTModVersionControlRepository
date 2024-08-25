@@ -25,7 +25,6 @@ reveal_blessings
 BetterMelk
 buy_until_rating
 true_level
-contracts_overlay
 PlayerOutlines
 ScoreboardDamage
 MyFavorites
@@ -33,7 +32,7 @@ smaller_talent_tree
 QuickLookCard
 InventoryStats
 TalentRefundBelow
-ENLocalizationFIXBlessings
+ENLocalizationFIXAIO
 show_cjk_glyphs
 creature_spawner
 weapon_customization
