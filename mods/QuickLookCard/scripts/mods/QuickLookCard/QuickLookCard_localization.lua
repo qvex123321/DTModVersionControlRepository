@@ -11,6 +11,18 @@ return {
 		ru = "Quick Look Card - Позволяет быстро узнать характеристики оружия в списке предметов.",
 	},
 
+	opt_modifier_mode = {
+		en = "Modifier Stats display mode",
+		["zh-cn"] = "五维数据显示模式",
+	},
+	opt_modifier_mode_current = {
+		en = "Current value",
+		["zh-cn"] = "当前值",
+	},
+	opt_modifier_mode_potential = {
+		en = "Potential value",
+		["zh-cn"] = "潜力值",
+	},
 	opt_group_toggles = {
 		en = "Toggles",
 		["zh-cn"] = "开关",
@@ -19,12 +31,6 @@ return {
 	},
 	opt_base_level = {
 		en = Localize("loc_weapon_stats_display_base_rating"),
-	},
-	opt_base_level_description = {
-		en = "{#color(85,235,50)}Redeemed+{#reset()} weapons only",
-		["zh-cn"] = "仅限{#color(85,235,50)}救赎{#reset()}及以上武器",
-		ja = "{#color(85,235,50)}救罪{#reset()}以上の武器のみ",
-		ru = "Только {#color(85,235,50)}Зелёное{#reset()} оружие и лучше",
 	},
 	opt_modifier = {
 		en = "Modifier Stats",
@@ -42,43 +48,43 @@ return {
 		en = Localize("loc_weapon_inventory_traits_title_text"),
 	},
 	opt_blessing_description = {
-		en = "Weapons only\nIncludes: lock indicator, rarity indicator with ownership color",
-		["zh-cn"] = "仅限武器\n包括：锁定指示、带拥有状态颜色的稀有度指示",
-		ja = "武器のみ\n内容：ロック表示、色による未獲得通知付きのレア度表示",
-		ru = "Только для оружия\nВключает для Благословений: индикатор блокировки, цифру редкости, с выделением неполученного благословения зелёным цветом",
+		en = "Weapons only",
+		["zh-cn"] = "仅限武器",
+		ja = "武器のみ",
+		ru = "Только для оружия",
 	},
 	opt_perk = {
 		en = Localize("loc_item_type_perk"),
 	},
 	opt_perk_description = {
-		en = "Weapons only\nIncludes: rarity indicator with lock color",
-		["zh-cn"] = "仅限武器\n包括：带锁定状态颜色的稀有度指示",
-		ja = "武器のみ\n内容：色によるロック表示付きのレア度表示",
-		ru = "Только для оружия\nВключает для Улучшений: индикатор редкости, с выделением заблокированных улучшений красным цветом",
+		en = "Weapons only",
+		["zh-cn"] = "仅限武器",
+		ja = "武器のみ",
+		ru = "Только для оружия",
 	},
 	opt_curio_blessing = {
 		en = "Curio Blessings",
-		["zh-cn"] = "珍品祝福",
+		["zh-cn"] = "附件祝福",
 		ja = "収集品の祝福",
 		ru = "Благословения устройств",
 	},
 	opt_curio_blessing_description = {
 		en = "Curios only",
-		["zh-cn"] = "仅限珍品",
+		["zh-cn"] = "仅限附件",
 		ja = "収集品のみ",
 		ru = "Только для устройств",
 	},
 	opt_curio_perk = {
 		en = "Curio Perk",
-		["zh-cn"] = "珍品专长",
+		["zh-cn"] = "附件专长",
 		ja = "収集品のパーク",
 		ru = "Улучшения устройств",
 	},
 	opt_curio_perk_description = {
-		en = "Curios only\nIncludes: rarity indicator with lock color",
-		["zh-cn"] = "仅限珍品\n包括：带锁定状态颜色的稀有度指示",
-		ja = "収集品のみ\n内容：色によるロック表示付きのレア度表示",
-		ru = "Только для устройств\nВключает для Улучшений: индикатор редкости, с выделением заблокированных улучшений красным цветом",
+		en = "Curios only",
+		["zh-cn"] = "仅限附件",
+		ja = "収集品のみ",
+		ru = "Только для устройств",
 	},
 
 	-- To translators: due to the limited screen space,
@@ -426,7 +432,7 @@ return {
 		ja = "活力", -- 最大スタミナ
 		ru = "ВНСЛ", -- Выносливость
 	},
-	trait_gadget_inate_health_increase = {
+	trait_gadget_innate_health_increase = {
 		en = "HP", -- Max Health
 		["zh-cn"] = "生命", -- 最大生命值
 		ja = "体力", -- 最大ヘルス
@@ -456,7 +462,7 @@ return {
 		ja = "策謀", -- 策謀
 		ru = "ТОЧН", -- Точность
 	},
-	trait_gadget_inate_max_wounds_increase = {
+	trait_gadget_innate_max_wounds_increase = {
 		en = "WND", -- Wound(s)
 		["zh-cn"] = "伤口", -- 生命格
 		ja = "傷口", -- 傷口
@@ -588,7 +594,7 @@ return {
 		ja = "致率", -- 遠隔攻撃のクリティカル率が増加する
 		ru = "ВКДБ", -- Вероятность критического удара от атак дальнего боя
 	},
-	trait_gadget_inate_toughness_increase = {
+	trait_gadget_innate_toughness_increase = {
 		en = "TN", -- Toughness
 		["zh-cn"] = "韧性", -- 韧性
 		ja = "靭性", -- 最大タフネス

@@ -1,24 +1,22 @@
 local mod = get_mod("QuickLookCard")
+local Items = require("scripts/utilities/items")
 local WeaponTemplates = require("scripts/settings/equipment/weapon_templates/weapon_templates")
 local WeaponStats = require("scripts/utilities/weapon_stats")
 local BuffTemplates = require("scripts/settings/buff/buff_templates")
 local MasterItems = require("scripts/backend/master_items")
-local ItemUtils = require("scripts/utilities/items")
 
 local QLColor = {
 	default = { 255, 250, 250, 250 },
-	modifier = {255, 250, 189, 73},
-	locked = { 255, 255, 66, 50 },
-	modified = { 255, 48, 229, 207 },
+	modifier = { 255, 250, 189, 73 },
 	new_trait = { 255, 90, 255, 0 },
 	low_trait = { 255, 255, 180, 0 },
 }
 
 local GadgetTraitBuffNames = {
-	gadget_inate_health_increase = "max_health_modifier",
-	gadget_inate_toughness_increase = "toughness_bonus",
+	gadget_innate_health_increase = "max_health_modifier",
+	gadget_innate_toughness_increase = "toughness_bonus",
 	gadget_stamina_increase = "stamina_modifier",
-	gadget_inate_max_wounds_increase = "extra_max_amount_of_wounds",
+	gadget_innate_max_wounds_increase = "extra_max_amount_of_wounds",
 }
 
 local compatibility_field_names = {
@@ -113,21 +111,6 @@ local function visibility_function_gadget(content, style)
 	return item.item_type == "GADGET"
 end
 
-local function perk_trait_lock(item, data, index)
-	local num_modifications, max_modifications = ItemUtils.modifications_by_rarity(item)
-	local item_locked = num_modifications == max_modifications
-
-	local entry = data[index]
-	if entry then
-		if entry.modified then
-			return "modified"
-		elseif item_locked then
-			return "locked"
-		end
-	end
-	return "open"
-end
-
 local function visibility_function_perk(content, style, index)
 	local gadget = visibility_function_gadget(content, style)
 	if (not mod:get("opt_perk") and not gadget) or (not mod:get("opt_curio_perk") and gadget) then
@@ -152,35 +135,12 @@ local function visibility_function_trait(content, style, index)
 	end
 	local item = content.element.item
 	if (not item.traits) or #item.traits < index then
-		return nil
+		return false
 	end
 	if not item.traits[index].rarity then
-		return nil
+		return false
 	end
-	local cache = Managers.data_service.crafting._trait_sticker_book_cache
-	if not cache then
-		return nil
-	end
-	local category = cache:cached_data_by_key(item.trait_category)
-	if not category then
-		return nil
-	end
-	local trait = item.traits[index]
-	local book = category[trait.id]
-	if not book then
-		return nil
-	end
-	if book[trait.rarity] == "seen" then
-		return "own"
-	end
-	local i = trait.rarity + 1
-	while book[i] and book[i] ~= "invalid" do
-		if book[i] == "seen" then
-			return "low"
-		end
-		i = i + 1
-	end
-	return "new"
+	return true
 end
 
 local function visibility_function_modifier(content, style)
@@ -231,7 +191,7 @@ local item_definitions = {
 				return false
 			end
 			local item = content.element.item
-			if not item.rarity or item.rarity < 2 then
+			if not item.rarity then
 				return false
 			end
 			return true
@@ -241,6 +201,27 @@ local item_definitions = {
 	-- ###### Blessings ######
 	-- #######################
 	{
+		pass_type = "texture",
+		style_id = "qlc_trait_icon_1",
+		value_id = "qlc_trait_icon_1",
+		value = "content/ui/materials/icons/perks/perk_level_05",
+		style = {
+			vertical_alignment = "top",
+			horizontal_alignment = "left",
+			offset = { 288, 90, 10 },
+			offset_i2d = { 105, 60, 5 },
+			size = { 16, 16 },
+			size_i2d = { 10, 10 },
+			color = QLColor.default,
+		},
+		visibility_function = function (content, style)
+			if not visibility_function_trait(content, style, 1) then
+				return false
+			end
+			return true
+		end,
+	},
+	{
 		pass_type = "text",
 		style_id = "qlc_trait_level_1",
 		value_id = "qlc_trait_level_1",
@@ -248,26 +229,18 @@ local item_definitions = {
 			vertical_alignment = "top",
 			horizontal_alignment = "left",
 			text_vertical_alignment = "center",
-			offset = { 18, 80, 10 },
-			offset_i2d = { 14, 84, 10 },
+			offset = { 308, 80, 10 },
+			offset_i2d = { 117, 47, 10 },
 			size = { 36, 36 },
 			text_color = QLColor.default,
-			font_type = "proxima_nova_bold",
+			font_type = "machine_medium",
 			font_size = 17,
-			font_size_i2d = 15,
+			font_size_i2d = 12,
 		},
 		value = "",
 		visibility_function = function (content, style)
-			local vis = visibility_function_trait(content, style, 1)
-			if not vis then
+			if not visibility_function_trait(content, style, 1) then
 				return false
-			end
-			if vis == "new" then
-				style.text_color = QLColor.new_trait
-			elseif vis == "low" then
-				style.text_color = QLColor.low_trait
-			else
-				style.text_color = QLColor.default
 			end
 			local item = content.element.item
 			content.qlc_trait_level_1 = tostring(item.traits[1].rarity)
@@ -275,37 +248,22 @@ local item_definitions = {
 		end,
 	},
 	{
-		pass_type = "text",
-		style_id = "qlc_trait_lock_1",
-		value_id = "qlc_trait_lock_1",
-		value = "",
+		pass_type = "texture",
+		style_id = "qlc_trait_icon_2",
+		value_id = "qlc_trait_icon_2",
+		value = "content/ui/materials/icons/perks/perk_level_05",
 		style = {
 			vertical_alignment = "top",
 			horizontal_alignment = "left",
-			text_vertical_alignment = "center",
-			text_horizontal_alignment = "center",
-			offset = { 42, 60, 10 },
-			offset_i2d = { 34, 68, 10 },
-			size = { 18, 18 },
-			text_color = QLColor.locked,
-			font_type = "proxima_nova_bold",
-			font_size = 17,
-			font_size_i2d = 15,
+			offset = { 323, 90, 10 },
+			offset_i2d = { 125, 60, 5 },
+			size = { 16, 16 },
+			size_i2d = { 10, 10 },
+			color = QLColor.default,
 		},
 		visibility_function = function (content, style)
-			if not visibility_function_trait(content, style, 1) then
+			if not visibility_function_trait(content, style, 2) then
 				return false
-			end
-			local item = content.element.item
-			local locked = perk_trait_lock(item, item.traits, 1)
-			if locked == "open" then
-				return false
-			elseif locked == "locked" then
-				content.qlc_trait_lock_1 = ""
-				style.text_color = QLColor.locked
-			elseif locked == "modified" then
-				content.qlc_trait_lock_1 = ""
-				style.text_color = QLColor.modified
 			end
 			return true
 		end,
@@ -318,65 +276,21 @@ local item_definitions = {
 			vertical_alignment = "top",
 			horizontal_alignment = "left",
 			text_vertical_alignment = "center",
-			offset = { 60, 80, 10 },
-			offset_i2d = { 52, 84, 10 },
+			offset = { 343, 80, 10 },
+			offset_i2d = { 137, 47, 10 },
 			size = { 36, 36 },
 			text_color = QLColor.default,
-			font_type = "proxima_nova_bold",
+			font_type = "machine_medium",
 			font_size = 17,
-			font_size_i2d = 15,
+			font_size_i2d = 12,
 		},
 		value = "",
-		visibility_function = function (content, style)
-			local vis = visibility_function_trait(content, style, 2)
-			if not vis then
-				return false
-			end
-			if vis == "new" then
-				style.text_color = QLColor.new_trait
-			elseif vis == "low" then
-				style.text_color = QLColor.low_trait
-			else
-				style.text_color = QLColor.default
-			end
-			local item = content.element.item
-			content.qlc_trait_level_2 = tostring(item.traits[2].rarity)
-			return true
-		end,
-	},
-	{
-		pass_type = "text",
-		style_id = "qlc_trait_lock_2",
-		value_id = "qlc_trait_lock_2",
-		value = "",
-		style = {
-			vertical_alignment = "top",
-			horizontal_alignment = "left",
-			text_vertical_alignment = "center",
-			text_horizontal_alignment = "center",
-			offset = { 84, 60, 10 },
-			offset_i2d = { 70, 68, 10 },
-			size = { 18, 18 },
-			text_color = QLColor.locked,
-			font_type = "proxima_nova_bold",
-			font_size = 17,
-			font_size_i2d = 15,
-		},
 		visibility_function = function (content, style)
 			if not visibility_function_trait(content, style, 2) then
 				return false
 			end
 			local item = content.element.item
-			local locked = perk_trait_lock(item, item.traits, 2)
-			if locked == "open" then
-				return false
-			elseif locked == "locked" then
-				content.qlc_trait_lock_2 = ""
-				style.text_color = QLColor.locked
-			elseif locked == "modified" then
-				content.qlc_trait_lock_2 = ""
-				style.text_color = QLColor.modified
-			end
+			content.qlc_trait_level_2 = tostring(item.traits[2].rarity)
 			return true
 		end,
 	},
@@ -391,7 +305,7 @@ local item_definitions = {
 			vertical_alignment = "top",
 			horizontal_alignment = "left",
 			text_vertical_alignment = "center",
-			offset = { 108, 60, 5 },
+			offset = { 148, 60, 5 },
 			offset_i2d = { 15, 34, 5 },
 			size = { 120, 36 },
 			text_color = QLColor.default,
@@ -410,7 +324,7 @@ local item_definitions = {
 			vertical_alignment = "top",
 			horizontal_alignment = "left",
 			text_vertical_alignment = "center",
-			offset = { 148, 60, 5 },
+			offset = { 188, 60, 5 },
 			offset_i2d = { 42, 34, 5 },
 			size = { 120, 36 },
 			text_color = QLColor.modifier,
@@ -429,7 +343,7 @@ local item_definitions = {
 			vertical_alignment = "top",
 			horizontal_alignment = "left",
 			text_vertical_alignment = "center",
-			offset = { 178, 60, 5 },
+			offset = { 218, 60, 5 },
 			offset_i2d = { 60, 34, 5 },
 			size = { 120, 36 },
 			text_color = QLColor.default,
@@ -448,7 +362,7 @@ local item_definitions = {
 			vertical_alignment = "top",
 			horizontal_alignment = "left",
 			text_vertical_alignment = "center",
-			offset = { 218, 60, 5 },
+			offset = { 258, 60, 5 },
 			offset_i2d = { 87, 34, 5 },
 			size = { 120, 36 },
 			text_color = QLColor.modifier,
@@ -467,7 +381,7 @@ local item_definitions = {
 			vertical_alignment = "top",
 			horizontal_alignment = "left",
 			text_vertical_alignment = "center",
-			offset = { 248, 60, 5 },
+			offset = { 288, 60, 5 },
 			offset_i2d = { 105, 34, 5 },
 			size = { 120, 36 },
 			text_color = QLColor.default,
@@ -486,7 +400,7 @@ local item_definitions = {
 			vertical_alignment = "top",
 			horizontal_alignment = "left",
 			text_vertical_alignment = "center",
-			offset = { 288, 60, 5 },
+			offset = { 328, 60, 5 },
 			offset_i2d = { 132, 34, 5 },
 			size = { 120, 36 },
 			text_color = QLColor.modifier,
@@ -505,7 +419,7 @@ local item_definitions = {
 			vertical_alignment = "top",
 			horizontal_alignment = "left",
 			text_vertical_alignment = "center",
-			offset = { 108, 80, 5 },
+			offset = { 148, 80, 5 },
 			offset_i2d = { 15, 47, 5 },
 			size = { 120, 36 },
 			text_color = QLColor.default,
@@ -524,7 +438,7 @@ local item_definitions = {
 			vertical_alignment = "top",
 			horizontal_alignment = "left",
 			text_vertical_alignment = "center",
-			offset = { 148, 80, 5 },
+			offset = { 188, 80, 5 },
 			offset_i2d = { 42, 47, 5 },
 			size = { 120, 36 },
 			text_color = QLColor.modifier,
@@ -543,7 +457,7 @@ local item_definitions = {
 			vertical_alignment = "top",
 			horizontal_alignment = "left",
 			text_vertical_alignment = "center",
-			offset = { 178, 80, 5 },
+			offset = { 218, 80, 5 },
 			offset_i2d = { 60, 47, 5 },
 			size = { 120, 36 },
 			text_color = QLColor.default,
@@ -562,7 +476,7 @@ local item_definitions = {
 			vertical_alignment = "top",
 			horizontal_alignment = "left",
 			text_vertical_alignment = "center",
-			offset = { 218, 80, 5 },
+			offset = { 258, 80, 5 },
 			offset_i2d = { 87, 47, 5 },
 			size = { 120, 36 },
 			text_color = QLColor.modifier,
@@ -584,7 +498,7 @@ local item_definitions = {
 			vertical_alignment = "top",
 			horizontal_alignment = "left",
 			text_vertical_alignment = "center",
-			offset = { 328, 60, 5 },
+			offset = { 368, 60, 5 },
 			offset_i2d = { 86, 65, 5 },
 			size = { 120, 36 },
 			text_color = QLColor.default,
@@ -614,10 +528,11 @@ local item_definitions = {
 		style = {
 			vertical_alignment = "top",
 			horizontal_alignment = "left",
-			offset = { 368, 70, 10 },
+			offset = { 408, 70, 10 },
 			offset_i2d = { 113, 77, 5 },
 			size = { 16, 16 },
 			size_i2d = { 13, 13 },
+			color = QLColor.default,
 		},
 		visibility_function = function (content, style)
 			if not visibility_function_perk(content, style, 1) then
@@ -630,14 +545,6 @@ local item_definitions = {
 				return false
 			end
 			local item = content.element.item
-			local locked = perk_trait_lock(item, item.perks, 1)
-			if locked == "locked" then
-				style.color = QLColor.locked
-			elseif locked == "modified" then
-				style.color = QLColor.modified
-			else
-				style.color = QLColor.default
-			end
 			local mat = "content/ui/materials/icons/perks/perk_level_" .. string.format("%02d", item.perks[1].rarity)
 			content.qlc_weapon_perk_icon_1 = mat
 			return true
@@ -651,7 +558,7 @@ local item_definitions = {
 			vertical_alignment = "top",
 			horizontal_alignment = "left",
 			text_vertical_alignment = "center",
-			offset = { 328, 80, 5 },
+			offset = { 368, 80, 5 },
 			offset_i2d = { 86, 80, 5 },
 			size = { 120, 36 },
 			text_color = QLColor.default,
@@ -681,10 +588,11 @@ local item_definitions = {
 		style = {
 			vertical_alignment = "top",
 			horizontal_alignment = "left",
-			offset = { 368, 90, 10 },
+			offset = { 408, 90, 10 },
 			offset_i2d = { 113, 92, 5 },
 			size = { 16, 16 },
 			size_i2d = { 13, 13 },
+			color = QLColor.default,
 		},
 		visibility_function = function (content, style)
 			if not visibility_function_perk(content, style, 2) then
@@ -697,14 +605,6 @@ local item_definitions = {
 				return false
 			end
 			local item = content.element.item
-			local locked = perk_trait_lock(item, item.perks, 2)
-			if locked == "locked" then
-				style.color = QLColor.locked
-			elseif locked == "modified" then
-				style.color = QLColor.modified
-			else
-				style.color = QLColor.default
-			end
 			local mat = "content/ui/materials/icons/perks/perk_level_" .. string.format("%02d", item.perks[2].rarity)
 			content.qlc_weapon_perk_icon_2 = mat
 			return true
@@ -721,7 +621,7 @@ local item_definitions = {
 			vertical_alignment = "top",
 			horizontal_alignment = "left",
 			text_vertical_alignment = "center",
-			offset = { 108, 80, 5 },
+			offset = { 148, 80, 5 },
 			offset_i2d = { 15, 47, 5 },
 			size = { 120, 36 },
 			text_color = QLColor.default,
@@ -748,10 +648,11 @@ local item_definitions = {
 		style = {
 			vertical_alignment = "top",
 			horizontal_alignment = "left",
-			offset = { 148, 90, 5 },
+			offset = { 188, 90, 5 },
 			offset_i2d = { 42, 59, 5 },
 			size = { 16, 16 },
 			size_i2d = { 12, 12 },
+			color = QLColor.default,
 		},
 		visibility_function = function (content, style)
 			if not visibility_function_perk(content, style, 1) then
@@ -761,14 +662,6 @@ local item_definitions = {
 				return false
 			end
 			local item = content.element.item
-			local locked = perk_trait_lock(item, item.perks, 1)
-			if locked == "locked" then
-				style.color = QLColor.locked
-			elseif locked == "modified" then
-				style.color = QLColor.modified
-			else
-				style.color = QLColor.default
-			end
 			local mat = "content/ui/materials/icons/perks/perk_level_" .. string.format("%02d", item.perks[1].rarity)
 			content.qlc_gadget_perk_icon_1 = mat
 			return true
@@ -782,7 +675,7 @@ local item_definitions = {
 			vertical_alignment = "top",
 			horizontal_alignment = "left",
 			text_vertical_alignment = "center",
-			offset = { 178, 80, 5 },
+			offset = { 218, 80, 5 },
 			offset_i2d = { 60, 47, 5 },
 			size = { 120, 36 },
 			text_color = QLColor.default,
@@ -809,10 +702,11 @@ local item_definitions = {
 		style = {
 			vertical_alignment = "top",
 			horizontal_alignment = "left",
-			offset = { 218, 90, 10 },
+			offset = { 258, 90, 10 },
 			offset_i2d = { 87, 59, 5 },
 			size = { 16, 16 },
 			size_i2d = { 12, 12 },
+			color = QLColor.default,
 		},
 		visibility_function = function (content, style)
 			if not visibility_function_perk(content, style, 2) then
@@ -822,14 +716,6 @@ local item_definitions = {
 				return false
 			end
 			local item = content.element.item
-			local locked = perk_trait_lock(item, item.perks, 2)
-			if locked == "locked" then
-				style.color = QLColor.locked
-			elseif locked == "modified" then
-				style.color = QLColor.modified
-			else
-				style.color = QLColor.default
-			end
 			local mat = "content/ui/materials/icons/perks/perk_level_" .. string.format("%02d", item.perks[2].rarity)
 			content.qlc_gadget_perk_icon_2 = mat
 			return true
@@ -843,7 +729,7 @@ local item_definitions = {
 			vertical_alignment = "top",
 			horizontal_alignment = "left",
 			text_vertical_alignment = "center",
-			offset = { 248, 80, 5 },
+			offset = { 288, 80, 5 },
 			offset_i2d = { 105, 47, 5 },
 			size = { 120, 36 },
 			text_color = QLColor.default,
@@ -870,10 +756,11 @@ local item_definitions = {
 		style = {
 			vertical_alignment = "top",
 			horizontal_alignment = "left",
-			offset = { 288, 90, 10 },
+			offset = { 328, 90, 10 },
 			offset_i2d = { 132, 59, 5 },
 			size = { 16, 16 },
 			size_i2d = { 12, 12 },
+			color = QLColor.default,
 		},
 		visibility_function = function (content, style)
 			if not visibility_function_perk(content, style, 3) then
@@ -883,14 +770,6 @@ local item_definitions = {
 				return false
 			end
 			local item = content.element.item
-			local locked = perk_trait_lock(item, item.perks, 3)
-			if locked == "locked" then
-				style.color = QLColor.locked
-			elseif locked == "modified" then
-				style.color = QLColor.modified
-			else
-				style.color = QLColor.default
-			end
 			local mat = "content/ui/materials/icons/perks/perk_level_" .. string.format("%02d", item.perks[3].rarity)
 			content.qlc_gadget_perk_icon_3 = mat
 			return true
@@ -907,7 +786,7 @@ local item_definitions = {
 			vertical_alignment = "top",
 			horizontal_alignment = "left",
 			text_vertical_alignment = "center",
-			offset = { 108, 60, 5 },
+			offset = { 148, 60, 5 },
 			offset_i2d = { 15, 34, 5 },
 			size = { 120, 36 },
 			text_color = QLColor.default,
@@ -926,7 +805,7 @@ local item_definitions = {
 			vertical_alignment = "top",
 			horizontal_alignment = "left",
 			text_vertical_alignment = "center",
-			offset = { 148, 60, 5 },
+			offset = { 188, 60, 5 },
 			offset_i2d = { 42, 34, 5 },
 			size = { 120, 36 },
 			text_color = QLColor.modifier,
@@ -967,18 +846,23 @@ local function fill_weapon_base_stats(content, item)
 		return
 	end
 
-	-- sort stats, copied from source code
 	local weapon_stats = WeaponStats:new(item)
-	local comparing_stats = weapon_stats:get_comparing_stats()
+	local comparing_stats = table.clone(weapon_stats:get_comparing_stats())
 	local num_stats = table.size(comparing_stats)
-	local comparing_stats_array = {}
-	for _, stat in pairs(comparing_stats) do
-		comparing_stats_array[#comparing_stats_array + 1] = stat
+	local start_preview_expertise = Items.expertise_level(item, true)
+	local max_preview_expertise = Items.max_expertise_level() - start_preview_expertise
+	local max_stats = Items.preview_stats_change(item, max_preview_expertise, comparing_stats)
+	if mod:get("opt_modifier_mode") == "potential" then
+		for _, stat in ipairs(comparing_stats) do
+			if stat.display_name and max_stats[stat.display_name] then
+				stat.fraction = max_stats[stat.display_name].fraction
+			end
+		end
 	end
 
 	-- fill values
 	for i = 1, num_stats do
-		local stat_data = comparing_stats_array[i]
+		local stat_data = comparing_stats[i]
 		local ii = base_stats_position_map[i]
 		local title = mod:localize("stat_" .. stat_data.display_name)
 		if title == "<" .. "stat_" .. stat_data.display_name .. ">" then

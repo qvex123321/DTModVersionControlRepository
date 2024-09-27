@@ -17,6 +17,7 @@ local definitions = {
 					">", "item", ItemUtils.compare_item_level,
 					">", "item", ItemUtils.compare_item_rarity,
 					"<", "item", ItemUtils.compare_item_name,
+					">", "item", ItemSortingUtils.compare_item_base_level,
 				})
 			},
 			{
@@ -31,6 +32,7 @@ local definitions = {
 					"<", "item", ItemUtils.compare_item_level,
 					"<", "item", ItemUtils.compare_item_rarity,
 					"<", "item", ItemUtils.compare_item_name,
+					"<", "item", ItemSortingUtils.compare_item_base_level,
 				})
 			},
 			{
@@ -45,6 +47,7 @@ local definitions = {
 					">", "item", ItemUtils.compare_item_rarity,
 					">", "item", ItemUtils.compare_item_level,
 					"<", "item", ItemUtils.compare_item_name,
+					">", "item", ItemSortingUtils.compare_item_base_level,
 				})
 			},
 			{
@@ -59,6 +62,7 @@ local definitions = {
 					"<", "item", ItemUtils.compare_item_rarity,
 					"<", "item", ItemUtils.compare_item_level,
 					"<", "item", ItemUtils.compare_item_name,
+					"<", "item", ItemSortingUtils.compare_item_base_level,
 				})
 			},
 			{
@@ -73,6 +77,7 @@ local definitions = {
 					"<", "item", ItemUtils.compare_item_name,
 					">", "item", ItemUtils.compare_item_level,
 					">", "item", ItemUtils.compare_item_rarity,
+					">", "item", ItemSortingUtils.compare_item_base_level,
 				})
 			},
 			{
@@ -87,6 +92,7 @@ local definitions = {
 					">", "item", ItemUtils.compare_item_name,
 					">", "item", ItemUtils.compare_item_level,
 					">", "item", ItemUtils.compare_item_rarity,
+					">", "item", ItemSortingUtils.compare_item_base_level,
 				})
 			}
 		},
@@ -99,10 +105,10 @@ local definitions = {
 				sort_function = ItemUtils.sort_element_key_comparator({
 					">", "offer", ItemSortingUtils.compare_offer_owned,
 					"<", "item", ItemSortingUtils.compare_item_top_curios,
-					"<", "item", ItemSortingUtils.compare_item_top_unearned_blessings,
 					">", "item", ItemUtils.compare_item_level,
 					">", "item", ItemUtils.compare_item_rarity,
 					"<", "item", ItemUtils.compare_item_name,
+					">", "item", ItemSortingUtils.compare_item_base_level,
 				})
 			},
 			{
@@ -113,10 +119,10 @@ local definitions = {
 				sort_function = ItemUtils.sort_element_key_comparator({
 					">", "offer", ItemSortingUtils.compare_offer_owned,
 					"<", "item", ItemSortingUtils.compare_item_top_curios,
-					"<", "item", ItemSortingUtils.compare_item_top_unearned_blessings,
 					"<", "item", ItemUtils.compare_item_level,
 					"<", "item", ItemUtils.compare_item_rarity,
 					"<", "item", ItemUtils.compare_item_name,
+					"<", "item", ItemSortingUtils.compare_item_base_level,
 				})
 			},
 			{
@@ -127,10 +133,10 @@ local definitions = {
 				sort_function = ItemUtils.sort_element_key_comparator({
 					">", "offer", ItemSortingUtils.compare_offer_owned,
 					"<", "item", ItemSortingUtils.compare_item_top_curios,
-					"<", "item", ItemSortingUtils.compare_item_top_unearned_blessings,
 					">", "item", ItemUtils.compare_item_rarity,
 					">", "item", ItemUtils.compare_item_level,
 					"<", "item", ItemUtils.compare_item_name,
+					">", "item", ItemSortingUtils.compare_item_base_level,
 				})
 			},
 			{
@@ -141,10 +147,10 @@ local definitions = {
 				sort_function = ItemUtils.sort_element_key_comparator({
 					">", "offer", ItemSortingUtils.compare_offer_owned,
 					"<", "item", ItemSortingUtils.compare_item_top_curios,
-					"<", "item", ItemSortingUtils.compare_item_top_unearned_blessings,
 					"<", "item", ItemUtils.compare_item_rarity,
 					"<", "item", ItemUtils.compare_item_level,
 					"<", "item", ItemUtils.compare_item_name,
+					"<", "item", ItemSortingUtils.compare_item_base_level,
 				})
 			},
 			{
@@ -155,11 +161,11 @@ local definitions = {
 				sort_function = ItemUtils.sort_element_key_comparator({
 					">", "offer", ItemSortingUtils.compare_offer_owned,
 					"<", "item", ItemSortingUtils.compare_item_top_curios,
-					"<", "item", ItemSortingUtils.compare_item_top_unearned_blessings,
 					"<", "offer", ItemUtils.compare_offer_price,
 					"<", "item", ItemUtils.compare_item_level,
 					"<", "item", ItemUtils.compare_item_rarity,
 					"<", "item", ItemUtils.compare_item_name,
+					"<", "item", ItemSortingUtils.compare_item_base_level,
 				})
 			},
 			{
@@ -170,11 +176,11 @@ local definitions = {
 				sort_function = ItemUtils.sort_element_key_comparator({
 					">", "offer", ItemSortingUtils.compare_offer_owned,
 					"<", "item", ItemSortingUtils.compare_item_top_curios,
-					"<", "item", ItemSortingUtils.compare_item_top_unearned_blessings,
 					">", "offer", ItemUtils.compare_offer_price,
 					">", "item", ItemUtils.compare_item_level,
 					">", "item", ItemUtils.compare_item_rarity,
 					"<", "item", ItemUtils.compare_item_name,
+					">", "item", ItemSortingUtils.compare_item_base_level,
 				})
 			},
 			{
@@ -185,10 +191,10 @@ local definitions = {
 				sort_function = ItemUtils.sort_element_key_comparator({
 					">", "offer", ItemSortingUtils.compare_offer_owned,
 					"<", "item", ItemSortingUtils.compare_item_top_curios,
-					"<", "item", ItemSortingUtils.compare_item_top_unearned_blessings,
 					"<", "item", ItemUtils.compare_item_name,
 					">", "item", ItemUtils.compare_item_level,
 					">", "item", ItemUtils.compare_item_rarity,
+					">", "item", ItemSortingUtils.compare_item_base_level,
 				})
 			},
 			{
@@ -199,10 +205,10 @@ local definitions = {
 				sort_function = ItemUtils.sort_element_key_comparator({
 					">", "offer", ItemSortingUtils.compare_offer_owned,
 					"<", "item", ItemSortingUtils.compare_item_top_curios,
-					"<", "item", ItemSortingUtils.compare_item_top_unearned_blessings,
 					">", "item", ItemUtils.compare_item_name,
 					">", "item", ItemUtils.compare_item_level,
 					">", "item", ItemUtils.compare_item_rarity,
+					">", "item", ItemSortingUtils.compare_item_base_level,
 				})
 			}
 		},
@@ -221,20 +227,23 @@ local definitions = {
 					">", "item", ItemUtils.compare_item_rarity,
 					">", "item", ItemUtils.compare_item_level,
 					"<", "item", ItemUtils.compare_item_name,
+					">", "item", ItemSortingUtils.compare_item_base_level,
 				})
 			},
 			{
-				id = "category_group_by_name",
-				display_name = mod:localize("custom_sort_category_group_by_name"),
+				id = "category_mark",
+				display_name = mod:localize("custom_sort_category_mark"),
 				sort_function = ItemUtils.sort_element_key_comparator({
 					"<", "item", ItemSortingUtils.compare_item_type_new,
 					"<", "item", ItemSortingUtils.compare_item_type_equipped,
 					"<", "item", ItemSortingUtils.compare_item_type_myfav,
 					"<", "item", ItemSortingUtils.compare_item_category_top_items,
 					">", "item", ItemSortingUtils.compare_item_category,
-					"<", "item", ItemUtils.compare_item_name,
+					">", "item", ItemSortingUtils.compare_item_mark,
 					">", "item", ItemUtils.compare_item_rarity,
 					">", "item", ItemUtils.compare_item_level,
+					"<", "item", ItemUtils.compare_item_name,
+					">", "item", ItemSortingUtils.compare_item_base_level,
 				})
 			},
 			{
@@ -275,24 +284,25 @@ local definitions = {
 				sort_function = ItemUtils.sort_element_key_comparator({
 					">", "offer", ItemSortingUtils.compare_offer_owned,
 					"<", "item", ItemSortingUtils.compare_item_top_curios,
-					"<", "item", ItemSortingUtils.compare_item_top_unearned_blessings,
 					">", "item", ItemSortingUtils.compare_item_category,
 					">", "item", ItemUtils.compare_item_rarity,
 					">", "item", ItemUtils.compare_item_level,
 					"<", "item", ItemUtils.compare_item_name,
+					">", "item", ItemSortingUtils.compare_item_base_level,
 				})
 			},
 			{
-				id = "category_group_by_name",
-				display_name = mod:localize("custom_sort_category_group_by_name"),
+				id = "category_mark",
+				display_name = mod:localize("custom_sort_category_mark"),
 				sort_function = ItemUtils.sort_element_key_comparator({
 					">", "offer", ItemSortingUtils.compare_offer_owned,
 					"<", "item", ItemSortingUtils.compare_item_top_curios,
-					"<", "item", ItemSortingUtils.compare_item_top_unearned_blessings,
 					">", "item", ItemSortingUtils.compare_item_category,
-					"<", "item", ItemUtils.compare_item_name,
+					">", "item", ItemSortingUtils.compare_item_mark,
 					">", "item", ItemUtils.compare_item_rarity,
 					">", "item", ItemUtils.compare_item_level,
+					"<", "item", ItemUtils.compare_item_name,
+					">", "item", ItemSortingUtils.compare_item_base_level,
 				})
 			},
 			{
@@ -303,7 +313,6 @@ local definitions = {
 				sort_function = ItemUtils.sort_element_key_comparator({
 					">", "offer", ItemSortingUtils.compare_offer_owned,
 					"<", "item", ItemSortingUtils.compare_item_top_curios,
-					"<", "item", ItemSortingUtils.compare_item_top_unearned_blessings,
 					">", "item", ItemSortingUtils.compare_item_base_level,
 					">", "item", ItemUtils.compare_item_level,
 					">", "item", ItemUtils.compare_item_rarity,
@@ -318,7 +327,6 @@ local definitions = {
 				sort_function = ItemUtils.sort_element_key_comparator({
 					">", "offer", ItemSortingUtils.compare_offer_owned,
 					"<", "item", ItemSortingUtils.compare_item_top_curios,
-					"<", "item", ItemSortingUtils.compare_item_top_unearned_blessings,
 					"<", "item", ItemSortingUtils.compare_item_base_level,
 					"<", "item", ItemUtils.compare_item_level,
 					"<", "item", ItemUtils.compare_item_rarity,

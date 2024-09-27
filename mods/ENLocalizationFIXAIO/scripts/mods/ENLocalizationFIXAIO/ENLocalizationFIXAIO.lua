@@ -181,15 +181,18 @@ local mult_hit_var_rgb = iu_actit("{multiple_hit:%s}", var_col)
 local procch_var_rgb = iu_actit("{proc_chance:%s}", var_col)
 local red_var_rgb = iu_actit("{reduction:%s}", var_col)
 local range_var_rgb = iu_actit("{range:%s}", var_col)
+local rangcrtdmg_var_rgb = iu_actit("{ranged_crit_damage:%s}", var_col)
 local rend_var_rgb = iu_actit("{rend:%s}", var_col)
 local stacks_var_rgb = iu_actit("{stacks:%s}", var_col)
 local stgr_var_rgb = iu_actit("{stagger:%s}", var_col)
+local stgrrang_var_rgb = iu_actit("{ranged_stagger:%s}", var_col)
 local stgrrdct_var_rgb = iu_actit("{stagger_reduction:%s}", var_col)
 local stam_var_rgb = iu_actit("{stamina:%s}", var_col)
 local time_var_rgb = iu_actit("{time:%s}", var_col)
 local tghns_var_rgb = iu_actit("{toughness:%s}", var_col)
 local value_var_rgb = iu_actit("{value:%s}", var_col)
 local warpchrg_var_rgb = iu_actit("{warp_charge:%s}", var_col)
+local weapsprd_var_rgb = iu_actit("{weapon_spread:%s}", var_col)
 
 local p_chrgspd_var_rgb = iu_actit("+{charge_speed:%s}", var_col)
 local p_dmgcls_var_rgb = iu_actit("+{close_damage:%s}", var_col)
@@ -216,7 +219,7 @@ local p_procch_var_rgb = iu_actit("+{proc_chance:%s}", var_col)
 local p_reload_var_rgb = iu_actit("+{reload_speed:%s}", var_col)
 local p_rend_var_rgb = iu_actit("+{rend:%s}", var_col)
 local p_rending_var_rgb = iu_actit("+{rending:%s}", var_col)
-local p_rending2_var_rgb = iu_actit("2.{rending:%s}", var_col) -- 2.5!
+local p_rending2_var_rgb = iu_actit("{rending:%s}", var_col) -- 2. #47 (1.4.13) FIXED!
 local p_stacks_var_rgb = iu_actit("+{stacks:%s}", var_col)
 local p_stgr_var_rgb = iu_actit("+{stagger:%s}", var_col)
 local p_spprsn_var_rgb = iu_actit("+{suppression:%s}", var_col)
@@ -371,7 +374,7 @@ mod.localization_templates = {
 {	id = "talent_tree_oper_mod_000_l_desc_en", -- toughness:+15%.
 	loc_keys = {"loc_talent_toughness_boost_low_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
-	return "{toughness:%s} "..toughness_rgb..".{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- Stacks additively with other Toughness nodes.\n- Current max Toughness is multiplied by the Toughness percentage buffs from Curios.\n- Maximum Toughness is the Base value that is used in Toughness recovered calculations of most Talents.{#reset()}" end}, -- colors
+	return "{toughness:%s} "..toughness_rgb..".{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- Stacks additively with other Toughness nodes.\n- Current max Toughness is multiplied by the Toughness percentage buffs from Curios.\n-- For example, at 75 Max Toughness (Ogryn's base 50 and one +25 Toughness node) with one +16% Toughness Curio with a +5% Toughness perk, Ogryn's Max Toughness of 75 is increased by 75x(0.16+0.05)=15.75 to 90.75 Toughness (HUD rounds up).\n- Maximum Toughness is the Base value that is used in Toughness recovered calculations of most Talents.{#reset()}" end}, -- colors -- Psyker, Ogryn, Zealot, Veteran
 --_____________________________________________________Toughness Boost
 {	id = "talent_tree_oper_mod_000_m_en", -- Toughness Boost
 	loc_keys = {"loc_talent_toughness_boost_medium",},
@@ -380,7 +383,7 @@ mod.localization_templates = {
 {	id = "talent_tree_oper_mod_000_m_desc_en", -- toughness:+25%.
 	loc_keys = {"loc_talent_toughness_boost_medium_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
-	return "{toughness:%s} "..toughness_rgb..".{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- Stacks additively with other Toughness nodes.\n- Current max Toughness is multiplied by the Toughness percentage buffs from Curios.{#reset()}" end}, -- colors
+	return "{toughness:%s} "..toughness_rgb..".{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- Stacks additively with other Toughness nodes.\n- Current max Toughness is multiplied by the Toughness percentage buffs from Curios.\n-- For example, at 75 Max Toughness (Ogryn's base 50 and one +25 Toughness node) with one +16% Toughness Curio with a +5% Toughness perk, Ogryn's Max Toughness of 75 is increased by 75x(0.16+0.05)=15.75 to 90.75 Toughness (HUD rounds up).\n- Maximum Toughness is the Base value that is used in Toughness recovered calculations of most Talents.{#reset()}" end}, -- colors -- Psyker, Ogryn, Veteran
 --_____________________________________________________Toughness Damage Reduction
 {	id = "talent_tree_oper_mod_002_l_en", -- Toughness Damage Reduction
 	loc_keys = {"loc_talent_toughness_damage_reduction_low",},
@@ -389,16 +392,16 @@ mod.localization_templates = {
 {	id = "talent_tree_oper_mod_002_l_desc_en", -- toughness:+5%.
 	loc_keys = {"loc_talent_toughness_damage_reduction_low_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
-	return "{toughness:%s} "..toughness_dmg_rgb.." Reduction.{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- Stacks additively with other Toughness Damage Reduction nodes.\n- Their sum stacks multiplicatively with other Damage Reduction buffs.{#reset()}" end}, -- colors
+	return "{toughness:%s} "..toughness_dmg_rgb.." Reduction.{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- Stacks additively with other Toughness Damage Reduction nodes.\n- Their sum Stacks multiplicatively with other Damage Reduction buffs.{#reset()}" end}, -- colors -- Psyker, Zealot, Veteran
 --_____________________________________________________Toughness Damage Reduction
 {	id = "talent_tree_oper_mod_002_m_en", -- Toughness Damage Reduction
 	loc_keys = {"loc_talent_toughness_damage_reduction_medium",},
 	locales = {"en",}, handle_func = function(locale, value)
 	return "Toughness Damage Reduction Medium" end}, -- Medium
-{	id = "talent_tree_oper_mod_002_m_desc_en", -- toughness:+5%.
+{	id = "talent_tree_oper_mod_002_m_desc_en", -- toughness:+10%.
 	loc_keys = {"loc_talent_toughness_damage_reduction_medium_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
-	return "{toughness:%s} "..toughness_dmg_rgb.." Reduction.{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- Stacks additively with other Toughness Damage Reduction nodes.\n- Their sum stacks multiplicatively with other Damage Reduction buffs.{#reset()}" end}, -- colors
+	return "{toughness:%s} "..toughness_dmg_rgb.." Reduction.{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- Stacks additively with other Toughness Damage Reduction nodes.\n- Their sum Stacks multiplicatively with other Damage Reduction buffs.{#reset()}" end}, -- colors -- Ogryn, Veteran
 --_____________________________________________________Peril Resistance
 -- {	id = "talent_tree_oper_mod_001_en", -- Peril Resistance
 	-- loc_keys = {"loc_talent_warp_charge_low",},
@@ -408,7 +411,7 @@ mod.localization_templates = {
 {	id = "talent_tree_oper_mod_001_desc_en", -- warp_charge:-5%.
 	loc_keys = {"loc_talent_warp_charge_low_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
-	return "{warp_charge:%s} "..peril_rgb.." Generation.{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- Stacks multiplicatively with other nodes and related Peril cost reduction buffs from \"Becalming Eruption\", \"Inner Tranquility\", \"Kinetic Resonance\", \"Reality Anchor\" and Combat Stimm.{#reset()}" end}, -- colors
+	return "{warp_charge:%s} "..peril_rgb.." Generation.{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- Stacks multiplicatively with other nodes and related Peril cost reduction buffs from: \"Becalming Eruption\", \"Inner Tranquility\", \"Kinetic Resonance\", \"Reality Anchor\" and Combat Stimm.{#reset()}" end}, -- colors -- Psyker
 --_____________________________________________________Inspiring Presence
 -- {	id = "talent_tree_oper_mod_003_en", -- Inspiring Presence
 	-- loc_keys = {"loc_talent_coherency_regen_low",},
@@ -418,7 +421,7 @@ mod.localization_templates = {
 {	id = "talent_tree_oper_mod_003_desc_en", -- coherency_regen:+10%.
 	loc_keys = {"loc_talent_coherency_regen_low_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
-	return "{coherency_regen:%s} "..toughness_rgb.." Replenishment for you and Allies in Coherency.{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- Stacks additively with:\nOgryn's Aura - \"Stay Close!\",\nVeteran's node - \"Inspiring Presence\"\nand Toughness Regeneration Speed from Curios.\n- Increases the base amount of Coherency Toughness regenerated per Allies per second:\n_______________________________\nAllies:		Toughness regen:\n1		3.75 -> 4.125\n2		5.625 -> 6.1875\n3		7.5 -> 8.25\n_______________________________{#reset()}" end}, -- colors
+	return "{coherency_regen:%s} "..toughness_rgb.." Replenishment for you and Allies in Coherency.{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- Stacks additively with:\nOgryn's Aura - \"Stay Close!\",\nVeteran's node - \"Inspiring Presence\"\nand Toughness Regeneration Speed from Curios.\n- Increases the base amount of Coherency Toughness Regenerated (CTR) per Allies per second:\n_______________________________\nAllies:	CTR:		After 5 seconds:\n0	0.00 -> 0.00	0.00\n1	3.75 -> 4.13	20.63(HUD:~21)\n2	5.63 -> 6.19	30.94(HUD:~31)\n3	7.50 -> 8.25	41.25(HUD:~42)\n_______________________________{#reset()}" end}, -- colors -- Psyker, Veteran
 --_____________________________________________________Ranged Damage Boost
 -- {	id = "talent_tree_oper_mod_004_en", -- Ranged Damage Boost
 	-- loc_keys = {"loc_talent_ranged_damage_low",},
@@ -428,7 +431,7 @@ mod.localization_templates = {
 {	id = "talent_tree_oper_mod_004_desc_en", -- ranged_damage:+5%.
 	loc_keys = {"loc_talent_ranged_damage_low_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
-	return "{ranged_damage:%s} Ranged "..damage_rgb..".{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- Stacks additively with other related Damage buffs.{#reset()}" end}, -- colors
+	return "{ranged_damage:%s} Ranged "..damage_rgb..".{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- Stacks additively with other Ranged Damage nodes and other related Damage buffs, and multiplicatively with Power level buffs from Weapon Blessings.{#reset()}" end}, -- colors -- Ogryn, Veteran
 --_____________________________________________________Health Boost
 {	id = "talent_tree_oper_mod_005_l_en", -- Health Boost
 	loc_keys = {"loc_talent_health_low",},
@@ -437,7 +440,7 @@ mod.localization_templates = {
 {	id = "talent_tree_oper_mod_005_l_desc_en", -- health:+5%.
 	loc_keys = {"loc_talent_health_low_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
-	return "{health:%s} "..health_rgb..".{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- Stacks additively with Health buffs from Curios.\n- Also applies to Health while downed.{#reset()}" end}, -- colors
+	return "{health:%s} "..health_rgb..".{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- Also applies to Health while downed.\n- Stacks additively with Health buffs from Curios.\n\n-- OGRYN: For example, one +21% Health Curio with a +5% Health Perk and this 5% Health node increase Ogryn's Max Health of 300 by 300x(0.21+0.05+0.05)=93 to 393 Health.\n\n-- VETERAN: For example, one +21% Health Curio with a +5% Health Perk and this 5% Health node increase Veteran's Max Health of 150 by 150x(0.21+0.05+0.05)=46.5 to 196.5 Health (HUD rounds up).{#reset()}" end}, -- colors -- Ogryn, Veteran
 --_____________________________________________________Health Boost
 {	id = "talent_tree_oper_mod_005_m_en", -- Health Boost
 	loc_keys = {"loc_talent_health_medium",},
@@ -446,7 +449,7 @@ mod.localization_templates = {
 {	id = "talent_tree_oper_mod_005_m_desc_en", -- health:+10%.
 	loc_keys = {"loc_talent_health_medium_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
-	return "{health:%s} "..health_rgb..".{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- Stacks additively with Health buffs from Curios.\n- Also applies to Health while downed.{#reset()}" end}, -- colors
+	return "{health:%s} "..health_rgb..".{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- Also applies to Health while downed.\n- Stacks additively with Health buffs from Curios.\n\n-- PSYKER: For example, one +21% Health Curio with a +5% Health Perk and this 10% Health node increase Psyker's Max Health of 150 by 150x(0.21+0.05+0.1)=54 to 204 Health.\n\n-- OGRYN: For example, one +21% Health Curio with a +5% Health Perk and this 10% Health node increase Ogryn's Max Health of 300 by 300x(0.21+0.05+0.1)=108 to 408 Health.\n\n-- ZEALOT: For example, one +21% Health Curio with a +5% Health Perk and this 10% Health node increase Zealot's Max Health of 200 by 200x(0.21+0.05+0.1)=72 to 272 Health.{#reset()}" end}, -- colors -- Psyker, Ogryn, Zealot
 --_____________________________________________________Critical Chance Boost
 -- {	id = "talent_tree_oper_mod_006_en", -- Critical Chance Boost
 	-- loc_keys = {"loc_talent_crit_chance_low",},
@@ -456,7 +459,7 @@ mod.localization_templates = {
 {	id = "talent_tree_oper_mod_006_desc_en", -- crit_chance:+5%.
 	loc_keys = {"loc_talent_crit_chance_low_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
-	return "{crit_chance:%s} "..crit_hit_chance_rgb..".{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- Works for all attacks that can Crit.\n- Stacks additively with other sources of Crit Chance.{#reset()}" end}, -- colors
+	return "{crit_chance:%s} "..crit_hit_chance_rgb..".{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- Works for all attacks that can Crit.\n- Stacks additively with other sources of Crit Chance.{#reset()}" end}, -- colors -- Psyker, Veteran
 --_____________________________________________________Movement Speed Boost
 -- {	id = "talent_tree_oper_mod_007_en", -- Movement Speed Boost
 	-- loc_keys = {"loc_talent_movement_speed_low",},
@@ -466,7 +469,7 @@ mod.localization_templates = {
 {	id = "talent_tree_oper_mod_007_desc_en",
 	loc_keys = {"loc_talent_movement_speed_low_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
-	return "{movement_speed:%s} Movement Speed.{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- Stacks additively with related buffs from \"Disrupt Destiny\", \"Mettle\", \"Warp Speed\" and weapon Blessings like \"Rev it Up\".{#reset()}" end}, -- movement_speed:+5%.
+	return "{movement_speed:%s} Movement Speed.{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- PSYKER: Stacks additively with related buffs from: \"Disrupt Destiny\", \"Mettle\", \"Warp Speed\" and weapon Blessings like \"Rev it Up\".\n- ZEALOT: Stacks additively with other Movement Speed nodes and Movement Speed buffs from \"Shroudfield\", \"Thy Wrath be Swift\", and Weapon Blessings like \"Rev it Up\".\n-- Stacks multiplicatively with Sprinting Speed buff from \"Swift Certainty\".\n- VETERAN: Stacks additively with Movement Speed buffs from \"Infiltrate\", \"Leave No One Behind\", aura \"Close and Kill\", and Weapon Blessings like \"Rev it Up\".{#reset()}" end}, -- movement_speed:+5%. -- Psyker, Zealot, Veteran
 --_____________________________________________________Melee Damage Boost
 {	id = "talent_tree_oper_mod_008_en", -- Melee Damage Boost Low
 	loc_keys = {"loc_talent_melee_damage_boost_low",},
@@ -475,7 +478,7 @@ mod.localization_templates = {
 {	id = "talent_tree_oper_mod_008_desc_en", -- melee_damage:+5%.
 	loc_keys = {"loc_talent_melee_damage_boost_low_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
-	return "{melee_damage:%s} Melee "..damage_rgb..".{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- Stacks additively with other Melee Damage nodes and other related Damage buffs.{#reset()}" end}, -- colors
+	return "{melee_damage:%s} Melee "..damage_rgb..".{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- Stacks additively with other Melee Damage nodes and other related Damage buffs, and multiplicatively with Power level buffs from Weapon Blessings.\n\n-- OGRYN: Buffs the Melee special actions from Ripper Gun, Grenadier Gauntlet (Melee part), Rumbler, Stubber, and Kickback.\n\n-- VETERAN: Applies to Melee special actions from Bolter, Braced Autogun, Headhunter Autogun, Helbore Lasgun, and Stub Revolver.{#reset()}" end}, -- colors
 --_____________________________________________________Melee Damage Boost
 {	id = "talent_tree_oper_mod_008_en", -- Melee Damage Boost Medium
 	loc_keys = {"loc_talent_melee_damage_boost_medium",},
@@ -484,7 +487,7 @@ mod.localization_templates = {
 {	id = "talent_tree_oper_mod_008_desc_en", -- melee_damage:+10%.
 	loc_keys = {"loc_talent_melee_damage_boost_medium_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
-	return "{melee_damage:%s} Melee "..damage_rgb..".{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- Stacks additively with other Melee Damage nodes and other related Damage buffs.{#reset()}" end}, -- colors
+	return "{melee_damage:%s} Melee "..damage_rgb..".{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- Stacks additively with other Melee Damage nodes and other related Damage buffs, and multiplicatively with Power level buffs from Weapon Blessings.\n- Applies to Melee special actions from Bolter, Braced Autogun, Headhunter Autogun, Helbore Lasgun, and Stub Revolver.{#reset()}" end}, -- colors
 --_____________________________________________________Stamina Boost
 -- {	id = "talent_tree_oper_mod_009_en", -- Stamina Boost
 	-- loc_keys = {"loc_talent_stamina_low",},
@@ -504,7 +507,7 @@ mod.localization_templates = {
 {	id = "talent_tree_oper_mod_010_desc_en", -- suppression:+25%.
 	loc_keys = {"loc_talent_suppression_low_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
-	return "{suppression:%s} Suppression Dealt to enemies.{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- Stacks additively with Suppression buffs from Talents and Weapon Blessing \"Powderburn\".{#reset()}" end},
+	return "{suppression:%s} Suppression Dealt to enemies.{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- OGRYN: Stacks additively with Suppression buff from Weapon Blessing \"Ceaseless Barrage\".\n- ZEALOT: Stacks additively with Suppression buff from Weapon Blessing \"Powderburn\".\n- VETERAN: Stacks additively with Suppression buffs from \"Competitive Urge\", \"Keep Their Heads Down!\", and Weapon Blessing \"Powderburn\".{#reset()}" end},
 --_____________________________________________________Reload Boost
 -- {	id = "talent_tree_oper_mod_011_en", -- Reload Boost
 	-- loc_keys = {"loc_talent_reload_speed_low",},
@@ -1289,7 +1292,7 @@ mod.localization_templates = {
 {	id = "talent_tree_zea_aura_003_desc_en",
 	loc_keys = {"loc_talent_zealot_always_in_coherency_description",},
 	locales = {"en",}, handle_func = function(locale, value)
-	return "Makes Zealot count as being in Coherency with one Ally which enables the lowest rate of Coherency "..toughness_rgb.." Regeneration of {#color(255, 255, 140)}3.75{#reset()} "..toughness_rgb.." per second.{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- This rate can be increased by Zealot's Talent \"Fortitude in Fellowship\", Toughness Regeneration Speed from Curios and related buffs from Psyker's and Veteran's Talent nodes \"Inspiring Presence\" or Ogryn's aura \"Stay Close!\"{#reset()}" end}, -- coherency_min_stack:2.
+	return "Makes Zealot count as being in Coherency with one Ally which enables the lowest rate of Coherency "..toughness_rgb.." Regeneration of {#color(255, 255, 140)}3.75{#reset()} "..toughness_rgb.." per second.{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- *Coherency Toughness Regenerated (CTR)\n_______________________________\nAllies:	CTR:		After 5 seconds:\n0	0.00 -> 3.75	18.75(HUD:~19)\n1	3.75 -> 3.75	18.75(HUD:~19)\n2	5.63 -> 5.63	28.13(HUD:~29)\n3	7.50 -> 7.50	37.50(HUD:~38)\n_______________________________\n- Stacks additively with \"Fortitude in Fellowship\":\n_______________________________\nAllies:	CTR:		After 5 seconds:\n0	3.75 -> 5.63	28.13(HUD:~29)\n1	3.75 -> 5.63	28.13(HUD:~29)\n2	5.63 -> 7.50	37.50(HUD:~38)\n3	7.50 -> 9.38	46.88(HUD:~47)\n_______________________________\n- Stacks multiplicatively During Calculation with Toughness Regeneration Speed from Curios and related buffs from Psyker's and Veteran's talent nodes \"Inspiring Presence\" or Ogryn's aura \"Stay Close!\".{#reset()}" end}, -- coherency_min_stack:2.
 
 -- ==============================================================ABILITIES
 -- _____________________________________________________Ability 0
@@ -1599,7 +1602,7 @@ mod.localization_templates = {
 {	id = "talent_tree_zea_pas_005_desc_en",
 	loc_keys = {"loc_talent_zealot_increased_coherency_regen_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
-	return "{toughness:%s} Coherency "..toughness_rgb.." Regeneration.{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- Increases Zealot's base amount of Coherency Toughness regenerated while in Coherency:\n_______________________________\nAllies:			Toughness:\n1			3.75 -> 5.63\n2			5.63 -> 7.50\n3			7.50 -> 9.38\n_______________________________\n- Stacks multiplicatively with:\nOgryn's Aura \"Stay Close!\",\nPsyker's and Veteran's Talent nodes \"Inspiring Presence\"\nand Toughness Regeneration Speed from Curios.{#reset()}" end}, -- toughness:+25%. -- colors
+	return "{toughness:%s} Coherency "..toughness_rgb.." Regeneration.{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- Increases Zealot's base amount of Coherency Toughness Regenerated (CTR):\n_______________________________\nAllies:	CTR:		After 5 seconds:\n0	0.00 -> 1.85	9.38(HUD:~10)\n1	3.75 -> 5.63	28.13(HUD:~29)\n2	5.63 -> 7.50	37.50(HUD:~38)\n3	7.50 -> 9.38	46.88(HUD:~47)\n_______________________________\n- Stacks additively with \"Loner\".\n- Stacks multiplicatively During Calculation with Toughness Regeneration Speed from Curios, Psyker's and Veteran's talent nodes \"Inspiring Presence\", and Ogryn's aura \"Stay Close!\".\n- Note that because of how the Toughness Coherency Regen rate modifier is applied During Calculation, this Talent enables Coherency Toughness Regeneration for Zealot even with no Allies in Coherency.{#reset()}" end}, -- toughness:+25%. -- colors
 -- {	id = "talent_tree_zea_pas_006_en", -- Purge the Unclean 7
 	-- loc_keys = {"loc_talent_zealot_3_passive_2",},
 	-- locales = {"en",},
@@ -1894,7 +1897,7 @@ mod.localization_templates = {
 {	id = "talent_tree_vet_blitz3_000_desc_en",
 	loc_keys = {"loc_ability_smoke_grenade_description",},
 	locales = {"en",}, handle_func = function(locale, value)
-	return "Throw a Grenade that creates a lingering Smoke cloud for {duration:%s} seconds. The cloud blocks line of sight for most enemies and reduces the sight range of enemies inside it.{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- Fuse time: 1.5 seconds.\n- Smoke cloud effect:\n-- Radius: 5.5 meters.\n-- Lasts: 15 seconds.\n-- Detection radius of unaggroed enemies is lowered so that players can enter an enemy's aggro range without drawing aggro immediately.\n-- If the player holds aggro in Melee combat, smoke doesnР В Р вЂ Р В РІР‚С™Р Р†РІР‚С›РЎС›t affect enemy perception.\n-- If the player holds aggro in Ranged combat, smoke makes the enemy stop firing and reposition.\n-- Gunners and Reapers in the smoke cloud keep firing at the playerР В Р вЂ Р В РІР‚С™Р Р†РІР‚С›РЎС›s last known position.\n-- Pox Hounds cannot lock on a player who is inside smoke cloud's area of effect and will keep circling the cloud.\n- Replenishes all grenades per grenade pickup.\n- No effect on Mutants, Poxbursters and Bombers.{#reset()}" end}, -- duration:15. -- colors Notice!
+	return "Throw a Grenade that creates a lingering Smoke cloud for {duration:%s} seconds. The cloud blocks line of sight for most enemies and reduces the sight range of enemies inside it.{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- Fuse time: 1.5 seconds.\n- Smoke cloud effect:\n-- Radius: 5.5 meters.\n-- Lasts: 15 seconds.\n-- Detection radius of unaggroed enemies is lowered so that players can enter an enemy's aggro range without drawing aggro immediately.\n-- If the player holds aggro in Melee combat, smoke doesn't affect enemy perception.\n-- If the player holds aggro in Ranged combat, smoke makes the enemy stop firing and reposition.\n-- Gunners and Reapers in the smoke cloud keep firing at the player's last known position.\n-- Pox Hounds cannot lock on a player who is inside smoke cloud's area of effect and will keep circling the cloud.\n- Replenishes all grenades per grenade pickup.\n- No effect on Mutants, Poxbursters and Bombers.{#reset()}" end}, -- duration:15. -- colors Notice!
 
 -- ==============================================================AURA
 --_____________________________________________________Aura 0
@@ -2112,7 +2115,7 @@ mod.localization_templates = {
 
 -- ==============================================================KEYSTONES
 --_____________________________________________________Keystone 1
--- {	id = "talent_tree_vet_keys1_000_en", -- MarksmanР В Р вЂ Р В РІР‚С™Р Р†РІР‚С›РЎС›s Focus
+-- {	id = "talent_tree_vet_keys1_000_en", -- Marksman's Focus
 	-- loc_keys = {"loc_talent_veteran_snipers_focus",},
 	-- locales = {"en",},
 	-- handle_func = function(locale, value)
@@ -2460,7 +2463,7 @@ mod.localization_templates = {
 {	id = "talent_tree_vet_pas_021_desc_en",
 	loc_keys = {"loc_talent_veteran_movement_speed_towards_downed_description",},
 	locales = {"en",}, handle_func = function(locale, value)
-	return "{revive_speed:%s} Assist Speed and Revive Speed. {movement_speed:%s} Movement Speed and "..stun_rgb.." Immunity when moving towards a Knocked Down or Incapacitated Ally. Whenever you Revive a Knocked Down Ally, they receive {damage_reduction:%s} "..damage_rgb.." Reduction for {duration:%s} seconds.{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- The Revive Speed buff Stacks additively with the Revive Speed stat from Curios.\n- \"Incapacitated\" includes: netted, ledged, pounced, grabbed (by Daemonhost, Chaos Spawn, Mutant), eaten by Beast of Nurgle and waiting for rescue after respawn.\n- The Movement Speed buff Stacks additively with related buffs from \"Infiltrate\", aura \"Close and Kill\", the Movement Speed node, and Weapon Blessings like \"\"Rev it Up\".\n- The Damage Reduction buff Stacks multiplicatively with other Damage Reduction buffs.{#reset()}" end}, -- revive_speed:+20%. movement_speed:+20%. damage_reduction:+33% duration:5. -- colors & s->seconds
+	return "{revive_speed:%s} Assist Speed and Revive Speed. {movement_speed:%s} Movement Speed and "..stun_rgb.." Immunity when moving towards a Knocked Down or Incapacitated Ally. Whenever you Revive a Knocked Down Ally, they receive {damage_reduction:%s} "..damage_rgb.." Reduction for {duration:%s} seconds.{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- The Revive Speed buff Stacks additively with the Revive Speed stat from Curios.\n- \"Incapacitated\" includes: netted, ledged, pounced, grabbed (by Daemonhost, Chaos Spawn, Mutant), eaten by Beast of Nurgle and waiting for rescue after respawn.\n- The Movement Speed buff Stacks additively with related buffs from \"Infiltrate\", aura \"Close and Kill\", the Movement Speed node, and Weapon Blessings like \"Rev it Up\".\n- The Damage Reduction buff Stacks multiplicatively with other Damage Reduction buffs.{#reset()}" end}, -- revive_speed:+20%. movement_speed:+20%. damage_reduction:+33% duration:5. -- colors & s->seconds
 -- {	id = "talent_tree_vet_pas_022_en", -- Precision Strikes
 	-- loc_keys = {"loc_talent_veteran_increased_weakspot_damage",},
 	-- locales = {"en",},
@@ -3063,7 +3066,7 @@ mod.localization_templates = {
 {	id = "talent_tree_ogr_pas_006_desc_en",
 	loc_keys = {"loc_talent_ogryn_coherency_toughness_increase_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
-	return toughness_rgb.." replenished while in Coherency is increased by {toughness_multiplier:%s}.{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- Increases Ogryn's base amount of Coherency Toughness Regenerated while in Coherency by 50%:\n_______________________________\nAllies:			Toughness:\n1			3.75 -> 5.63\n2			5.63 -> 8.44\n3			7.50 -> 11.25\n_______________________________ \n- Stacks additively with Ogryn's Aura \"Stay Close!\", keystone \"Feel No Pain\" (including \"Toughest!\"), Toughness Regeneration Speed from Curios, and Psyker's and Veteran's Talent nodes \"Inspiring Presence\".{#reset()}" end}, -- toughness_multiplier:+50%. -- colors
+	return toughness_rgb.." replenished while in Coherency is increased by {toughness_multiplier:%s}.{#color(177, 144, 0)}\n+++-------------------------------------------------+++\n- Increases Ogryn's base amount of Coherency Toughness Regenerated (CTR) while in Coherency by 50%:\n_______________________________\nAllies:	CTR:		\n1			3.75 -> 5.63\n2			5.63 -> 8.44\n3			7.50 -> 11.25\n_______________________________ \n- Stacks additively with Ogryn's Aura \"Stay Close!\", keystone \"Feel No Pain\" (including \"Toughest!\"), Toughness Regeneration Speed from Curios, and Psyker's and Veteran's Talent nodes \"Inspiring Presence\".{#reset()}" end}, -- toughness_multiplier:+50%. -- colors
 -- {	id = "talent_tree_ogr_pas_007_en", -- Slam
 	-- loc_keys = {"loc_talent_ogryn_melee_stagger",},
 	-- locales = {"en",},
@@ -3375,7 +3378,7 @@ mod.localization_templates = {
 {	id = "trait_bespoke_23_desc_ext_en", -- Brutal Momentum
 	loc_keys = {"loc_trait_bespoke_infinite_cleave_on_weakspot_kill_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
-	return p_wkspdmg_var_rgb.." "..weakspot_dmg_rgb..". "..weakspot_rgb.." Kills also ignore "..hit_mass_rgb.." of all enemies except Ogryns, and thereby receives infinite "..cleave_rgb.."." end}, -- colors
+	return p_wkspdmg_var_rgb.." "..weakspot_dmg_rgb..". "..weakspot_rgb.." Kills also ignore up to 3 enemies "..hit_mass_rgb.."." end}, -- colors
 {	id = "trait_bespoke_24_desc_ext_en", -- Limbsplitter
 	loc_keys = {"loc_trait_bespoke_power_bonus_on_first_attack_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
@@ -3400,7 +3403,7 @@ mod.localization_templates = {
 {	id = "trait_bespoke_29_desc_ext_en", -- Thunderous
 	loc_keys = {"loc_trait_bespoke_targets_receive_rending_debuff_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
-	return "Target receives "..stacks_var_rgb.." Stacks of "..p_rending2_var_rgb.." "..brittleness_rgb.." on Hit. Lasts "..time_var_rgb.." seconds. Up to {#color(255, 255, 140)}40%{#reset()}."..brtl_note_rgb end}, -- colors s->seconds
+	return "Target receives "..stacks_var_rgb.." Stacks of "..p_rending2_var_rgb.." "..brittleness_rgb.." on Hit. Lasts "..time_var_rgb.." seconds. Max "..maxstks_var_rgb.." Stacks, up to {#color(255, 255, 140)}40%{#reset()}."..brtl_note_rgb end}, -- colors s->seconds
 {	id = "trait_bespoke_30_desc_ext_en", -- Decapitator
 	loc_keys = {"loc_trait_bespoke_stacking_rending_on_one_hit_kills_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
@@ -3429,8 +3432,7 @@ mod.localization_templates = {
 {	id = "trait_bespoke_36_desc_ext_en", -- Haymaker
 	loc_keys = {"loc_trait_bespoke_heavy_chained_hits_increases_killing_blow_chance_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
-	return p_procch_var_rgb.." to Instakill human-sized enemies on Chained Heavy Hit. Stacks "..stacks_var_rgb.." times." end}, -- colors
-
+	return p_procch_var_rgb.." to Instakill human-sized enemies on Chained Heavy Hit. Stacks "..stacks_var_rgb.." times. Note that other potential triggers will not activated on instakill." end}, -- colors
 {	id = "trait_bespoke_36_1_desc_ext_en", -- Opportunist
 	loc_keys = {"loc_trait_bespoke_armor_penetration_against_staggered_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
@@ -3470,16 +3472,16 @@ mod.localization_templates = {
 {	id = "trait_bespoke_41_desc_ext_en", -- Run 'n' Gun
 	loc_keys = {"loc_trait_bespoke_allow_hipfire_while_sprinting_and_bonus_stats_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
-	return "You can Hipfire with this weapon while Sprinting. "..p_dmgnr_var_rgb.." Close "..damage_rgb.." while Sprinting." end}, -- colors
+	return "You can Hipfire with this weapon while Sprinting. "..p_dmgnr_var_rgb.." Close "..damage_rgb.." while Sprinting. Also reduces weapon Spread at all times by "..weapsprd_var_rgb.." ." end}, -- colors
 -- ____________________________________________________Force Staff - Trauma
 {	id = "trait_bespoke_42_desc_ext_en", -- Rending Shockwave
 	loc_keys = {"loc_trait_bespoke_rend_armor_on_aoe_charge_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
-	return "Target receives for {#color(255, 255, 140)}5{#reset()} seconds up to "..stacks_var_rgb.." Stacks "..p_rending2_var_rgb.." "..brittleness_rgb..", scaling with charge time of Secondary Attack. Up to {#color(255, 255, 140)}40%{#reset()}."..brtl_note_rgb end}, -- rewrite colors s->seconds Note!
+	return "Target receives up to "..stacks_var_rgb.." Stacks "..p_rending2_var_rgb.." "..brittleness_rgb..", scaling with charge time of Secondary Attack. Lasts "..time_var_rgb.." seconds. Max "..maxstks_var_rgb.." Stacks, up to {#color(255, 255, 140)}40%{#reset()}."..brtl_note_rgb end}, -- rewrite colors s->seconds Note!
 {	id = "trait_bespoke_43_desc_ext_en", -- Sustained Fire
 	loc_keys = {"loc_trait_bespoke_followup_shots_ranged_damage_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
-	return p_dmg_var_rgb.." "..damage_rgb.." on Second, Third and Fourth shots in a Salvo."..trauma_note_rgb end}, -- colors -- "on Third and Fourth shots" -> "on Second, Third and Fourth"
+	return p_dmg_var_rgb.." "..damage_rgb.." on Second, Third and Fourth shots in a Salvo."..trauma_note_rgb end}, -- colors
 {	id = "trait_bespoke_44_desc_ext_en", -- Transfer Peril
 	loc_keys = {"loc_trait_bespoke_peril_vent_on_weakspot_hit_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
@@ -3535,7 +3537,8 @@ mod.localization_templates = {
 {	id = "trait_bespoke_56_desc_ext_en", -- Falter
 	loc_keys = {"loc_trait_bespoke_negate_stagger_reduction_on_weakspot_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
-	return "Ignore "..stgr_var_rgb.." "..stagger_rgb.." Resistance on "..weakspothit_rgb.."." end}, -- colors
+	return "Increased "..stagger_rgb.." on enemies by "..stgr_var_rgb..", on "..weakspothit_rgb..". Additionally, increases Ranged "..stagger_rgb.." strength by "..stgrrang_var_rgb.."." end}, -- colors
+	-- return "Ignore "..stgr_var_rgb.." "..stagger_rgb.." Resistance on "..weakspothit_rgb.."." end}, -- colors
 {	id = "trait_bespoke_57_desc_ext_en", -- Surgical
 	loc_keys = {"loc_trait_bespoke_crit_chance_based_on_aim_time_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
@@ -3564,7 +3567,7 @@ mod.localization_templates = {
 {	id = "trait_bespoke_63_desc_ext_en", -- Punishing Salvo
 	loc_keys = {"loc_trait_bespoke_followup_shots_ranged_weakspot_damage_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
-	return p_dmg_var_rgb.." "..weakspot_dmg_rgb.." on Second, Third and Fourth shots in a Salvo."..dmg_x_2_5_note_rgb end}, -- colors -- "on Third and Fourth shots" to "on Second, Third and Fourth"
+	return p_dmg_var_rgb.." "..weakspot_dmg_rgb.." on Second, Third and Fourth shots in a Salvo." end}, -- colors
 {	id = "trait_bespoke_64_desc_ext_en", -- Fire Frenzy
 	loc_keys = {"loc_trait_bespoke_increase_close_damage_on_close_kill_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
@@ -3657,7 +3660,7 @@ mod.localization_templates = {
 {	id = "trait_bespoke_78_desc_ext_en", -- Deathblow
 	loc_keys = {"loc_trait_bespoke_infinite_melee_cleave_on_weakspot_kill_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
-	return p_wkspdmg_var_rgb.." "..weakspot_dmg_rgb..". "..weakspot_rgb.." Kills also ignore Enemy "..hit_mass_rgb.."." end}, -- colors
+	return p_wkspdmg_var_rgb.." "..weakspot_dmg_rgb..". "..weakspot_rgb.." Kills also ignore up to 3 enemies "..hit_mass_rgb.."." end}, -- colors
 -- ____________________________________________________Lawbringer Combat Shotgun
 {	id = "trait_bespoke_79_desc_ext_en", -- Flechette
 	loc_keys = {"loc_trait_bespoke_bleed_on_crit_ranged_desc",},
@@ -3696,7 +3699,7 @@ mod.localization_templates = {
 {	id = "trait_bespoke_87_desc_ext_en", -- Shattering Impact
 	loc_keys = {"loc_trait_bespoke_armor_rend_on_projectile_hit_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
-	return "Target receives "..stacks_var_rgb.." Stacks of "..p_rending2_var_rgb.." "..brittleness_rgb.." on direct projectile hit. Lasts "..time_var_rgb.." seconds. Up to {#color(255, 255, 140)}40%{#reset()}."..brtl_note_rgb end}, -- colors s->seconds
+	return "Target receives "..stacks_var_rgb.." Stacks of "..p_rending2_var_rgb.." "..brittleness_rgb.." on direct projectile hit. Lasts "..time_var_rgb.." seconds. Max "..maxstks_var_rgb.." Stacks, up to {#color(255, 255, 140)}40%{#reset()}."..brtl_note_rgb end}, -- colors s->seconds
 
 -- ==================================================VETERAN
 -- ____________________________________________________Melee
@@ -3722,7 +3725,8 @@ mod.localization_templates = {
 {	id = "trait_bespoke_92_desc_ext_en", -- Gets Hot!
 	loc_keys = {"loc_trait_bespoke_crit_chance_scaled_on_heat_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
-	return "Up to "..p_crit_var_rgb.." "..crit_chance_rgb..".  The higher the Overheating level, the higher the Crit chance." end}, -- colors -- "(scales on Heat Level)" -> " The higher the Overheating level, the higher the Crit chance."
+	return crit_hit_chance_rgb.." scales by your current Heat level up to "..crit_var_rgb..". Also increases "..crit_rgb.." Ranged attacks damage by "..rangcrtdmg_var_rgb.."." end}, -- colors -- "(scales on Heat Level)" -> " The higher the Overheating level, the higher the Crit chance."
+	-- return "Up to "..p_crit_var_rgb.." "..crit_chance_rgb..".  The higher the Overheating level, the higher the Crit chance." end}, -- colors -- "(scales on Heat Level)" -> " The higher the Overheating level, the higher the Crit chance."
 -- ____________________________________________________Helbore Lasgun
 {	id = "trait_bespoke_93_desc_ext_en", -- Weight of Fire (Onslaught)
 	loc_keys = {"loc_trait_bespoke_faster_charge_on_chained_attacks_desc",},
@@ -3783,7 +3787,8 @@ mod.localization_templates = {
 {	id = "trait_bespoke_102_desc_ext_en", -- Can opener
 	loc_keys = {"loc_trait_bespoke_armor_rending_bayonette_desc",},
 	locales = {"en",}, handle_func = function(locale, value)
-	return "Target receives "..stacks_var_rgb.." stacks of "..p_rending2_var_rgb.." "..brittleness_rgb.." on weapon Special Hit. Lasts "..time_var_rgb.." seconds. Up to {#color(255, 255, 140)}40%{#reset()}."..brtl_note_rgb end}, -- colors s->seconds
+	return "Target receives "..stacks_var_rgb.." Stacks of "..p_rending2_var_rgb.." "..brittleness_rgb.." on weapon Special Hit. Lasts "..time_var_rgb.." seconds. Max "..maxstks_var_rgb.." Stacks, up to {#color(255, 255, 140)}40%{#reset()}."..brtl_note_rgb end}, -- colors s->seconds
+	-- return "Target receives "..stacks_var_rgb.." stacks of "..p_rending2_var_rgb.." "..brittleness_rgb.." on weapon Special Hit. Lasts "..time_var_rgb.." seconds. Up to {#color(255, 255, 140)}40%{#reset()}."..brtl_note_rgb end}, -- colors s->seconds
 {	id = "trait_bespoke_103_desc_ext_en", -- Born in blood
 	loc_keys = {"loc_trait_bespoke_toughness_on_close_range_kills_desc",},
 	locales = {"en",}, handle_func = function(locale, value)

@@ -23,7 +23,6 @@ ChatBlock
 pickup_notif_tweaker
 reveal_blessings
 BetterMelk
-buy_until_rating
 true_level
 PlayerOutlines
 ScoreboardDamage
