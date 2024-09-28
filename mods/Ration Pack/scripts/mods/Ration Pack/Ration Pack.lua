@@ -1,12 +1,12 @@
 --[[
 Title: Ration Pack
 Author: Wobin
-Date: 27/09/2024
+Date: 28/09/2024
 Repository: https://github.com/Wobin/RationPack
-Version: 6.3
+Version: 6.3.1
 ]]--
 local mod = get_mod("Ration Pack")
-mod.version = "6.3"
+mod.version = "6.3.1"
 local charge_lookup = {}
 local UIFontSettings = require("scripts/managers/ui/ui_font_settings")
 local Pickups = require("scripts/settings/pickup/pickups")
@@ -276,8 +276,7 @@ mod.on_all_mods_loaded = function()
   end)
     mod:hook_require("scripts/extension_systems/unit_templates", function(instance)    
         if is_mod_loading then
-          mod:hook_safe(instance.medical_crate_deployable, "husk_init", function(unit)
-            mod:echo("husk_init")            
+          mod:hook_safe(instance.medical_crate_deployable, "husk_init", function(unit)              
             unit_spawned(unit, false)
           end)
           if instance.medical_crate_deployable.pre_unit_destroyed then

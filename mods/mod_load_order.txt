@@ -47,3 +47,4 @@ ScoreboardTagCounter
 StimmsPickupIcon
 InspectFromSocial
 CollectibleFinder
+FilterSacrifice
