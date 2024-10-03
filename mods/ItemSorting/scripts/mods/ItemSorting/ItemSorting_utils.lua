@@ -1,4 +1,5 @@
 local mod = get_mod("ItemSorting")
+local ItemUtils = require("scripts/utilities/items")
 local ItemSortingUtils = {}
 
 function ItemSortingUtils.get_trait_category(item)
@@ -95,6 +96,12 @@ function ItemSortingUtils.compare_item_myfav(a, b)
 		return true
 	elseif b.__isort_myfav and not a.__isort_myfav then
 		return false
+	elseif a.__isort_myfav and b.__isort_myfav then
+		if a.__isort_myfav < b.__isort_myfav then
+			return true
+		elseif b.__isort_myfav < a.__isort_myfav then
+			return false
+		end
 	end
 	return nil
 end
@@ -108,6 +115,12 @@ function ItemSortingUtils.compare_item_type_myfav(a, b)
 			return true
 		elseif b.__isort_myfav and not a.__isort_myfav then
 			return false
+		elseif a.__isort_myfav and b.__isort_myfav then
+			if a.__isort_myfav < b.__isort_myfav then
+				return true
+			elseif b.__isort_myfav < a.__isort_myfav then
+				return false
+			end
 		end
 		return nil
 	end
@@ -160,6 +173,12 @@ function ItemSortingUtils.compare_item_category_top_items(a, b)
 				return true
 			elseif b.__isort_myfav and not a.__isort_myfav then
 				return false
+			elseif a.__isort_myfav and b.__isort_myfav then
+				if a.__isort_myfav < b.__isort_myfav then
+					return true
+				elseif b.__isort_myfav < a.__isort_myfav then
+					return false
+				end
 			end
 		end
 	elseif a.__isort_type_equipped and b.__isort_type_equipped then
@@ -175,10 +194,33 @@ end
 function ItemSortingUtils.compare_item_category(a, b)
 	local a_category = ItemSortingUtils.get_trait_category(a)
 	local b_category = ItemSortingUtils.get_trait_category(b)
+	local a_name, b_name = "", ""
+	if ItemUtils.is_weapon(a.item_type) then
+		a_name = ItemUtils.weapon_lore_family_name(a)
+	end
+	if ItemUtils.is_weapon(b.item_type) then
+		b_name = ItemUtils.weapon_lore_family_name(b)
+	end
 
-	if a_category < b_category then
+	if a_category == b_category then
+		return nil
+	end
+	if a_name == "" and b_name == "" then
+		if a_category < b_category then
+			return true
+		elseif b_category < a_category then
+			return false
+		end
+		return nil
+	end
+	if a_name == "" then
 		return true
-	elseif b_category < a_category then
+	elseif b_name == "" then
+		return false
+	end
+	if a_name < b_name then
+		return true
+	elseif b_name < a_name then
 		return false
 	end
 	return nil
