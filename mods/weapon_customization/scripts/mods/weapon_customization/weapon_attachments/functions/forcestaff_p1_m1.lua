@@ -64,6 +64,7 @@ return {
             {id = "body_03",      name = "Body 3"},
             {id = "body_04",      name = "Body 4"},
             {id = "body_05",      name = "Body 5"},
+            {id = "force_staff_full_ml01",      name = "Body 6"},
         }
         if default == nil then default = true end
         if default then return table.icombine(
@@ -80,6 +81,7 @@ return {
             {name = "body_03",      model = _item_melee.."/full/force_staff_full_03"},
             {name = "body_04",      model = _item_melee.."/full/force_staff_full_04"},
             {name = "body_05",      model = _item_melee.."/full/force_staff_full_05"},
+            {name = "force_staff_full_ml01",      model = _item_melee.."/full/force_staff_full_ml01"},
         }, parent, angle, move, remove, type or "body", no_support, automatic_equip, hide_mesh, mesh_move, special_resolve)
     end,
 
@@ -92,6 +94,7 @@ return {
             {id = "shaft_upper_03",      name = "Upper Shaft 3"},
             {id = "shaft_upper_04",      name = "Upper Shaft 4"},
             {id = "shaft_upper_05",      name = "Upper Shaft 5"},
+            {id = "shaft_upper_06",      name = "Upper Shaft 6"},
         }
         if default == nil then default = true end
         if default then return table.icombine(
@@ -108,6 +111,7 @@ return {
             {name = "shaft_upper_03",      model = _item_ranged.."/shafts/force_staff_shaft_upper_03"},
             {name = "shaft_upper_04",      model = _item_ranged.."/shafts/force_staff_shaft_upper_04"},
             {name = "shaft_upper_05",      model = _item_ranged.."/shafts/force_staff_shaft_upper_05"},
+            {name = "shaft_upper_06",      model = _item_ranged.."/shafts/force_staff_shaft_upper_ml01"},
         }, parent, angle, move, remove, type or "shaft_upper", no_support, automatic_equip, hide_mesh, mesh_move, special_resolve)
     end,
 
@@ -120,6 +124,7 @@ return {
             {id = "shaft_lower_03",      name = "Lower Shaft 3"},
             {id = "shaft_lower_04",      name = "Lower Shaft 4"},
             {id = "shaft_lower_05",      name = "Lower Shaft 5"},
+            {id = "shaft_lower_06",      name = "Lower Shaft 6"},
         }
         if default == nil then default = true end
         if default then return table.icombine(
@@ -136,6 +141,7 @@ return {
             {name = "shaft_lower_03",      model = _item_ranged.."/shafts/force_staff_shaft_lower_03"},
             {name = "shaft_lower_04",      model = _item_ranged.."/shafts/force_staff_shaft_lower_04"},
             {name = "shaft_lower_05",      model = _item_ranged.."/shafts/force_staff_shaft_lower_05"},
+            {name = "shaft_lower_06",      model = _item_ranged.."/shafts/force_staff_shaft_lower_ml01"},
         }, parent, angle, move, remove, type or "shaft_lower", no_support, automatic_equip, hide_mesh, mesh_move, special_resolve)
     end,
 }
