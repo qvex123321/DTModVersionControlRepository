@@ -76,10 +76,8 @@ end
 local function player_career(profile)
 	local archetype = profile.archetype
 	local archetypename = archetype.archetype_name
-	local subclass = profile.specialization
-	local subclassname = archetype.specializations[subclass].title
 	local symbol = archetype.string_symbol
-	return Localize(archetypename),Localize(subclassname),symbol
+	return Localize(archetypename),symbol
 end
 
 
@@ -282,7 +280,8 @@ mod.get_playerloadout_intel = function(profile,widget)
 	local Melee, Range = profile.loadout["slot_primary"], profile.loadout["slot_secondary"]
 	local content = widget.content
 	local style = widget.style
-	local class,career,symbol = player_career(profile)
+	--local class,career,symbol = player_career(profile)
+	local class,symbol = player_career(profile)
 	local main_class_method = {hide = "",name = class, symbol = symbol, both = symbol..class}
 	local weapons = {
 		Melee = {
@@ -388,19 +387,11 @@ local function spectating_hud_tactical_overlay()
 	return false
 end
 
-mod.player_loaded = function(player,widget)
-	local psyroom = Managers.state and Managers.state.game_mode and Managers.state.game_mode:game_mode_name() == "shooting_range"
-	if psyroom then
-		return false
-	end
-	
-	local account = player._account_id
-	local profile = player._profile
-	local Melee, Range = weapon_display_name(profile,"Melee"), weapon_display_name(profile,"Range")
+local player_loaded = function(account,profile)
 	if mod.teamatesloadout[account] then
-		local gears = mod.teamatesloadout[account].Melee == Melee and mod.teamatesloadout[account].Range == Range
-		local intel = mod.weapon_enable and widget.content.loadout_intel_Melee ~= " " and widget.content.loadout_intel_Range ~= " "
-		return  gears and intel
+		local Melee = profile.loadout.slot_primary.__gear_id
+		local Range = profile.loadout.slot_secondary.__gear_id
+		return Melee and Range and mod.teamatesloadout[account].Melee == Melee and mod.teamatesloadout[account].Range == Range
 	end
 	return false
 end
@@ -410,18 +401,17 @@ mod.update_loadout = function(self, dt, t, player, ui_renderer)
 		return
 	end
 	
-	local tactical_active = Managers.ui and Managers.ui._hud and Managers.ui._hud._tactical_overlay_active or spectating_hud_tactical_overlay()
-	local profile = player._profile
-	local account = player._account_id
+	local tactical_active = Managers.ui and Managers.ui._hud and Managers.ui._hud:tactical_overlay_active() or spectating_hud_tactical_overlay()
 	local widget = self._widgets_by_name.playerloadout_intel
-	if not mod.player_loaded(player,widget) and tactical_active then
+	local profile = player._profile
+	local account = player._account_id	
+	if tactical_active and not player_loaded(account,profile) then
 		mod.get_playerloadout_intel(profile,widget)
 		mod.teamatesloadout[account] = {
-			Melee = widget.content.loadout_intel_Melee,
-			Range = widget.content.loadout_intel_Range,
+			Melee = profile.loadout.slot_primary.__gear_id,
+			Range = profile.loadout.slot_secondary.__gear_id,
 			--scenegraph = self._ui_scenegraph.player_loadout
 		}
-		--self._position_scenegraphs
 	end
 	self:_set_widget_visible(widget,tactical_active,ui_renderer)
 end
@@ -437,15 +427,14 @@ end)
 mod:hook_safe("CameraHandler","_switch_follow_target",function (self, new_unit)
 	mod.teamatesloadout = {}
 end)
+mod:hook_safe(CLASS.InventoryView,"on_exit",function() mod.teamatesloadout = {} end)
 
-
+mod.on_game_state_changed = function(status,state_name)
+	if not table.is_empty(mod.teamatesloadout) then mod.teamatesloadout = {} end
+end
 mod.on_all_mods_loaded = function()
 	mod:init()
 end
-mod.on_game_state_changed = function(status,state_name)
-	mod.teamatesloadout = {}
-end
-
 
 mod.playerloadout_definition = function(instance)
 	instance.scenegraph_definition.player_loadout = {
@@ -870,33 +859,6 @@ end
 mod.on_setting_changed = function(setting_name)
 	mod:init()
 end
-mod:command("lom",mod:localize("echo_team_loadout_brief"),function(...)
-	local key = {...}
-	if key[1] == "reset" then
-		mod.teamatesloadout = {}
-	elseif key[1] == "weapon" then
-		local me_loadout = get_local_player()._profile.loadout
-		local templates = {
-			me_loadout["slot_primary"].weapon_template or "????",
-			me_loadout["slot_secondary"].weapon_template or "????",			
-		}
-		mod:echo("\n"..templates[1].."\n"..templates[2])
-	elseif table.is_empty(key) then
-		local brief = "\n"
-		local players = Managers.player and Managers.player:players()
-		if players then
-			for k,player in pairs(players) do
-				if player:is_human_controlled() then
-					local profile = player._profile
-					local name = profile.name
-					local Melee, Range = weapon_display_name(profile,"Melee"),weapon_display_name(profile,"Range")
-					brief = string.format("%s%s:\n%s\n%s\n",brief,name,Melee,Range)
-				end
-			end
-			mod:echo(brief)
-		end
-	end
-end)
 
 
 -- Define rows

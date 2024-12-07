@@ -60,8 +60,8 @@ local mod = get_mod("weapon_customization")
                     backpack_right = {position = vector3_box(.12, -.03, .11), rotation = vector3_box(-136, 10, 93), scale = vector3_box(vector3_one())},
                 },
                 WEAPON_MELEE = {
-                    hips_front = {position = vector3_box(.21, .03, .041), rotation = vector3_box(178, -65, -102), scale = vector3_box(vector3_one())},
-                    hips_back = {position = vector3_box(.24, .066, .1), rotation = vector3_box(178, -65, -102), scale = vector3_box(vector3_one())},
+                    hips_front = {position = vector3_box(.075, .03, .041), rotation = vector3_box(178, -65, -102), scale = vector3_box(vector3_one())},
+                    hips_back = {position = vector3_box(.075, .033, .066), rotation = vector3_box(178, -65, -102), scale = vector3_box(vector3_one())},
                     hips_left = {position = vector3_box(-.09, .09, .03), rotation = vector3_box(146, -8.1, 170), scale = vector3_box(vector3_one())},
                     hips_right = {position = vector3_box(.09, .09, -.03), rotation = vector3_box(146, 8.1, -170), scale = vector3_box(vector3_one())},
                     leg_left = {position = vector3_box(.16, -.002, -.15), rotation = vector3_box(172, 85, 12), scale = vector3_box(vector3_one())},
@@ -516,6 +516,7 @@ local mod = get_mod("weapon_customization")
                     step_move = vector3_box(-.02, .0125, 0), step_rotation = vector3_box(5, -2.5, 5)},
                 backpack = {position = vector3_box(.3, .25, -.225), rotation = vector3_box(120, -95, 90), scale = vector3_box(1, 1, 1),
                     step_move = vector3_box(-.01, .0125, 0), step_rotation = vector3_box(5, -2.5, 5)},
+                center_mass = vector3_box(0, 0, -.8),
                 loading = mod.visible_equipment_loading_offsets.ranged_huge,
                 init = function(visible_equipment_extension, slot)
                     -- Flip
@@ -523,7 +524,6 @@ local mod = get_mod("weapon_customization")
                     local unit = ext.dummy_units[slot].attachments and ext.dummy_units[slot].attachments[1]
                     if unit and unit_alive(unit) then
                         unit_set_local_rotation(unit, 1, quaternion_from_vector(vector3(0, 180, 0)))
-                        unit_set_local_position(unit, 1, vector3(0, 0, .8))
                     end
                 end,
             },
@@ -545,11 +545,22 @@ local mod = get_mod("weapon_customization")
                 loading = mod.visible_equipment_loading_offsets.melee_medium,
                 step_sounds = {SoundEventAliases.sfx_equip_03.events.combatknife_p1_m2},
             },
+            powermaul_p1_m1 = {
+                default = {position = vector3_box(.3, .25, -.1), rotation = vector3_box(180, -90, 110), scale = vector3_box(1, 1, 1),
+                    step_move = vector3_box(-.01, .0125, 0), step_rotation = vector3_box(5, -2.5, 5)},
+                backpack = {position = vector3_box(.4, .25, -.225), rotation = vector3_box(120, -95, 90), scale = vector3_box(1, 1, 1),
+                    step_move = vector3_box(-.01, .0125, 0), step_rotation = vector3_box(5, -2.5, 5)},
+                center_mass = vector3_box(0, 0, -.1),
+                loading = mod.visible_equipment_loading_offsets.melee_medium,
+                step_sounds = {SoundEventAliases.sfx_equip_03.events.combatknife_p1_m2},
+            },
             powermaul_2h_p1_m1 = {
                 default = {position = vector3_box(.1, .25, -.1), rotation = vector3_box(180, -90, 130), scale = vector3_box(1, 1, 1),
                     step_move = vector3_box(-.02, -.0125, 0), step_rotation = vector3_box(5, -2.5, 5)},
                 backpack = {position = vector3_box(.1, .25, -.225), rotation = vector3_box(120, -95, 90), scale = vector3_box(1, 1, 1),
                     step_move = vector3_box(-.01, -.0125, 0), step_rotation = vector3_box(5, -2.5, 5)},
+                center_mass = vector3_box(0, 0, -.6),
+                -- attach_points = {"back_left", "back_right", "backpack_left", "backpack_right", "hips_left", "hips_right", "hips_back"},
                 loading = mod.visible_equipment_loading_offsets.ranged_huge,
                 init = function(visible_equipment_extension, slot)
                     -- Flip
@@ -557,7 +568,7 @@ local mod = get_mod("weapon_customization")
                     local unit = ext.dummy_units[slot].attachments and ext.dummy_units[slot].attachments[1]
                     if unit and unit_alive(unit) then
                         unit_set_local_rotation(unit, 1, quaternion_from_vector(vector3(0, 180, 0)))
-                        unit_set_local_position(unit, 1, vector3(0, 0, .4))
+                        -- unit_set_local_position(unit, 1, vector3(0, 0, .4))
                     end
                 end,
             },
@@ -620,6 +631,7 @@ local mod = get_mod("weapon_customization")
             mod.visible_equipment_offsets.combatsword_p3_m2 = mod.visible_equipment_offsets.combatsword_p3_m1
             mod.visible_equipment_offsets.combatsword_p3_m3 = mod.visible_equipment_offsets.combatsword_p3_m1
             mod.visible_equipment_offsets.chainaxe_p1_m2 = mod.visible_equipment_offsets.chainaxe_p1_m1
+            mod.visible_equipment_offsets.powermaul_p1_m2 = mod.visible_equipment_offsets.powermaul_p1_m1
         --#endregion
         --#region Ogryn Guns
             mod.visible_equipment_offsets.ogryn_heavystubber_p1_m2 = mod.visible_equipment_offsets.ogryn_heavystubber_p1_m1

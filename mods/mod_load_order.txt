@@ -31,9 +31,9 @@ smaller_talent_tree
 QuickLookCard
 InventoryStats
 TalentRefundBelow
-ENLocalizationFIXAIO
 show_cjk_glyphs
 creature_spawner
+master_item_community_patch
 weapon_customization
 LoadoutMonitor
 OpenPlayerProfile
@@ -49,3 +49,4 @@ InspectFromSocial
 CollectibleFinder
 FilterSacrifice
 who_are_you
+Enhanced_descriptions

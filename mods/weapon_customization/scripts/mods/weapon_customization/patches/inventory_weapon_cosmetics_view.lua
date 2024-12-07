@@ -369,7 +369,7 @@ mod:hook_require("scripts/ui/views/inventory_weapon_cosmetics_view/inventory_wea
 		local render_settings = self._render_settings
 		local ui_renderer = self._ui_renderer
 		local ui_default_renderer = self._ui_default_renderer
-		local ui_forward_renderer = self._ui_forward_renderer
+		local ui_forward_renderer = self._ui_forward_renderer or ui_default_renderer
 		render_settings.start_layer = layer
 		render_settings.scale = render_scale
 		render_settings.inverse_scale = render_scale and 1 / render_scale
@@ -2573,6 +2573,7 @@ mod:hook_require("scripts/ui/views/inventory_weapon_cosmetics_view/inventory_wea
 	-- Custom switch tab
 	instance.custom_switch_tab = function(self, index)
 		if self:is_tab(index) then
+			mod.weapon_skin_override = nil
 			self:present_grid_layout({})
 			self._item_grid._widgets_by_name.grid_empty.visible = false
 			self:hide_custom_widgets(false)
@@ -2580,6 +2581,7 @@ mod:hook_require("scripts/ui/views/inventory_weapon_cosmetics_view/inventory_wea
 			table_clear(self.original_weapon_settings)
 			self:get_changed_weapon_settings()
 		else
+			mod.weapon_skin_override = true
 			-- local t = managers.time:time("main")
 			-- mod.reset_start = t
 			self:check_unsaved_changes(true)
