@@ -37,7 +37,6 @@ master_item_community_patch
 weapon_customization
 LoadoutMonitor
 OpenPlayerProfile
-CThruShields
 ItemSorting
 more_characters_and_loadouts
 ForTheEmperor
@@ -50,3 +49,5 @@ CollectibleFinder
 FilterSacrifice
 who_are_you
 Enhanced_descriptions
+TransparentShield
+quick_level_mastery

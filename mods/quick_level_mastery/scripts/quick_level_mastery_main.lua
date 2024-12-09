@@ -1,0 +1,27 @@
+mod = get_mod("quick_level_mastery")
+
+mod.enable_debug                               = mod:get("debug_setting")
+mod.enable_view_armoury                 = mod:get("store_armoury")
+mod.enable_view_armoury_brunt           = mod:get("store_brunts")
+mod.enable_view_armoury_requisition     = mod:get("store_requisition")
+--mod.enable_view_hadron                = mod:get("store_hadron_entreat")
+mod.enable_view_melk                    = mod:get("store_melk")
+mod.enable_view_melk_mystery            = false --mod:get("store_melk_mystery")
+mod.enable_view_melk_acquisitions       = mod:get("store_melk_acquisitions")
+
+BruntsSacrificeView = mod:io_dofile("quick_level_mastery/scripts/views/brunts_view")
+RequisitionSacrificeView = mod:io_dofile("quick_level_mastery/scripts/views/requisition_view")
+MysterySacrificeView = mod:io_dofile("quick_level_mastery/scripts/views/mystery_view")
+AcquisitionsSacrificeView = mod:io_dofile("quick_level_mastery/scripts/views/acquisitions_view")
+QuickSacrifice = mod:io_dofile("quick_level_mastery/scripts/quick_sacrifice")
+
+mod.on_setting_changed = function()
+    mod.enable_debug                               = mod:get("debug_setting")
+    mod.enable_view_armoury                 = mod:get("store_armoury")
+    mod.enable_view_armoury_brunt           = mod:get("store_brunts")
+    mod.enable_view_armoury_requisition     = mod:get("store_requisition")
+    --mod.enable_view_hadron                  = mod:get("store_hadron_entreat")
+    mod.enable_view_melk                    = mod:get("store_melk")
+    mod.enable_view_melk_mystery            = false --mod:get("store_melk_mystery")
+    mod.enable_view_melk_acquisitions       = mod:get("store_melk_acquisitions")
+end
