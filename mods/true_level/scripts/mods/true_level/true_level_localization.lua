@@ -29,7 +29,8 @@ mod._symbols = {
     rating = "\xEE\x80\x9F",
     shock = "\xEE\x80\xA7",
     skull = "\xEE\x80\x9E",
-    star = "\xEE\x80\xAA"
+    star = "\xEE\x80\xAA",
+    none = ""
 }
 
 local loc = {
@@ -76,6 +77,30 @@ local loc = {
              "Вместе: 130 \n" ..
              "По умолчанию: 30 ",
     },
+    prioritize_other_levels = {
+        en = "Prioritize Other Levels",
+        ja = "他のレベル表示を優先する",
+        ["zh-cn"] = "优先显示其他等级",
+        ru = "Приоритет другим уровням",
+    },
+    prioritize_other_levels_desc = {
+        en = "Hide normal level if prestige level or havoc rank is available.",
+        ja = "プレステージレベルやハヴォックランクが有効な場合は、通常のレベルを非表示にします。",
+        ["zh-cn"] = "如果能显示声望等级或者浩劫等级，则隐藏常规等级。",
+        ru = "Скрыть обычный уровень, если доступен уровень престижа или ранг хаоса.",
+    },
+    level_icon = {
+        en = "Level Icon",
+        ja = "レベルアイコン",
+        ["zh-cn"] = "等级图标",
+        ru = "Значок уровня",
+    },
+    level_color = {
+        en = "Level Color",
+        ja = "レベルの色",
+        ["zh-cn"] = "等级颜色",
+        ru = "Цвет уровня",
+    },
     use_global = {
         en = "Use Global Setting",
         ja = "グローバル設定を使用する",
@@ -110,6 +135,7 @@ local loc = {
         en = "None",
         ja = "なし",
         ["zh-cn"] = "无",
+        ru = "Не показывать",
     },
     enable_prestige_level = {
         en = "Show Prestige Level",
@@ -132,6 +158,8 @@ local loc = {
     prestige_level_icon = {
         en = "Prestige Icon",
         ja = "プレステージアイコン",
+        ["zh-cn"] = "声望图标",
+        ru = "Значок престижа",
     },
     prestige_level_color = {
         en = "Prestige Level Color",
@@ -143,11 +171,19 @@ local loc = {
         en = "Show Havoc Rank",
         ja = "ハヴォックランクを表示する",
         ["zh-cn"] = "显示浩劫等级",
+        ru = "Показывать ранг «Верной смерти»",
+    },
+    havoc_rank_icon = {
+        en = "Havoc Rank Icon",
+        ja = "ハヴォックランクアイコン",
+        ["zh-cn"] = "浩劫等级图标",
+        ru = "Значок ранга «Верной смерти»",
     },
     havoc_rank_color = {
         en = "Havoc Rank Color",
         ja = "ハヴォックランクの色",
         ["zh-cn"] = "浩劫等级颜色",
+        ru = "Цвет ранга «Верной смерти»",
     },
     level_up = {
         en = "Level Up!",
@@ -253,10 +289,14 @@ for i, ele in pairs(mod._elements) do
     end
 
     _add_child_loc("display_style", ele)
+    _add_child_loc("prioritize_other_levels", ele)
+    _add_child_loc("level_icon", ele)
+    _add_child_loc("level_color", ele)
     _add_child_loc("enable_prestige_level", ele)
     _add_child_loc("prestige_level_icon", ele)
     _add_child_loc("prestige_level_color", ele)
     _add_child_loc("enable_havoc_rank", ele)
+    _add_child_loc("havoc_rank_icon", ele)
     _add_child_loc("havoc_rank_color", ele)
 end
 

@@ -1,5 +1,7 @@
 ---@diagnostic disable: undefined-global
 
+			-- ============ DO NOT DO ANYTHING BELOW! ============ --
+
 local mod = get_mod("Enhanced_descriptions")
 local InputUtils = require("scripts/managers/input/input_utils")
 local iu_actit = InputUtils.apply_color_to_input_text
@@ -7,12 +9,6 @@ local iu_actit = InputUtils.apply_color_to_input_text
 --[+ ++NUMBERS++ +]--
 	--[+ +Variables+ +]--
 	local var_col = Color[mod:get("variables_text_colour")](255, true)
-	--[+ Talents +]--
-	local Scriers_gaze_rgb = iu_actit("Scrier's Gaze", var_col)
-	local Stun_gren_rgb = iu_actit("Stun Grenade", var_col)
-	local Fury_rgb = iu_actit("Fury", var_col)
-	local Frag_gren_rgb = iu_actit("Frag Grenade", var_col)
-	local Fragmentation_gren_rgb = iu_actit("Fragmentation Grenade", var_col)
 		--[+ Plus +]--
 	local p_stam_var_rgb = iu_actit("+{stamina:%s}", var_col)
 	local p_rbc_rgb = iu_actit("+{reduced_block_cost:%s}", var_col)
@@ -20,8 +16,11 @@ local iu_actit = InputUtils.apply_color_to_input_text
 	local m_tghn_reg_del_rgb = iu_actit("-{toughness_regen_delay_multiplier:%s}", var_col)
 		--[+ Blessings +]--
 	local ammo_var_rgb = iu_actit("{ammo:%s}", var_col)
+	local amount_var_rgb = iu_actit("{amount:%s}", var_col)
+	local attack_spd_var_rgb = iu_actit("{attack_speed:%s}", var_col)
 	local block_var_rgb = iu_actit("{block_cost:%s}", var_col)
 	local blltam_var_rgb = iu_actit("{bullet_amount:%s}", var_col)
+	local buildup_var_rgb = iu_actit("{buildup_amount:%s}", var_col)
 	local chnc_var_rgb = iu_actit("{chance:%s}", var_col)
 	local chrgtime_var_rgb = iu_actit("{charge_time:%s}", var_col)
 	local cd_var_rgb = iu_actit("{cooldown:%s}", var_col)
@@ -34,13 +33,17 @@ local iu_actit = InputUtils.apply_color_to_input_text
 	local critchmin_var_rgb = iu_actit("{crit_chance_min:%s}", var_col)
 	local dmg_var_rgb = iu_actit("{damage:%s}", var_col)
 	local dur_var_rgb = iu_actit("{duration:%s}", var_col)
+	local heat_diss_var_rgb = iu_actit("{heat_dissipation:%s}", var_col)
+	local heat_red_var_rgb = iu_actit("{heat_reduction:%s}", var_col)
 	local hit_var_rgb = iu_actit("{hit:%s}", var_col)
 	local hit_mass_red_var_rgb = iu_actit("{hit_mass_reduction:%s}", var_col)
 	local impact_var_rgb = iu_actit("{impact:%s}", var_col)
+	local interval_var_rgb = iu_actit("{interval:%s}", var_col)
 	local maxstks_var_rgb = iu_actit("{max_stacks:%s}", var_col)
 	local max_stk_cnt_var_rgb = iu_actit("{max_stack_count:%s}", var_col)
 	local min_stk_cnt_var_rgb = iu_actit("{min_stack_count:%s}", var_col)
 	local mult_hit_var_rgb = iu_actit("{multiple_hit:%s}", var_col)
+	local overheat_red_var_rgb = iu_actit("{overheat_reduction:%s}", var_col)
 	local pwr_var_rgb = iu_actit("{power:%s}", var_col)
 	local pwrlvl_var_rgb = iu_actit("{power_level:%s}", var_col)
 	local procch_var_rgb = iu_actit("{proc_chance:%s}", var_col)
@@ -128,11 +131,14 @@ local iu_actit = InputUtils.apply_color_to_input_text
 	local n_1_5_rgb = iu_actit("1.5", var_col)
 	local n_1_7_rgb = iu_actit("1.7", var_col)
 	local n_2_rgb = iu_actit("2", var_col)
+	local n_2e_rgb = iu_actit("2e", var_col)
 	local n_2_5_rgb = iu_actit("2.5", var_col)
 	local n_3_rgb = iu_actit("3", var_col)
+	local n_3e_rgb = iu_actit("3e", var_col)
 	local n_3_5_rgb = iu_actit("3.5", var_col)
 	local n_3_75_rgb = iu_actit("3.75", var_col)
 	local n_4_rgb = iu_actit("4", var_col)
+	local n_4e_rgb = iu_actit("4e", var_col)
 	local n_5_rgb = iu_actit("5", var_col)
 	local n_6_rgb = iu_actit("6", var_col)
 	local n_7_rgb = iu_actit("7", var_col)
@@ -163,17 +169,14 @@ local iu_actit = InputUtils.apply_color_to_input_text
 	local pc_p19_rgb = iu_actit("+19%", var_col)
 
 return {
-	Scriers_gaze_rgb = Scriers_gaze_rgb,
-	Stun_gren_rgb = Stun_gren_rgb,
-	Fury_rgb = Fury_rgb,
-	Frag_gren_rgb = Frag_gren_rgb,
-	Fragmentation_gren_rgb = Fragmentation_gren_rgb,
-
 	rending_pc_var_rgb = rending_pc_var_rgb,
 	stacks_num_var_rgb = stacks_num_var_rgb,
 	ammo_var_rgb = ammo_var_rgb,
+	amount_var_rgb = amount_var_rgb,
+	attack_spd_var_rgb = attack_spd_var_rgb,
 	block_var_rgb = block_var_rgb,
 	blltam_var_rgb = blltam_var_rgb,
+	buildup_var_rgb = buildup_var_rgb,
 	chnc_var_rgb = chnc_var_rgb,
 	chrgtime_var_rgb = chrgtime_var_rgb,
 	cd_var_rgb = cd_var_rgb,
@@ -186,13 +189,17 @@ return {
 	critchmin_var_rgb = critchmin_var_rgb,
 	dmg_var_rgb = dmg_var_rgb,
 	dur_var_rgb = dur_var_rgb,
+	heat_diss_var_rgb = heat_diss_var_rgb,
+	heat_red_var_rgb = heat_red_var_rgb,
 	hit_var_rgb = hit_var_rgb,
 	hit_mass_red_var_rgb = hit_mass_red_var_rgb,
 	impact_var_rgb = impact_var_rgb,
+	interval_var_rgb = interval_var_rgb,
 	maxstks_var_rgb = maxstks_var_rgb,
 	max_stk_cnt_var_rgb = max_stk_cnt_var_rgb,
 	min_stk_cnt_var_rgb = min_stk_cnt_var_rgb,
 	mult_hit_var_rgb = mult_hit_var_rgb,
+	overheat_red_var_rgb = overheat_red_var_rgb,
 	procch_var_rgb = procch_var_rgb,
 	pwr_var_rgb = pwr_var_rgb,
 	pwrlvl_var_rgb = pwrlvl_var_rgb,
@@ -277,11 +284,14 @@ return {
 	n_1_5_rgb = n_1_5_rgb,
 	n_1_7_rgb = n_1_7_rgb,
 	n_2_rgb = n_2_rgb,
+	n_2e_rgb = n_2e_rgb,
 	n_2_5_rgb = n_2_5_rgb,
 	n_3_rgb = n_3_rgb,
+	n_3e_rgb = n_3e_rgb,
 	n_3_5_rgb = n_3_5_rgb,
 	n_3_75_rgb = n_3_75_rgb,
 	n_4_rgb = n_4_rgb,
+	n_4e_rgb = n_4e_rgb,
 	n_5_rgb = n_5_rgb,
 	n_6_rgb = n_6_rgb,
 	n_7_rgb = n_7_rgb,

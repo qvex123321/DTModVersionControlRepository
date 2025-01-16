@@ -1,4 +1,7 @@
 ---@diagnostic disable: undefined-global, undefined-field
+
+			-- ============ DO NOT DO ANYTHING ABOVE! ============ --
+
 local mod = get_mod("Enhanced_descriptions")
 
 local options = {
@@ -192,5 +195,6 @@ table.insert(options.options.widgets, create_option_set("note", "terminal_text_w
 table.insert(options.options.widgets, create_option_set("numbers", "ui_hud_yellow_super_light"))
 table.insert(options.options.widgets, create_option_set("variables", "ui_hud_yellow_super_light"))
 table.insert(options.options.widgets, create_option_set("warning", "item_rarity_6"))
+table.insert(options.options.widgets, create_option_set("talents", "ui_input_color"))
 
 return options

@@ -19,6 +19,35 @@ local feats_symbol = {
 	Keystone = "("..mod:localize("player_Feats_symbol_Keystone")..")",
 }
 local weapon_slot = {Melee = "slot_primary", Range = "slot_secondary"}
+local talents_index = {
+	veteran = {
+		Ability = {"veteran_combat_ability_elite_and_special_outlines","veteran_combat_ability_stagger_nearby_enemies","veteran_invisibility_on_combat_ability"},
+		Blitz = {"veteran_grenade_apply_bleed","veteran_krak_grenade","veteran_smoke_grenade"},
+		Aura = {"veteran_aura_gain_ammo_on_elite_kill_improved","veteran_increased_damage_coherency","veteran_movement_speed_coherency"},
+		Keystone = {"veteran_snipers_focus","veteran_improved_tag","veteran_weapon_switch_passive"},
+	},
+	zealot = {
+		Ability = {"zealot_attack_speed_post_ability","zealot_bolstering_prayer","zealot_stealth"},
+		Blitz = {"zealot_improved_stun_grenade","zealot_flame_grenade","zealot_throwing_knives"},
+		Aura = {"zealot_toughness_damage_reduction_coherency_improved","zealot_corruption_healing_coherency_improved","zealot_always_in_coherency"},
+		Keystone = {"zealot_fanatic_rage","zealot_martyrdom","zealot_quickness_passive"},
+	},
+	psyker = {
+		Ability = {"psyker_shout_vent_warp_charge","psyker_combat_ability_force_field","psyker_combat_ability_stance"},
+		Blitz = {"psyker_brain_burst_improved","psyker_grenade_chain_lightning","psyker_grenade_throwing_knives"},
+		Aura = {"psyker_aura_damage_vs_elites","psyker_cooldown_aura_improved","psyker_aura_crit_chance_aura"},
+		Keystone = {"psyker_passive_souls_from_elite_kills","psyker_empowered_ability","psyker_new_mark_passive"},
+	},
+	ogryn = {
+		Ability = {"ogryn_longer_charge","ogryn_taunt_shout","ogryn_special_ammo"},
+		Blitz = {"ogryn_grenade_friend_rock","ogryn_box_explodes","ogryn_grenade_frag"},
+		Aura = {"ogryn_melee_damage_coherency_improved","ogryn_toughness_regen_aura","ogryn_damage_vs_suppressed_coherency"},
+		Keystone = {"ogryn_passive_heavy_hitter","ogryn_carapace_armor","ogryn_leadbelcher_no_ammo_chance"},
+	},
+}
+
+
+
 mod.teamatesloadout = {}
 mod.left_panel_lift = 0 - mod:get("left_panel_lift")
 mod.text_color = {255,239,238,238}
@@ -33,14 +62,14 @@ mod.init = function(self)
 		main_class = mod:get("display_main_class"),
 	}
 	mod.offsets = {
-		lobby = {mod:get("lobby_talent_offset"),mod:get("lobby_weapon_offset"),mod:get("lobby_weapon_gap")},
+		lobby = {mod:get("lobby_weapon_offset"),mod:get("lobby_weapon_gap"),mod:get("lobby_talent_offset"),mod:get("lobby_talent_offset_y")},
 		notable_talents = {mod:get("notable_talents_offset_x"),mod:get("notable_talents_offset_y"),mod:get("notable_talents_separation")},
 		PlayerName = { mod:get("player_name_offset_x"), mod:get("player_name_offset_y"),},
 		Feats = { mod:get("player_feats_offset_x"), mod:get("player_feats_offset_y"),},
 		Class = { mod:get("player_class_offset_x"), mod:get("player_class_offset_y"),},
 	}
 	mod.font_size = {
-		lobby = mod:get("lobby_weapon_font_size"),
+		lobby = {mod:get("lobby_weapon_font_size"),mod:get("lobby_Keystone_font_size")},
 		feats = mod:get("player_feats_font_size"),
 		notable_talents = {mod:get("notable_talents_icon_size"),mod:get("notable_talents_icon_size")},
 		PlayerName = mod:get("player_name_font_size"),
@@ -62,7 +91,7 @@ mod.init = function(self)
 	}
 	scoreboard = get_mod("scoreboard")
 	mod.left_panel_lift = 0 - mod:get("left_panel_lift")
-	mod.lobby_exhibition = { weapon = mod:get("lobby_exhibition_weapons")}
+	mod.lobby_exhibition = { weapon = mod:get("lobby_exhibition_weapons"), keystone = mod:get("lobby_exhibition_Keystone")}
 	mod.endview_scoreboard_length = mod:get("endview_scoreboard_length")
 	mod.notable_talents_intensity = mod:get("notable_talents_intensity")
 	mod.teamatesloadout = {}
@@ -80,34 +109,21 @@ local function player_career(profile)
 	return Localize(archetypename),symbol
 end
 
-
+function lobby_keystone(profile)
+	local archetype = profile.archetype.name
+	local talents = profile.talents
+	local vaild_archetype = talents_index[archetype]
+if vaild_archetype then
+	local keystones = vaild_archetype.Keystone
+	for i = 1,#keystones do
+		if talents[keystones[i]] then
+			return tostring(i)
+		end
+	end
+	return ""
+end
+end
 local function player_feats(profile)
-	local talents_index = {
-		veteran = {
-			Ability = {"veteran_combat_ability_elite_and_special_outlines","veteran_combat_ability_stagger_nearby_enemies","veteran_invisibility_on_combat_ability"},
-			Blitz = {"veteran_grenade_apply_bleed","veteran_krak_grenade","veteran_smoke_grenade"},
-			Aura = {"veteran_aura_gain_ammo_on_elite_kill_improved","veteran_increased_damage_coherency","veteran_movement_speed_coherency"},
-			Keystone = {"veteran_snipers_focus","veteran_improved_tag","veteran_weapon_switch_passive"},
-		},
-		zealot = {
-			Ability = {"zealot_attack_speed_post_ability","zealot_bolstering_prayer","zealot_stealth"},
-			Blitz = {"zealot_improved_stun_grenade","zealot_flame_grenade","zealot_throwing_knives"},
-			Aura = {"zealot_toughness_damage_reduction_coherency_improved","zealot_corruption_healing_coherency_improved","zealot_always_in_coherency"},
-			Keystone = {"zealot_fanatic_rage","zealot_martyrdom","zealot_quickness_passive"},
-		},
-		psyker = {
-			Ability = {"psyker_shout_vent_warp_charge","psyker_combat_ability_force_field","psyker_combat_ability_stance"},
-			Blitz = {"psyker_brain_burst_improved","psyker_grenade_chain_lightning","psyker_grenade_throwing_knives"},
-			Aura = {"psyker_aura_damage_vs_elites","psyker_cooldown_aura_improved","psyker_aura_crit_chance_aura"},
-			Keystone = {"psyker_passive_souls_from_elite_kills","psyker_empowered_ability","psyker_new_mark_passive"},
-		},
-		ogryn = {
-			Ability = {"ogryn_longer_charge","ogryn_taunt_shout","ogryn_special_ammo"},
-			Blitz = {"ogryn_grenade_friend_rock","ogryn_box_explodes","ogryn_grenade_frag"},
-			Aura = {"ogryn_melee_damage_coherency_improved","ogryn_toughness_regen_aura","ogryn_damage_vs_suppressed_coherency"},
-			Keystone = {"ogryn_passive_heavy_hitter","ogryn_carapace_armor","ogryn_leadbelcher_no_ammo_chance"},
-		},
-	}
 	local archetype = profile.archetype.name
 	local talents = profile.talents
 	
@@ -363,14 +379,23 @@ mod.lobby_loadout = function (self, dt, t, input_service)
 				panel_content.loadout_intel_Melee = ""
 				panel_content.loadout_intel_Range = ""
 			else
-				local offset_M = mod.offsets.lobby[2]
-				local offset_gap = mod.offsets.lobby[3]
+				local offset_M = mod.offsets.lobby[1]
+				local offset_gap = mod.offsets.lobby[2]
 				panel_content.loadout_intel_Melee = weapon_display_name(profile,"Melee")
 				panel_content.loadout_intel_Range = weapon_display_name(profile,"Range")
 				panel_style.loadout_intel_Melee.offset[2] = offset_M
 				panel_style.loadout_intel_Range.offset[2] = offset_M + offset_gap
-				panel_style.loadout_intel_Melee.font_size = mod.font_size.lobby or 17
-				panel_style.loadout_intel_Range.font_size = mod.font_size.lobby or 17
+				panel_style.loadout_intel_Melee.font_size = mod.font_size.lobby[1] or 17
+				panel_style.loadout_intel_Range.font_size = mod.font_size.lobby[1] or 17
+			end
+			if not mod.lobby_exhibition.keystone then
+				panel_content.loadout_intel_Keystone = ""
+			else
+				local offset_x,offset_y = mod.offsets.lobby[3],mod.offsets.lobby[4]
+				panel_content.loadout_intel_Keystone = lobby_keystone(profile)
+				panel_style.loadout_intel_Keystone.offset[1] = offset_x
+				panel_style.loadout_intel_Keystone.offset[2] = offset_y
+				panel_style.loadout_intel_Keystone.font_size = mod.font_size.lobby[2] or 17
 			end
 		end
 	end
@@ -805,15 +830,15 @@ mod:hook_require(lobby_view_definition_path,function(instance)
 			},
 			{
 				pass_type = "text",
-				value_id = "loadout_intel_Feats",
-				style_id = "loadout_intel_Feats",
+				value_id = "loadout_intel_Keystone",
+				style_id = "loadout_intel_Keystone",
 				value = "",
 				style = {
 					vertical_alignment = "top",
 					text_vertical_alignment = "top",
 					horizontal_alignment = "center",
 					text_horizontal_alignment = "center",
-					offset = {0, 235, 1},
+					offset = {200, 235, 1},
 					size = {250, 100},
 					text_color = mod.text_color,
 					font_size = 17,

@@ -36,13 +36,6 @@ return {
 						type = "checkbox",
 						default_value = true,
 					},
-					--{
-					--	setting_id = "lobby_talent_offset",
-					--	title = "lobby_talent_offset",
-					--	type = "numeric",
-					--	default_value = 0,
-					--	range = { -250, 250 },
-					--},
 					{
 						setting_id = "lobby_weapon_font_size",
 						title = "lobby_weapon_font_size",
@@ -63,6 +56,32 @@ return {
 						type = "numeric",
 						default_value = 35,
 						range = { 1, 100 },
+					},
+					{
+						setting_id = "lobby_exhibition_Keystone",
+						type = "checkbox",
+						default_value = true,
+					},
+					{
+						setting_id = "lobby_Keystone_font_size",
+						title = "setting_font_size",
+						type = "numeric",
+						default_value = 35,
+						range = { 1, 50 },
+					},
+					{
+						setting_id = "lobby_talent_offset",
+						title = "setting_offset_x",
+						type = "numeric",
+						default_value = 125,
+						range = { -250, 300 },
+					},
+					{
+						setting_id = "lobby_talent_offset_y",
+						title = "setting_offset_y",
+						type = "numeric",
+						default_value = 190,
+						range = { -250, 300 },
 					},
 				},
 				

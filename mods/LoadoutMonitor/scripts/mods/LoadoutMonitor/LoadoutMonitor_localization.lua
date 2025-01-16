@@ -18,6 +18,10 @@ local locr = {
 		en = "Display weapons",
 		["zh-cn"] = "显示武器",
 	},
+	lobby_exhibition_Keystone = {
+		en = "Display Keystone",
+		["zh-cn"] = "显示基石",
+	},
 	lobby_exhibition_feats = {
 		en = "Display feats",
 		["zh-cn"] = "显示天赋",

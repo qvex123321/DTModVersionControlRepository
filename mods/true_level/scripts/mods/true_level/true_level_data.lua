@@ -73,6 +73,26 @@ local data = {
                         default_value = "separate",
                         tooltip = "display_style_desc",
                         options = option_tables.style,
+                        sub_widgets = {
+                            {
+                                setting_id = "prioritize_other_levels",
+                                type = "checkbox",
+                                default_value = false,
+                                tooltip = "prioritize_other_levels_desc"
+                            },
+                            {
+                                setting_id = "level_icon",
+                                type = "dropdown",
+                                default_value = mod._symbols.level,
+                                options = table.clone(option_tables.symbol),
+                            },
+                            {
+                                setting_id = "level_color",
+                                type = "dropdown",
+                                default_value = "default",
+                                options = table.clone(option_tables.color),
+                            },
+                        },
                     },
                     {
                         setting_id = "enable_prestige_level",
@@ -83,8 +103,8 @@ local data = {
                             {
                                 setting_id = "prestige_level_icon",
                                 type = "dropdown",
-                                default_value = "\xEE\x80\xAE",
-                                options = option_tables.symbol,
+                                default_value = mod._symbols.aquila,
+                                options = table.clone(option_tables.symbol),
                             },
                             {
                                 setting_id = "prestige_level_color",
@@ -99,6 +119,12 @@ local data = {
                         type = "checkbox",
                         default_value = true,
                         sub_widgets = {
+                            {
+                                setting_id = "havoc_rank_icon",
+                                type = "dropdown",
+                                default_value = mod._symbols.havoc_rank,
+                                options = table.clone(option_tables.symbol),
+                            },
                             {
                                 setting_id = "havoc_rank_color",
                                 type = "dropdown",
@@ -137,6 +163,27 @@ for i, ele in ipairs(mod._elements) do
                 type = "dropdown",
                 default_value = "use_global",
                 options = get_child_options("style"),
+                sub_widgets = {
+                    {
+                        setting_id = "prioritize_other_levels_" .. ele,
+                        type = "dropdown",
+                        default_value = "use_global",
+                        tooltip = "prioritize_other_levels_desc",
+                        options = get_child_options("toggle"),
+                    },
+                    {
+                        setting_id = "level_icon_" .. ele,
+                        type = "dropdown",
+                        default_value = "use_global",
+                        options = get_child_options("symbol"),
+                    },
+                    {
+                        setting_id = "level_color_" .. ele,
+                        type = "dropdown",
+                        default_value = "use_global",
+                        options = get_child_options("color"),
+                    },
+                }
             },
             {
                 setting_id = "enable_prestige_level_" .. ele,
@@ -164,6 +211,12 @@ for i, ele in ipairs(mod._elements) do
                 default_value = "use_global",
                 options = get_child_options("toggle"),
                 sub_widgets = {
+                    {
+                        setting_id = "havoc_rank_icon_" .. ele,
+                        type = "dropdown",
+                        default_value = "use_global",
+                        options = get_child_options("symbol"),
+                    },
                     {
                         setting_id = "havoc_rank_color_" .. ele,
                         type = "dropdown",
