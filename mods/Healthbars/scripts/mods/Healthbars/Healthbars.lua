@@ -26,6 +26,11 @@ mod.on_setting_changed = function()
 end
 
 local function should_enable_healthbar(unit)
+	local game_mode_name = Managers.state.game_mode:game_mode_name()
+	if game_mode_name == "shooting_range" and not get_mod("creature_spawner") then
+		return false
+	end
+
 	local unit_data_extension = ScriptUnit.extension(unit, "unit_data_system")
 	local breed = unit_data_extension:breed()
 
@@ -64,3 +69,12 @@ mod:hook_safe(
 		end
 	end
 )
+
+mod.textures = { bleed = "https://darkti.de/mod-assets/bleed.png", burn = "https://darkti.de/mod-assets/burn.png" }
+mod.colors = { bleed = { 255, 255, 0, 0 }, burn = { 255, 255, 102, 0 } }
+
+for k, v in pairs(mod.textures) do
+	Managers.url_loader:load_texture(v):next(function(data)
+		mod.textures[k] = data.texture
+	end)
+end

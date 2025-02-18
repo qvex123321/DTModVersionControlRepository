@@ -66,12 +66,12 @@ local __isort_extra_keys = {
 	"__isort_type_myfav",
 }
 
-local function fill_items_extra(view, layout_field)
-	local new_items = get_valid_new_items() or nil
-	if not layout_field then
-		layout_field = "_filtered_offer_items_layout"
+local function fill_items_extra(view, inv_items_layout)
+	if not inv_items_layout then
+		return
 	end
-	local inv_items_layout = view and view[layout_field] or {}
+
+	local new_items = get_valid_new_items() or nil
 	local presets = ProfileUtils.get_profile_presets()
 	local current_preset_id = ProfileUtils.get_active_profile_preset_id()
 	local MyFavorites = get_mod("MyFavorites")
@@ -156,31 +156,30 @@ local function fill_items_extra(view, layout_field)
 	end
 end
 
-mod.on_enabled = function()
+mod.on_enabled = function ()
 	if mod:get("custom_sort_category_group_by_name") then
 		mod:set("custom_sort_category_mark", true)
 		mod:set("custom_sort_category_group_by_name", nil)
 	end
 end
 
-local function sort_grid_layout(func, self, sort_function)
-	if not self._filtered_offer_items_layout then
-		return
-	end
-	fill_items_extra(self)
-	func(self, sort_function)
+local function sort_grid_layout(func, self, sort_function, optional_filter_layout)
+	local layout = optional_filter_layout or self._item_grid_layout or self._item_grid._visible_grid_layout
+	fill_items_extra(self, layout)
+	fill_items_extra(self, self._offer_items_layout)
+	func(self, sort_function, optional_filter_layout)
 end
 
-mod:hook(InventoryWeaponsView, "_sort_grid_layout", function(func, self, sort_function)
-	sort_grid_layout(func, self, sort_function)
+mod:hook(InventoryWeaponsView, "_sort_grid_layout", function (func, self, sort_function, optional_filter_layout)
+	sort_grid_layout(func, self, sort_function, optional_filter_layout)
 end)
 
-mod:hook(CraftingMechanicusModifyView, "_sort_grid_layout", function(func, self, sort_function)
-	sort_grid_layout(func, self, sort_function)
+mod:hook(CraftingMechanicusModifyView, "_sort_grid_layout", function (func, self, sort_function, optional_filter_layout)
+	sort_grid_layout(func, self, sort_function, optional_filter_layout)
 end)
 
-mod:hook(CraftingMechanicusBarterItemsView, "_sort_grid_layout", function(func, self, sort_function)
-	sort_grid_layout(func, self, sort_function)
+mod:hook(CraftingMechanicusBarterItemsView, "_sort_grid_layout", function (func, self, sort_function, optional_filter_layout)
+	sort_grid_layout(func, self, sort_function, optional_filter_layout)
 end)
 
 local function setup_sort_options(self, view_type)
@@ -224,22 +223,22 @@ local function setup_sort_options(self, view_type)
 	self._item_grid:setup_sort_button(self._sort_options, sort_callback)
 end
 
-mod:hook(InventoryWeaponsView, "_setup_sort_options", function(func, self)
+mod:hook(InventoryWeaponsView, "_setup_sort_options", function (func, self)
 	setup_sort_options(self, "inventory")
 end)
 
-mod:hook(CraftingMechanicusModifyView, "_setup_sort_options", function(func, self)
+mod:hook(CraftingMechanicusModifyView, "_setup_sort_options", function (func, self)
 	setup_sort_options(self, "inventory")
 end)
 
-mod:hook(CraftingMechanicusBarterItemsView, "_setup_sort_options", function(func, self)
+mod:hook(CraftingMechanicusBarterItemsView, "_setup_sort_options", function (func, self)
 	setup_sort_options(self, "inventory")
 end)
 
-mod:hook(CreditsVendorView, "_setup_sort_options", function(func, self)
+mod:hook(CreditsVendorView, "_setup_sort_options", function (func, self)
 	setup_sort_options(self, "store")
 end)
 
-mod:hook(MarksVendorView, "_setup_sort_options", function(func, self)
+mod:hook(MarksVendorView, "_setup_sort_options", function (func, self)
 	setup_sort_options(self, "store")
 end)
