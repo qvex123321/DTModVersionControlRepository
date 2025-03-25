@@ -13,10 +13,10 @@ end
 local scoreboard = get_mod("scoreboard")
 local default_feats_order = {"Ability","Blitz","Aura","Keystone"}
 local feats_symbol = {
-	Ability = "("..mod:localize("player_Feats_symbol_Ability")..")",
-	Blitz = "("..mod:localize("player_Feats_symbol_Blitz")..")",
-	Aura = "("..mod:localize("player_Feats_symbol_Aura")..")",
-	Keystone = "("..mod:localize("player_Feats_symbol_Keystone")..")",
+	Ability = mod:localize("player_Feats_symbol_Ability"),
+	Blitz = mod:localize("player_Feats_symbol_Blitz"),
+	Aura = mod:localize("player_Feats_symbol_Aura"),
+	Keystone = mod:localize("player_Feats_symbol_Keystone"),
 }
 local weapon_slot = {Melee = "slot_primary", Range = "slot_secondary"}
 local talents_index = {
@@ -105,7 +105,14 @@ end
 local function player_career(profile)
 	local archetype = profile.archetype
 	local archetypename = archetype.archetype_name
-	local symbol = archetype.string_symbol
+	local name = archetype.name or "404"
+	local symbols = {
+		veteran = "",
+		zealot = "",
+		psyker = "",
+		ogryn = "",
+	}
+	local symbol = archetype.string_symbol or symbols[name] or "?"
 	return Localize(archetypename),symbol
 end
 
@@ -113,15 +120,15 @@ function lobby_keystone(profile)
 	local archetype = profile.archetype.name
 	local talents = profile.talents
 	local vaild_archetype = talents_index[archetype]
-if vaild_archetype then
-	local keystones = vaild_archetype.Keystone
-	for i = 1,#keystones do
-		if talents[keystones[i]] then
-			return tostring(i)
+	if vaild_archetype then
+		local keystones = vaild_archetype.Keystone
+		for i = 1,#keystones do
+			if talents[keystones[i]] then
+				return tostring(i)
+			end
 		end
+		return ""
 	end
-	return ""
-end
 end
 local function player_feats(profile)
 	local archetype = profile.archetype.name
@@ -169,78 +176,34 @@ local function notable_talents(profile,style)
 				"content/ui/textures/icons/talents/veteran/veteran_better_deployables",
 			},
 			{
-				"veteran_movement_speed_towards_downed",
-				"content/ui/textures/icons/talents/veteran/veteran_movement_speed_towards_downed",
-			},
-			{
-				"veteran_allies_in_coherency_share_toughness_gain",
-				"content/ui/textures/icons/talents/veteran/veteran_allies_in_coherency_share_toughness_gain",
-			},
-			{
-				"veteran_combat_ability_revive_nearby_allies",
-				"content/ui/textures/icons/talents/veteran/veteran_combat_ability_revive_nearby_allies",
-				Color.salmon(255, true),
-				-0.03
-			},
-			{
 				"veteran_reduced_threat_after_combat_ability",
 				"content/ui/textures/icons/talents/veteran/veteran_reduced_threat_when_still",
 				Color.salmon(255, true),
 			},
-			{
-				"veteran_combat_ability_melee_and_ranged_damage_to_coherency",
-				"content/ui/textures/icons/talents/veteran/veteran_combat_ability_melee_and_ranged_damage_to_coherency",
-				Color.salmon(255, true),
-			},
 		},
 		zealot = {
-			{
-				"zealot_ally_damage_taken_reduced",
-				"content/ui/textures/icons/talents/zealot/zealot_ally_damage_taken_reduced",
-			},
-			{
-				"zealot_channel_grants_toughness_damage_reduction",
-				"content/ui/textures/icons/talents/zealot/zealot_channel_grants_toughness_damage_reduction",
-				Color.salmon(255, true),
-			},
-			{
-				"zealot_channel_grants_damage",
-				"content/ui/textures/icons/talents/zealot/zealot_channel_grants_damage",
-				Color.salmon(255, true),
-			},
 		},
 		psyker = {
-			{
-				"psyker_elite_kills_add_warpfire",
-				"content/ui/textures/icons/talents/psyker/psyker_2_tier_2_name_3",
-			},
-			{
-				"psyker_2_tier_3_name_2",
-				"content/ui/textures/icons/talents/psyker/psyker_2_tier_3_name_2",
-			},
 		},
 		ogryn = {
-			{
-				"ogryn_taunt_damage_taken_increase",
-				"content/ui/textures/icons/talents/ogryn/ogryn_taunt_damage_taken_increase",
-				Color.salmon(255, true),
-			},
 		},	
 	}
-	
-	if talents_index[archetype] then
-		local num = 1
-		for i = 1, #talents_index[archetype] do
-			local current = talents_index[archetype][i]
-			if talents[current[1]] then
-				local slot = "loadout_intel_icon_"..tostring(num)
-				style[slot].material_values.icon_texture = current[2]
-				style[slot].material_values.intensity = mod.notable_talents_intensity + (current[4] or 0)
-				style[slot].color = current[3] or Color.turquoise(255, true)
-				style[slot].size = mod.font_size.notable_talents
-				style[slot].offset[1] = mod.offsets.notable_talents[1] + mod.offsets.notable_talents[3] * (num - 1)
-				style[slot].offset[2] = mod.offsets.notable_talents[2]
-				num = num + 1
+	local arc = talents_index[archetype]
+	if arc then
+		local num,icons = 1, #arc
+		if icons >= 1 then
+			for i = 1, icons do
+				local current = arc[i]
+				if talents[current[1]] then
+					local slot = "loadout_intel_icon_"..tostring(num)
+					style[slot].material_values.icon_texture = current[2]
+					style[slot].material_values.intensity = mod.notable_talents_intensity + (current[4] or 0)
+					style[slot].color = current[3] or Color.turquoise(255, true)
+					style[slot].size = mod.font_size.notable_talents
+					style[slot].offset[1] = mod.offsets.notable_talents[1] + mod.offsets.notable_talents[3] * (num - 1)
+					style[slot].offset[2] = mod.offsets.notable_talents[2]
+					num = num + 1
+				end
 			end
 		end
 		if num < 6 then
@@ -283,7 +246,7 @@ local function weapon_display_name(profile,slot)
 	else		
 		name = ItemUtils.display_name(weapon) or " "
 	end
-	return string.trim(name)
+	return name ~= " " and string.trim(name) or " "
 end
 
 local trait_offsets = {
@@ -412,8 +375,8 @@ local function spectating_hud_tactical_overlay()
 	return false
 end
 
-local player_loaded = function(account,profile)
-	if mod.teamatesloadout[account] then
+local player_loaded = function(account,profile,widget)
+	if mod.teamatesloadout[account] and widget and widget.content and widget.content.loadout_intel_Melee ~= " " then
 		local Melee = profile.loadout.slot_primary.__gear_id
 		local Range = profile.loadout.slot_secondary.__gear_id
 		return Melee and Range and mod.teamatesloadout[account].Melee == Melee and mod.teamatesloadout[account].Range == Range
@@ -430,7 +393,7 @@ mod.update_loadout = function(self, dt, t, player, ui_renderer)
 	local widget = self._widgets_by_name.playerloadout_intel
 	local profile = player._profile
 	local account = player._account_id	
-	if tactical_active and not player_loaded(account,profile) then
+	if tactical_active and not player_loaded(account,profile,widget) then
 		mod.get_playerloadout_intel(profile,widget)
 		mod.teamatesloadout[account] = {
 			Melee = profile.loadout.slot_primary.__gear_id,
@@ -449,14 +412,16 @@ mod:hook_safe("HudElementTacticalOverlay","_update_left_panel_elements",function
 	self:set_scenegraph_position("left_panel",nil,mod.left_panel_lift)
 end)
 
+
 mod:hook_safe("CameraHandler","_switch_follow_target",function (self, new_unit)
 	mod.teamatesloadout = {}
 end)
 mod:hook_safe(CLASS.InventoryView,"on_exit",function() mod.teamatesloadout = {} end)
-
-mod.on_game_state_changed = function(status,state_name)
-	if not table.is_empty(mod.teamatesloadout) then mod.teamatesloadout = {} end
-end
+mod:hook_safe("PackageSynchronizerClient","add_bot",function() mod.teamatesloadout = {} end)
+mod:hook_safe("PackageSynchronizerClient","remove_bot",function() mod.teamatesloadout = {} end)
+--mod.on_game_state_changed = function(status,state_name)
+--	if not table.is_empty(mod.teamatesloadout) then mod.teamatesloadout = {} end
+--end
 mod.on_all_mods_loaded = function()
 	mod:init()
 end

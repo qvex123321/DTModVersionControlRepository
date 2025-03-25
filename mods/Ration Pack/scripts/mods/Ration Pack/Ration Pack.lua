@@ -1,17 +1,17 @@
 --[[
 Title: Ration Pack
 Author: Wobin
-Date: 28/09/2024
+Date: 25/03/2025
 Repository: https://github.com/Wobin/RationPack
-Version: 6.3.1
+Version: 6.3.3
 ]]--
 local mod = get_mod("Ration Pack")
-mod.version = "6.3.1"
+mod.version = "6.3.3"
 local charge_lookup = {}
 local UIFontSettings = require("scripts/managers/ui/ui_font_settings")
 local Pickups = require("scripts/settings/pickup/pickups")
 local BuffSettings = require("scripts/settings/buff/buff_settings")
-local medical_crate_config = require("scripts/settings/deployables/medical_crate")
+local medical_crate_config = require("scripts/settings/deployables/templates/medical_crate")
 local decal_unit_name = "content/levels/training_grounds/fx/decal_aoe_indicator"
 local package_name = "content/levels/training_grounds/missions/mission_tg_basic_combat_01"
 local decals = mod:persistent_table("medical_crate_decals")
@@ -170,7 +170,7 @@ local function set_decal_colour(decal_unit, r, g, b)
 end
 
 local function get_decal_unit(unit, r, g, b)
-  
+
 	local world = Unit.world(unit)
 	local position = Unit.local_position(unit, 1)
 
@@ -277,6 +277,9 @@ mod.on_all_mods_loaded = function()
     mod:hook_require("scripts/extension_systems/unit_templates", function(instance)    
         if is_mod_loading then
           mod:hook_safe(instance.medical_crate_deployable, "husk_init", function(unit)              
+            unit_spawned(unit, false)
+          end)
+          mod:hook_safe(instance.medical_crate_deployable, "local_init", function(unit)              
             unit_spawned(unit, false)
           end)
           if instance.medical_crate_deployable.pre_unit_destroyed then
