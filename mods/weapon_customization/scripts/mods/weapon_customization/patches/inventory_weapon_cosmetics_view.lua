@@ -108,6 +108,11 @@ mod:hook_require("scripts/ui/views/inventory_weapon_cosmetics_view/inventory_wea
 	local info_box_size = {1250, 200}
 	local equip_button_size = {374, 76}
 
+	-- Create attachment info box widgets
+	local sub_display_name_style = table_clone(UIFontSettings.header_3)
+	sub_display_name_style.text_horizontal_alignment = "left"
+	sub_display_name_style.text_vertical_alignment = "top"
+
 	-- Get attachment slot scenegraph names
 	local cosmetics_scenegraphs = mod:get_cosmetics_scenegraphs()
 	-- local cosmetics_scenegraphs = mod.data_cache:cosmetics_scenegraphs()
@@ -214,6 +219,76 @@ mod:hook_require("scripts/ui/views/inventory_weapon_cosmetics_view/inventory_wea
 	})
 	instance.widget_definitions.randomize_button.content.original_text = utf8_upper(mod:localize("loc_weapon_inventory_randomize_button"))
 
+	-- Create reset button scenegraph
+	instance.scenegraph_definition.prev_button = {
+		vertical_alignment = "bottom",
+		parent = "equip_button",
+		horizontal_alignment = "right",
+		size = {equip_button_size[1] / 3 + (equip_button_size[1] - equip_button_size[1] / 3), equip_button_size[2]},
+		position = {(-equip_button_size[1] - 35) * 2, -equip_button_size[2] - 10, 1}
+	}
+	-- Create reset button widget
+	instance.widget_definitions.prev_button = UIWidget.create_definition(table_clone(ButtonPassTemplates.default_button), "prev_button", {
+		gamepad_action = "confirm_pressed",
+		text = utf8_upper(mod:localize("loc_weapon_inventory_prev_button")),
+		hotspot = {
+			on_pressed_sound = UISoundEvents.weapons_skin_confirm
+		}
+	}, {equip_button_size[1] / 3, equip_button_size[2]})
+	instance.widget_definitions.prev_button.content.original_text = utf8_upper(mod:localize("loc_weapon_inventory_prev_button"))
+
+	-- Create randomize button scenegraph
+	instance.scenegraph_definition.next_button = {
+		vertical_alignment = "bottom",
+		parent = "equip_button",
+		horizontal_alignment = "right",
+		size = {equip_button_size[1] / 3, equip_button_size[2]},
+		position = {0, -equip_button_size[2] - 10, 1}
+	}
+	-- Create randomize button widget
+	instance.widget_definitions.next_button = UIWidget.create_definition(table_clone(ButtonPassTemplates.default_button), "next_button", {
+		gamepad_action = "confirm_pressed",
+		text = utf8_upper(mod:localize("loc_weapon_inventory_next_button")),
+		hotspot = {
+			on_pressed_sound = UISoundEvents.weapons_skin_confirm
+		}
+	}, {equip_button_size[1] / 3, equip_button_size[2]})
+	instance.widget_definitions.next_button.content.original_text = utf8_upper(mod:localize("loc_weapon_inventory_next_button"))
+
+	-- Create randomize button scenegraph
+	instance.scenegraph_definition.combination_button = {
+		vertical_alignment = "bottom",
+		parent = "equip_button",
+		horizontal_alignment = "right",
+		size = equip_button_size,
+		position = {-equip_button_size[1] / 3 - 35, -equip_button_size[2] - 10, 1}
+	}
+	-- Create randomize button widget
+	instance.widget_definitions.combination_button = UIWidget.create_definition(table_clone(ButtonPassTemplates.default_button), "combination_button", {
+		gamepad_action = "confirm_pressed",
+		text = utf8_upper(mod:localize("loc_weapon_inventory_combination_button")),
+		hotspot = {
+			on_pressed_sound = UISoundEvents.weapons_skin_confirm
+		}
+	}, equip_button_size)
+	instance.widget_definitions.combination_button.content.original_text = utf8_upper(mod:localize("loc_weapon_inventory_combination_button"))
+
+	instance.scenegraph_definition.combination_name = {
+		vertical_alignment = "bottom",
+		parent = "equip_button",
+		horizontal_alignment = "right",
+		size = {equip_button_size[1], equip_button_size[2]},
+		position = {-equip_button_size[1] - 35, -equip_button_size[2] - 10 + 5, 1}
+	}
+	instance.widget_definitions.combination_name = UIWidget.create_definition({
+		{
+			value = "test",
+			value_id = "text",
+			pass_type = "text",
+			style = sub_display_name_style
+		}
+	}, "combination_name")
+
 	-- Create attachment info box scenegraphs
 	instance.scenegraph_definition.attachment_info_box = {
 		vertical_alignment = "bottom",
@@ -250,11 +325,6 @@ mod:hook_require("scripts/ui/views/inventory_weapon_cosmetics_view/inventory_wea
 		size = {150, 50},
 		position = {310, 0, 3}
 	}
-
-	-- Create attachment info box widgets
-	local sub_display_name_style = table_clone(UIFontSettings.header_3)
-	sub_display_name_style.text_horizontal_alignment = "left"
-	sub_display_name_style.text_vertical_alignment = "top"
 
 	instance.widget_definitions.attachment_info_box = UIWidget.create_definition({
 		{
@@ -2346,6 +2416,7 @@ mod:hook_require("scripts/ui/views/inventory_weapon_cosmetics_view/inventory_wea
 			vector3_box(vector3_zero()),
 		}
 		self.scenegraph_to_widgets = {}
+		self.combination = nil
 	end
 
 	-- Custom enter
@@ -2485,6 +2556,24 @@ mod:hook_require("scripts/ui/views/inventory_weapon_cosmetics_view/inventory_wea
 		self._widgets_by_name.reset_button.content.hotspot.pressed_callback = callback(self, "cb_on_reset_pressed")
 		-- Randomize button
 		self._widgets_by_name.randomize_button.content.hotspot.pressed_callback = callback(self, "cb_on_randomize_pressed")
+		-- Prev button
+		self._widgets_by_name.prev_button.content.hotspot.pressed_callback = callback(self, "cb_on_prev_pressed")
+		-- Next button
+		self._widgets_by_name.next_button.content.hotspot.pressed_callback = callback(self, "cb_on_next_pressed")
+		-- Combination button
+		self._widgets_by_name.combination_button.content.hotspot.pressed_callback = callback(self, "cb_on_combination_pressed")
+	end
+
+	instance.cb_on_prev_pressed = function(self)
+		mod:echo("cb_on_prev_pressed")
+	end
+
+	instance.cb_on_next_pressed = function(self)
+		mod:echo("cb_on_next_pressed")
+	end
+
+	instance.cb_on_combination_pressed = function(self)
+		mod:echo("cb_on_combination_pressed")
 	end
 
 	-- Update equip button
@@ -2495,7 +2584,7 @@ mod:hook_require("scripts/ui/views/inventory_weapon_cosmetics_view/inventory_wea
 			-- Get button content
 			local button_content = button and button.content
 			-- Get disabled state
-			local disabled = not self:attachments_changed_since_start() or mod.build_animation:is_busy()
+			local disabled = not self:attachments_changed_since_start() --or mod.build_animation:is_busy()
 			-- Set disabled
 			button_content.hotspot.disabled = disabled
 			-- Update text
@@ -2510,11 +2599,13 @@ mod:hook_require("scripts/ui/views/inventory_weapon_cosmetics_view/inventory_wea
 		-- Get button content
 		local button_content = button and button.content
 		-- Get disabled state
-		local disabled = not self:attachments_changed_at_all() or mod.build_animation:is_busy()
+		-- local disabled = not self:attachments_changed_at_all() or mod.build_animation:is_busy()
+		-- local disabled = not self:attachments_changed_at_all() or self:is_busy()
 		-- Set disabled
-		button_content.hotspot.disabled = disabled
+		-- button_content.hotspot.disabled = disabled
+		button_content.hotspot.disabled = false
 		-- Update text
-		button_content.text = utf8_upper(disabled and mod:localize("loc_weapon_inventory_no_reset_button") or mod:localize("loc_weapon_inventory_reset_button"))
+		-- button_content.text = utf8_upper(disabled and mod:localize("loc_weapon_inventory_no_reset_button") or mod:localize("loc_weapon_inventory_reset_button"))
 	end
 
 	-- Reset button pressed callback
@@ -2549,13 +2640,16 @@ mod:hook_require("scripts/ui/views/inventory_weapon_cosmetics_view/inventory_wea
 		-- Get button content
 		local button_content = button and button.content
 		-- Get disabled state
-		local disabled = mod.build_animation:is_busy()
+		-- local disabled = mod.build_animation:is_busy()
+		-- local disabled = self:is_busy()
 		-- Set disabled
-		button_content.hotspot.disabled = disabled
+		button_content.hotspot.disabled = false
+		-- button_content.hotspot.disabled = disabled
 	end
 
 	-- Randomize button pressed callback
 	instance.cb_on_randomize_pressed = function(self, skip_animation)
+		mod:echo("cb_on_randomize_pressed")
 		-- Get random attachments
 		local random_attachments = mod.gear_settings:randomize_weapon(self._selected_item)
 		-- mod:dtf(random_attachments, "random_attachments", 10)
@@ -2589,6 +2683,13 @@ mod:hook_require("scripts/ui/views/inventory_weapon_cosmetics_view/inventory_wea
 		end
 	end
 
+	instance.update_combination_inputs = function(self)
+		self._widgets_by_name["prev_button"].visible = false
+		self._widgets_by_name["next_button"].visible = false
+		self._widgets_by_name["combination_button"].visible = false
+		self._widgets_by_name["combination_name"].visible = false
+	end
+
 	instance.update_attachment_info = function(self)
 		local visible = self._widgets_by_name.attachment_display_name.content.text ~= ""
 		self._widgets_by_name.attachment_info_box.visible = false
@@ -2613,6 +2714,7 @@ mod:hook_require("scripts/ui/views/inventory_weapon_cosmetics_view/inventory_wea
 		self:update_equip_button()
 		self:update_reset_button()
 		self:update_randomize_button()
+		self:update_combination_inputs()
 
 		if not self:is_busy() then
 			ui_weapon_spawner:initiate_camera_movement()
@@ -2666,6 +2768,8 @@ mod:hook(CLASS.InventoryWeaponCosmeticsView, "on_enter", function(func, self, ..
 	-- Create temp gear settings
 	-- self:create_temp_setting()
 	mod.gear_settings:create_temp_settings(self._gear_id)
+
+	-- mod:echo("on_enter")
 
 	-- Original function
 	func(self, ...)

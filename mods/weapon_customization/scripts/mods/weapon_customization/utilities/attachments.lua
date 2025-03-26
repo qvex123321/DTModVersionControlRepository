@@ -5,7 +5,7 @@ local mod = get_mod("weapon_customization")
 -- ##### ┴└─└─┘└─┘└└─┘┴┴└─└─┘ #########################################################################################
 
 --#region Require
-	local MasterItems = mod:original_require("scripts/backend/master_items")
+	-- local MasterItems = mod:original_require("scripts/backend/master_items")
 	local WeaponCustomizationLocalization = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_customization_localization")
 	local SoundEventAliases = mod:original_require("scripts/settings/sound/player_character_sound_event_aliases")
 --#endregion

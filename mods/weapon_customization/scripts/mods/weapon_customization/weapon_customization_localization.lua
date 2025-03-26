@@ -253,6 +253,14 @@ return {
 		ru = "Светило Погибели Хаоса",
 		["zh-cn"] = "混沌祸根发光灵体",
 	},
+	mod_attachment_flashlight_05 = {
+		en = "Glowy Stick",
+		de = "Leuchtender Stock",
+	},
+	mod_attachment_flashlight_06 = {
+		en = "Big Shiny",
+		de = "Großes Glänzendes",
+	},
 	mod_attachment_laser_pointer = {
 		en = "Sanctified Targeter",
 		de = "Geheiligter Zielerfasser",
@@ -1135,6 +1143,15 @@ return {
 	-- ##### ┌─┐┬ ┬┌─┐┌┬┐┌─┐┌┬┐┬┌─┐┌─┐┌┬┐┬┌─┐┌┐┌  ┬  ┬┬┌─┐┬ ┬ #########################################################
 	-- ##### │  │ │└─┐ │ │ │││││┌─┘├─┤ │ ││ ││││  └┐┌┘│├┤ │││ #########################################################
 	-- ##### └─┘└─┘└─┘ ┴ └─┘┴ ┴┴└─┘┴ ┴ ┴ ┴└─┘┘└┘   └┘ ┴└─┘└┴┘ #########################################################
+	loc_weapon_inventory_next_button = {
+		en = ">",
+	},
+	loc_weapon_inventory_prev_button = {
+		en = "<",
+	},
+	loc_weapon_inventory_combination_button = {
+		en = "Combination",
+	},
 	loc_weapon_inventory_reset_button = {
 		en = "Reset All",
 		de = "Alles Zurücksetzen",

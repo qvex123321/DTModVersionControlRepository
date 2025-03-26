@@ -215,6 +215,7 @@ end
 	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/patches/equipment_component")
 
 	-- Definitions
+	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/visible_equipment/offsets")
 	mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_customization_anchors")
 
 	-- Extensions

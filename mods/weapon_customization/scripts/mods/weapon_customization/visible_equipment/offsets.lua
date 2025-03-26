@@ -316,6 +316,31 @@ local mod = get_mod("weapon_customization")
                     end
                 end,
             },
+            ogryn_heavystubber_p2_m1 = {
+                default = {position = vector3_box(.8, .45, .15), rotation = vector3_box(200, -10, 100), scale = vector3_box(1, 1, 1),
+                    step_move = vector3_box(-.01, .003, .005), step_rotation = vector3_box(-1, 1.5, -1.5)},
+                backpack = {position = vector3_box(.1, .6, .8), rotation = vector3_box(200, 60, 70), scale = vector3_box(1, 1, 1),
+                    step_move = vector3_box(.02, -.03, -.04), step_rotation = vector3_box(2.5, -2.5, .5)},
+                center_mass = vector3_box(0, -.6, .2),
+                loading = mod.visible_equipment_loading_offsets.ranged_bulky,
+                init = function(visible_equipment_extension, slot)
+                    local slot_info_id = mod.gear_settings:slot_info_id(slot.item)
+                    local slot_infos = mod:persistent_table(REFERENCE).attachment_slot_infos
+                    local attachment_slot_info = slot_infos and slot_infos[slot_info_id]
+                    if attachment_slot_info then
+                        local receiver = attachment_slot_info.attachment_slot_to_unit["receiver"]
+                        local attachment = attachment_slot_info.unit_to_attachment_name[receiver]
+                        if receiver and unit_alive(receiver) then
+                            local node_index = 15
+                            -- if attachment == "receiver_04" then node_index = 21 end
+                            -- if attachment == "receiver_05" or attachment == "receiver_06" or attachment == "receiver_07" then node_index = 15 end
+                            local rot = vector3(0, 0, 90)
+                            local rotation = quaternion_from_euler_angles_xyz(rot[1], rot[2], rot[3])
+                            unit_set_local_rotation(receiver, node_index, rotation)
+                        end
+                    end
+                end,
+            },
             ogryn_rippergun_p1_m1 = {
                 default = {position = vector3_box(.4, .55, .4), rotation = vector3_box(200, -10, 90), scale = vector3_box(1, 1, 1),
                     step_move = vector3_box(-.01, .003, .005), step_rotation = vector3_box(-1, 1.5, -1.5)},
@@ -636,6 +661,8 @@ local mod = get_mod("weapon_customization")
         --#region Ogryn Guns
             mod.visible_equipment_offsets.ogryn_heavystubber_p1_m2 = mod.visible_equipment_offsets.ogryn_heavystubber_p1_m1
             mod.visible_equipment_offsets.ogryn_heavystubber_p1_m3 = mod.visible_equipment_offsets.ogryn_heavystubber_p1_m1
+            mod.visible_equipment_offsets.ogryn_heavystubber_p2_m2 = mod.visible_equipment_offsets.ogryn_heavystubber_p2_m1
+            mod.visible_equipment_offsets.ogryn_heavystubber_p2_m3 = mod.visible_equipment_offsets.ogryn_heavystubber_p2_m1
             mod.visible_equipment_offsets.ogryn_rippergun_p1_m2 = mod.visible_equipment_offsets.ogryn_rippergun_p1_m1
             mod.visible_equipment_offsets.ogryn_rippergun_p1_m3 = mod.visible_equipment_offsets.ogryn_rippergun_p1_m1
             mod.visible_equipment_offsets.ogryn_thumper_p1_m2 = mod.visible_equipment_offsets.ogryn_thumper_p1_m1

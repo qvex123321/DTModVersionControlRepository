@@ -11,8 +11,7 @@ local mod = get_mod("weapon_customization")
     local footstep_intervals_templates = mod:original_require("scripts/settings/equipment/footstep/footstep_intervals_templates")
     local WeaponTemplate = mod:original_require("scripts/utilities/weapon/weapon_template")
     local ScriptCamera = mod:original_require("scripts/foundation/utilities/script_camera")
-
-    local VisibleEquipmentOffsets = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/visible_equipment/offsets")
+    -- local VisibleEquipmentOffsets = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/visible_equipment/offsets")
 --#endregion
 
 -- ##### ┌─┐┌─┐┬─┐┌─┐┌─┐┬─┐┌┬┐┌─┐┌┐┌┌─┐┌─┐ ############################################################################
@@ -840,7 +839,7 @@ VisibleEquipmentExtension.load_slot = function(self, slot)
     self.weapon_template[slot] = WeaponTemplate.weapon_template_from_item(slot.item)
     -- Attach settings
     local attach_settings = self.equipment_component:_attach_settings()
-    self.equipment_component:_fill_attach_settings_3p(attach_settings, slot)
+    self.equipment_component:_fill_attach_settings_3p(attach_settings, self.player_unit, slot)
     attach_settings.skip_link_children = true
     -- Spawn dummy weapon
     self.dummy_units[slot] = self.dummy_units[slot] or {}

@@ -32,6 +32,7 @@ return {
             {id = "ogryn_powermaul_shaft_03",    name = "Ogryn Powermaul 3"},
             {id = "ogryn_powermaul_shaft_04",    name = "Ogryn Powermaul 4"},
             {id = "ogryn_powermaul_shaft_05",    name = "Ogryn Powermaul 5"},
+            {id = "ogryn_powermaul_shaft_06",    name = "Ogryn Powermaul 6"},
             {id = "ogryn_power_maul_shaft_ml01", name = "Ogryn Powermaul ML01"},
         }
         if default == nil then default = true end
@@ -49,6 +50,7 @@ return {
             {name = "ogryn_powermaul_shaft_03",    model = _item_ranged.."/shafts/power_maul_shaft_03"},
             {name = "ogryn_powermaul_shaft_04",    model = _item_ranged.."/shafts/power_maul_shaft_04"},
             {name = "ogryn_powermaul_shaft_05",    model = _item_ranged.."/shafts/power_maul_shaft_05"},
+            {name = "ogryn_powermaul_shaft_06",    model = _item_ranged.."/shafts/power_maul_shaft_06"},
             {name = "ogryn_power_maul_shaft_ml01", model = _item_ranged.."/shafts/power_maul_shaft_ml01"},
         }, parent, angle, move, remove, type or "shaft", no_support, automatic_equip, hide_mesh, mesh_move)
     end,

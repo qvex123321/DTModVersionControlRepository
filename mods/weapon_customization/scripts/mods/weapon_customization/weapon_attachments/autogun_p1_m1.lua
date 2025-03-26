@@ -684,6 +684,15 @@ local mod = get_mod("weapon_customization")
                     --#endregion
                 },
             },
+            -- ┌─┐┌─┐┌─┐┌─┐┌─┐┌┬┐
+            -- │ │├┤ ├┤ └─┐├┤  │
+            -- └─┘└  └  └─┘└─┘ ┴
+            offset = {
+                default = mod.visible_equipment_offsets.human.WEAPON_RANGED.default,
+                backpack = mod.visible_equipment_offsets.human.WEAPON_RANGED.backpack,
+                -- center_mass = vector3_box(0, -.3, 0),
+                loading = mod.visible_equipment_loading_offsets.default,
+            },
         }
     )
 --#endregion

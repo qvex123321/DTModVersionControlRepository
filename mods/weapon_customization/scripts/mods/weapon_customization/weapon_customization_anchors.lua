@@ -122,6 +122,7 @@ end
 --#region Load files
 	local _common_functions = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/common")
 	local _ogryn_heavystubber_p1_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/ogryn_heavystubber_p1_m1")
+	local _ogryn_heavystubber_p2_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/ogryn_heavystubber_p2_m1")
 	local _ogryn_rippergun_p1_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/ogryn_rippergun_p1_m1")
 	local _ogryn_thumper_p1_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/ogryn_thumper_p1_m1")
 	local _ogryn_gauntlet_p1_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/ogryn_gauntlet_p1_m1")
@@ -150,6 +151,7 @@ end
 	local _combataxe_p2_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/combataxe_p2_m1")
 	local _combatknife_p1_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/combatknife_p1_m1")
 	local _powersword_p1_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/powersword_p1_m1")
+	local _powersword_2h_p1_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/powersword_2h_p1_m1")
 	local _chainaxe_p1_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/chainaxe_p1_m1")
 	local _chainsword_p1_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/chainsword_p1_m1")
 	local _combataxe_p3_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/combataxe_p3_m1")
@@ -160,6 +162,7 @@ end
 	local _chainsword_2h_p1_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/chainsword_2h_p1_m1")
 	local _combatsword_p2_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/combatsword_p2_m1")
 	local _forcesword_p1_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/forcesword_p1_m1")
+	local _forcesword_2h_p1_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/forcesword_2h_p1_m1")
 	local _combatsword_p3_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/combatsword_p3_m1")
 --#endregion
 
@@ -167,6 +170,7 @@ end
 	mod.anchors = {
 		--#region Ogryn Guns
 			ogryn_heavystubber_p1_m1 = _ogryn_heavystubber_p1_m1.anchors,
+			ogryn_heavystubber_p2_m1 = _ogryn_heavystubber_p2_m1.anchors,
 			ogryn_rippergun_p1_m1    = _ogryn_rippergun_p1_m1.anchors,
 			ogryn_thumper_p1_m1      = _ogryn_thumper_p1_m1.anchors,
 			ogryn_gauntlet_p1_m1     = _ogryn_gauntlet_p1_m1.anchors,
@@ -200,6 +204,7 @@ end
 			combataxe_p2_m1        = _combataxe_p2_m1.anchors,
 			combatknife_p1_m1      = _combatknife_p1_m1.anchors,
 			powersword_p1_m1       = _powersword_p1_m1.anchors,
+			powersword_2h_p1_m1    = _powersword_2h_p1_m1.anchors,
 			chainaxe_p1_m1         = _chainaxe_p1_m1.anchors,
 			chainsword_p1_m1       = _chainsword_p1_m1.anchors,
 			combataxe_p3_m1        = _combataxe_p3_m1.anchors,
@@ -210,6 +215,7 @@ end
 			chainsword_2h_p1_m1    = _chainsword_2h_p1_m1.anchors,
 			combatsword_p2_m1      = _combatsword_p2_m1.anchors,
 			forcesword_p1_m1       = _forcesword_p1_m1.anchors,
+			forcesword_2h_p1_m1    = _forcesword_2h_p1_m1.anchors,
 			combatsword_p3_m1      = _combatsword_p3_m1.anchors,
 		--#endregion
 	}
@@ -217,6 +223,8 @@ end
 		--#region Ogryn Guns
 			mod.anchors.ogryn_heavystubber_p1_m2 = mod.anchors.ogryn_heavystubber_p1_m1
 			mod.anchors.ogryn_heavystubber_p1_m3 = mod.anchors.ogryn_heavystubber_p1_m1
+			mod.anchors.ogryn_heavystubber_p2_m2 = mod.anchors.ogryn_heavystubber_p2_m1
+			mod.anchors.ogryn_heavystubber_p2_m3 = mod.anchors.ogryn_heavystubber_p2_m1
 			mod.anchors.ogryn_rippergun_p1_m2    = mod.anchors.ogryn_rippergun_p1_m1
 			mod.anchors.ogryn_rippergun_p1_m3    = mod.anchors.ogryn_rippergun_p1_m1
 				-- mod.anchors.ogryn_rippergun_npc_01 = mod.anchors.ogryn_rippergun_p1_m1
@@ -293,6 +301,7 @@ end
 			mod.anchors.powersword_p1_m3       = mod.anchors.powersword_p1_m1
 				-- mod.anchors.powersword_npc_01    = mod.anchors.powersword_p1_m1
 				-- mod.anchors.powersword_2h_npc_01 = mod.anchors.powersword_p1_m1
+			mod.anchors.powersword_2h_p1_m2    = mod.anchors.powersword_2h_p1_m1
 			mod.anchors.combatsword_p1_m2      = mod.anchors.combatsword_p1_m1
 			mod.anchors.combatsword_p1_m3      = mod.anchors.combatsword_p1_m1
 			mod.anchors.thunderhammer_2h_p1_m2 = mod.anchors.thunderhammer_2h_p1_m1
@@ -301,6 +310,7 @@ end
 			mod.anchors.forcesword_p1_m2       = mod.anchors.forcesword_p1_m1
 			mod.anchors.forcesword_p1_m3       = mod.anchors.forcesword_p1_m1
 				-- mod.anchors.forcesword_npc_01  = mod.anchors.forcesword_p1_m1
+			mod.anchors.forcesword_2h_p1_m2    = mod.anchors.forcesword_2h_p1_m1
 			mod.anchors.combatsword_p3_m2      = mod.anchors.combatsword_p3_m1
 			mod.anchors.combatsword_p3_m3      = mod.anchors.combatsword_p3_m1
 			mod.anchors.powermaul_p1_m2        = mod.anchors.powermaul_p1_m1
@@ -312,6 +322,7 @@ end
 	mod.attachment = {
 		--#region Ogryn Guns
 			ogryn_heavystubber_p1_m1 = _ogryn_heavystubber_p1_m1.attachments,
+			ogryn_heavystubber_p2_m1 = _ogryn_heavystubber_p2_m1.attachments,
 			ogryn_rippergun_p1_m1    = _ogryn_rippergun_p1_m1.attachments,
 			ogryn_thumper_p1_m1      = _ogryn_thumper_p1_m1.attachments,
 			ogryn_gauntlet_p1_m1     = _ogryn_gauntlet_p1_m1.attachments,
@@ -345,6 +356,7 @@ end
 			combataxe_p2_m1        = _combataxe_p2_m1.attachments,
 			combatknife_p1_m1      = _combatknife_p1_m1.attachments,
 			powersword_p1_m1       = _powersword_p1_m1.attachments,
+			powersword_2h_p1_m1    = _powersword_2h_p1_m1.attachments,
 			chainaxe_p1_m1         = _chainaxe_p1_m1.attachments,
 			chainsword_p1_m1       = _chainsword_p1_m1.attachments,
 			combataxe_p3_m1        = _combataxe_p3_m1.attachments,
@@ -355,6 +367,7 @@ end
 			chainsword_2h_p1_m1    = _chainsword_2h_p1_m1.attachments,
 			combatsword_p2_m1      = _combatsword_p2_m1.attachments,
 			forcesword_p1_m1       = _forcesword_p1_m1.attachments,
+			forcesword_2h_p1_m1    = _forcesword_2h_p1_m1.attachments,
 			combatsword_p3_m1      = _combatsword_p3_m1.attachments,
 		--#endregion
 	}
@@ -362,6 +375,8 @@ end
 		--#region Ogryn Guns
 			mod.attachment.ogryn_heavystubber_p1_m2 = mod.attachment.ogryn_heavystubber_p1_m1
 			mod.attachment.ogryn_heavystubber_p1_m3 = mod.attachment.ogryn_heavystubber_p1_m1
+			mod.attachment.ogryn_heavystubber_p2_m2 = mod.attachment.ogryn_heavystubber_p2_m1
+			mod.attachment.ogryn_heavystubber_p2_m3 = mod.attachment.ogryn_heavystubber_p2_m1
 			mod.attachment.ogryn_rippergun_p1_m2 = mod.attachment.ogryn_rippergun_p1_m1
 			mod.attachment.ogryn_rippergun_p1_m3 = mod.attachment.ogryn_rippergun_p1_m1
 				-- mod.attachment.ogryn_rippergun_npc_01 = mod.attachment.ogryn_rippergun_p1_m1
@@ -438,6 +453,7 @@ end
 			mod.attachment.powersword_p1_m3       = mod.attachment.powersword_p1_m1
 				-- mod.attachment.powersword_npc_01    = mod.attachment.powersword_p1_m1
 				-- mod.attachment.powersword_2h_npc_01 = mod.attachment.powersword_p1_m1
+			mod.attachment.powersword_2h_p1_m2    = mod.attachment.powersword_2h_p1_m1
 			mod.attachment.chainaxe_p1_m2         = mod.attachment.chainaxe_p1_m1
 			mod.attachment.chainsword_p1_m2       = mod.attachment.chainsword_p1_m1
 				-- mod.attachment.chainsword_npc_01  = mod.attachment.chainsword_p1_m1
@@ -450,6 +466,7 @@ end
 			mod.attachment.forcesword_p1_m2       = mod.attachment.forcesword_p1_m1
 			mod.attachment.forcesword_p1_m3       = mod.attachment.forcesword_p1_m1
 				-- mod.attachment.forcesword_npc_01  = mod.attachment.forcesword_p1_m1
+			mod.attachment.forcesword_2h_p1_m2    = mod.attachment.forcesword_2h_p1_m1
 			mod.attachment.combatsword_p3_m2      = mod.attachment.combatsword_p3_m1
 			mod.attachment.combatsword_p3_m3      = mod.attachment.combatsword_p3_m1
 			mod.attachment.powermaul_p1_m2        = mod.attachment.powermaul_p1_m1
@@ -739,6 +756,8 @@ end
 		"flashlight_02",
 		"flashlight_03",
 		"flashlight_04",
+		"flashlight_ogryn_01",
+		"flashlight_ogryn_long_01",
 		"laser_pointer",
 	}
 	mod.laser_pointers = {
@@ -873,6 +892,7 @@ end
 	mod.attachment_models = {
 		--#region Ogryn Guns
 			ogryn_heavystubber_p1_m1 = _ogryn_heavystubber_p1_m1.models,
+			ogryn_heavystubber_p2_m1 = _ogryn_heavystubber_p2_m1.models,
 			ogryn_rippergun_p1_m1    = _ogryn_rippergun_p1_m1.models,
 			ogryn_thumper_p1_m1      = _ogryn_thumper_p1_m1.models,
 			ogryn_gauntlet_p1_m1     = _ogryn_gauntlet_p1_m1.models,
@@ -906,6 +926,7 @@ end
 			combataxe_p2_m1        = _combataxe_p2_m1.models,
 			combatknife_p1_m1      = _combatknife_p1_m1.models,
 			powersword_p1_m1       = _powersword_p1_m1.models,
+			powersword_2h_p1_m1    = _powersword_2h_p1_m1.models,
 			chainaxe_p1_m1         = _chainaxe_p1_m1.models,
 			chainsword_p1_m1       = _chainsword_p1_m1.models,
 			combataxe_p3_m1        = _combataxe_p3_m1.models,
@@ -916,6 +937,7 @@ end
 			chainsword_2h_p1_m1    = _chainsword_2h_p1_m1.models,
 			combatsword_p2_m1      = _combatsword_p2_m1.models,
 			forcesword_p1_m1       = _forcesword_p1_m1.models,
+			forcesword_2h_p1_m1    = _forcesword_2h_p1_m1.models,
 			combatsword_p3_m1      = _combatsword_p3_m1.models,
 		--#endregion
 	}
@@ -923,6 +945,8 @@ end
 		--#region Ogryn Guns
 			mod.attachment_models.ogryn_heavystubber_p1_m2 = mod.attachment_models.ogryn_heavystubber_p1_m1
 			mod.attachment_models.ogryn_heavystubber_p1_m3 = mod.attachment_models.ogryn_heavystubber_p1_m1
+			mod.attachment_models.ogryn_heavystubber_p2_m2 = mod.attachment_models.ogryn_heavystubber_p2_m1
+			mod.attachment_models.ogryn_heavystubber_p2_m3 = mod.attachment_models.ogryn_heavystubber_p2_m1
 			mod.attachment_models.ogryn_rippergun_p1_m2    = mod.attachment_models.ogryn_rippergun_p1_m1
 			mod.attachment_models.ogryn_rippergun_p1_m3    = mod.attachment_models.ogryn_rippergun_p1_m1
 				-- mod.attachment_models.ogryn_rippergun_npc_01 = mod.attachment_models.ogryn_rippergun_p1_m1
@@ -1003,6 +1027,7 @@ end
 			mod.attachment_models.powersword_p1_m3       = mod.attachment_models.powersword_p1_m1
 				-- mod.attachment_models.powersword_npc_01 = mod.attachment_models.powersword_p1_m1
 				-- mod.attachment_models.powersword_2h_npc_01 = mod.attachment_models.powersword_p1_m1
+			mod.attachment_models.powersword_2h_p1_m2    = mod.attachment_models.powersword_2h_p1_m1
 			mod.attachment_models.combatsword_p1_m2      = mod.attachment_models.combatsword_p1_m1
 			mod.attachment_models.combatsword_p1_m3      = mod.attachment_models.combatsword_p1_m1
 			mod.attachment_models.thunderhammer_2h_p1_m2 = mod.attachment_models.thunderhammer_2h_p1_m1
@@ -1011,6 +1036,7 @@ end
 			mod.attachment_models.forcesword_p1_m2       = mod.attachment_models.forcesword_p1_m1
 			mod.attachment_models.forcesword_p1_m3       = mod.attachment_models.forcesword_p1_m1
 				-- mod.attachment_models.forcesword_npc_01 = mod.attachment_models.forcesword_p1_m1
+			mod.attachment_models.forcesword_2h_p1_m2    = mod.attachment_models.forcesword_2h_p1_m1
 			mod.attachment_models.combatsword_p3_m2      = mod.attachment_models.combatsword_p3_m1
 			mod.attachment_models.combatsword_p3_m3      = mod.attachment_models.combatsword_p3_m1
 			mod.attachment_models.powermaul_p1_m2        = mod.attachment_models.powermaul_p1_m1
@@ -1033,6 +1059,7 @@ end
 	mod.attachment_sounds = {
 		--#region Ogryn Guns
 			ogryn_heavystubber_p1_m1 = _ogryn_heavystubber_p1_m1.sounds,
+			ogryn_heavystubber_p2_m1 = _ogryn_heavystubber_p2_m1.sounds,
 			ogryn_rippergun_p1_m1 	 = _ogryn_rippergun_p1_m1.sounds,
 			ogryn_thumper_p1_m1      = _ogryn_thumper_p1_m1.sounds,
 			ogryn_gauntlet_p1_m1     = _ogryn_gauntlet_p1_m1.sounds,
@@ -1066,6 +1093,7 @@ end
 			combataxe_p2_m1        = _combataxe_p2_m1.sounds,
 			combatknife_p1_m1      = _combatknife_p1_m1.sounds,
 			powersword_p1_m1       = _powersword_p1_m1.sounds,
+			powersword_2h_p1_m1    = _powersword_2h_p1_m1.sounds,
 			chainaxe_p1_m1         = _chainaxe_p1_m1.sounds,
 			chainsword_p1_m1       = _chainsword_p1_m1.sounds,
 			combataxe_p3_m1        = _combataxe_p3_m1.sounds,
@@ -1076,6 +1104,7 @@ end
 			chainsword_2h_p1_m1    = _chainsword_2h_p1_m1.sounds,
 			combatsword_p2_m1      = _combatsword_p2_m1.sounds,
 			forcesword_p1_m1       = _forcesword_p1_m1.sounds,
+			forcesword_2h_p1_m1    = _forcesword_2h_p1_m1.sounds,
 			combatsword_p3_m1      = _combatsword_p3_m1.sounds,
 		--#endregion
 	}
@@ -1083,6 +1112,8 @@ end
 		--#region Ogryn Guns
 			mod.attachment_sounds.ogryn_heavystubber_p1_m2 = mod.attachment_sounds.ogryn_heavystubber_p1_m1
 			mod.attachment_sounds.ogryn_heavystubber_p1_m3 = mod.attachment_sounds.ogryn_heavystubber_p1_m1
+			mod.attachment_sounds.ogryn_heavystubber_p2_m2 = mod.attachment_sounds.ogryn_heavystubber_p2_m1
+			mod.attachment_sounds.ogryn_heavystubber_p2_m3 = mod.attachment_sounds.ogryn_heavystubber_p2_m1
 			mod.attachment_sounds.ogryn_rippergun_p1_m2 = mod.attachment_sounds.ogryn_rippergun_p1_m1
 			mod.attachment_sounds.ogryn_rippergun_p1_m3 = mod.attachment_sounds.ogryn_rippergun_p1_m1
 				-- mod.attachment_models.ogryn_rippergun_npc_01 = mod.attachment_models.ogryn_rippergun_p1_m1
@@ -1159,6 +1190,7 @@ end
 			mod.attachment_sounds.powersword_p1_m3       = mod.attachment_sounds.powersword_p1_m1
 				-- mod.attachment_sounds.powersword_npc_01    = mod.attachment_sounds.powersword_p1_m1
 				-- mod.attachment_sounds.powersword_2h_npc_01 = mod.attachment_sounds.powersword_p1_m1
+			mod.attachment_sounds.powersword_2h_p1_m2       = mod.attachment_sounds.powersword_2h_p1_m1
 			mod.attachment_sounds.chainaxe_p1_m2         = mod.attachment_sounds.chainaxe_p1_m1
 			mod.attachment_sounds.chainsword_p1_m2       = mod.attachment_sounds.chainsword_p1_m1
 				-- mod.attachment_sounds.chainsword_npc_01  = mod.attachment_sounds.chainsword_p1_m1
@@ -1171,6 +1203,7 @@ end
 			mod.attachment_sounds.forcesword_p1_m2       = mod.attachment_sounds.forcesword_p1_m1
 			mod.attachment_sounds.forcesword_p1_m3       = mod.attachment_sounds.forcesword_p1_m1
 				-- mod.attachment_sounds.forcesword_npc_01  = mod.attachment_sounds.forcesword_p1_m1
+			mod.attachment_sounds.forcesword_2h_p1_m2    = mod.attachment_sounds.forcesword_2h_p1_m1
 			mod.attachment_sounds.combatsword_p3_m2      = mod.attachment_sounds.combatsword_p3_m1
 			mod.attachment_sounds.combatsword_p3_m3      = mod.attachment_sounds.combatsword_p3_m1
 			mod.attachment_sounds.powermaul_p1_m2        = mod.attachment_sounds.powermaul_p1_m1

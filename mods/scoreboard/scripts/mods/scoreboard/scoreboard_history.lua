@@ -219,7 +219,7 @@ mod.save_scoreboard_history_entry = function(self, sorted_rows)
 		num_players = num_players + 1
 		if num_players < 5 then
 			local account_id = player:account_id() or player:name()
-			local symbol = player._profile.archetype.string_symbol
+			local symbol = player._profile.archetype.string_symbol or player._profile.archetype.symbol or ""
 			file:write(num_players..";"..account_id..";"..player:name()..";"..symbol.."\n")
 		end
 	end
