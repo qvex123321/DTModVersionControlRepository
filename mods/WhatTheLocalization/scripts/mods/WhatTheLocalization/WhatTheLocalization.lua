@@ -23,15 +23,17 @@ local function load_templates(templates, lang)
 		if lang_match then
 			if fix.loc_keys then
 				for _, loc_key in ipairs(fix.loc_keys) do
-					registered_fixes[loc_key] = registered_fixes[loc_key] or {}
-					table.insert(registered_fixes[loc_key], fix.handle_func)
+					if loc_key then
+						registered_fixes[loc_key] = registered_fixes[loc_key] or {}
+						table.insert(registered_fixes[loc_key], fix.handle_func)
+					end
 				end
 			end
 		end
 	end
 end
 
-mod.reload_templates = function()
+mod.reload_templates = function ()
 	if not mod:is_enabled() then
 		return
 	end
@@ -47,20 +49,20 @@ mod.reload_templates = function()
 	end
 end
 
-mod.on_enabled = function(initial_call)
+mod.on_enabled = function ()
 	mod.reload_templates()
 end
 
-mod.on_all_mods_loaded = function()
+mod.on_all_mods_loaded = function ()
 	mod.reload_templates()
 end
 
-mod.on_disabled = function(initial_call)
+mod.on_disabled = function ()
 	table.clear(Managers.localization._string_cache)
 	table.clear(registered_fixes)
 end
 
-mod:hook(LocalizationManager, "_lookup", function(func, self, key)
+mod:hook(LocalizationManager, "_lookup", function (func, self, key)
 	local ret = func(self, key)
 	local fixes = registered_fixes[key]
 	if not fixes then
@@ -72,7 +74,7 @@ mod:hook(LocalizationManager, "_lookup", function(func, self, key)
 	return ret
 end)
 
-mod.toggle_debug_mode = function()
+mod.toggle_debug_mode = function ()
 	if not Managers.ui:chat_using_input() then
 		local debug_mode = not mod:get("enable_debug_mode")
 		mod:set("enable_debug_mode", debug_mode, false)
@@ -84,7 +86,7 @@ mod.toggle_debug_mode = function()
 	end
 end
 
-mod:hook(LocalizationManager, "localize", function(func, self, key, no_cache, context)
+mod:hook(LocalizationManager, "localize", function (func, self, key, no_cache, context)
 	local ret = func(self, key, no_cache, context)
 	return mod:get("enable_debug_mode") and key or ret
 end)
@@ -96,7 +98,7 @@ local visualize_mapping = {
 	["\r"] = "",
 }
 
-mod:command("loc", mod:localize("loc_command_description"), function(key)
+mod:command("loc", mod:localize("loc_command_description"), function (key)
 	if not key then
 		mod:echo(mod:localize("loc_command_missing_key"))
 		return

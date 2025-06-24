@@ -188,6 +188,15 @@ local mod = get_mod("weapon_customization")
     }
 --#endregion
 
+-- mod:hook(CLASS.ExtensionManager, "unregister_units", function(func, self, units, num_units, unregister_from_level_units, ...)
+--     local world = managers.world and managers.world:world("level_world")
+--     if world then
+--         for _, unit in pairs(units) do
+--             world_unlink_unit(world, unit)
+--         end
+--     end
+-- end)
+
 -- ##### ┌─┐┬  ┌─┐┌─┐┌─┐ ##############################################################################################
 -- ##### │  │  ├─┤└─┐└─┐ ##############################################################################################
 -- ##### └─┘┴─┘┴ ┴└─┘└─┘ ##############################################################################################
@@ -203,6 +212,7 @@ VisibleEquipmentExtension.init = function(self, extension_init_context, unit, ex
     VisibleEquipmentExtension.super.init(self, extension_init_context, unit, extension_init_data)
     -- Attributes
     self.profile = extension_init_data.profile
+    self.ui_profile_spawner = extension_init_data.ui_profile_spawner
     self.loading_spawn_point = extension_init_data.loading_spawn_point
     self.equipment_component = extension_init_data.equipment_component
     self.equipment = extension_init_data.equipment
@@ -247,6 +257,8 @@ VisibleEquipmentExtension.init = function(self, extension_init_context, unit, ex
     -- Events
     managers.event:register(self, "weapon_customization_settings_changed", "on_settings_changed")
     managers.event:register(self, "weapon_customization_attach_point_changed", "on_attach_point_changed")
+    managers.event:register(self, "weapon_customization_cutscene", "set_cutscene")
+    -- managers.event:register(self, "weapon_customization_mission_intro", "set_mission_intro")
     -- Settings
     self:on_settings_changed()
     -- Initialized
@@ -261,6 +273,8 @@ VisibleEquipmentExtension.delete = function(self)
     -- Events
     managers.event:unregister(self, "weapon_customization_settings_changed")
     managers.event:unregister(self, "weapon_customization_attach_point_changed")
+    managers.event:unregister(self, "weapon_customization_cutscene")
+    -- managers.event:unregister(self, "weapon_customization_mission_intro")
     -- Uninitialize
     self.initialized = false
     -- -- Iterate slots
@@ -477,9 +491,20 @@ VisibleEquipmentExtension.is_sprinting = function(self)
     return self.is_in_hub and self.hub_jog_character_state and self.hub_jog_character_state.move_state == SPRINT or is_sprinting
 end
 
+VisibleEquipmentExtension.world = function(self)
+    return self.world
+end
+
 -- ##### ┌┬┐┌─┐┌┬┐┬ ┬┌─┐┌┬┐┌─┐ ########################################################################################
 -- ##### │││├┤  │ ├─┤│ │ ││└─┐ ########################################################################################
 -- ##### ┴ ┴└─┘ ┴ ┴ ┴└─┘─┴┘└─┘ ########################################################################################
+
+VisibleEquipmentExtension.set_cutscene = function(self, is_cutscene)
+    self.cut_scene = is_cutscene
+    if self.initialized then
+        self:update_equipment_visibility()
+    end
+end
 
 VisibleEquipmentExtension.set_spectated = function(self, spectated)
     self.spectated = spectated
@@ -803,6 +828,55 @@ VisibleEquipmentExtension.correct_gear_node = function(self, slot)
 
 end
 
+VisibleEquipmentExtension.check_attach_points = function(self, slot)
+    for _, slot_name in pairs(mod.attachment_slots) do
+
+        local ap_name = "ap_"..slot_name
+        local rp_name = "rp_"..slot_name
+        if (unit_has_node(self.dummy_units[slot].base, slot_name)) then
+            mod:echo(slot_name.." = "..tostring(unit_node(self.dummy_units[slot].base, slot_name)).." in base")
+        elseif (unit_has_node(self.dummy_units[slot].base, ap_name)) then
+            mod:echo(ap_name.." = "..tostring(unit_node(self.dummy_units[slot].base, ap_name)).." in base")
+        elseif (unit_has_node(self.dummy_units[slot].base, rp_name)) then
+            mod:echo(rp_name.." = "..tostring(unit_node(self.dummy_units[slot].base, rp_name)).." in base")
+        end
+        for _, attachment_unit in pairs(self.dummy_units[slot].attachments) do
+            if (unit_has_node(attachment_unit, slot_name)) then
+                mod:echo(slot_name.." = "..tostring(unit_node(attachment_unit, slot_name)).." in attachment")
+            elseif (unit_has_node(attachment_unit, ap_name)) then
+                mod:echo(ap_name.." = "..tostring(unit_node(attachment_unit, ap_name)).." in attachment")
+            elseif (unit_has_node(attachment_unit, rp_name)) then
+                mod:echo(rp_name.." = "..tostring(unit_node(attachment_unit, rp_name)).." in attachment")
+            end
+        end
+        local slot_name_ = slot_name.."_00"
+        local ap_name_ = "ap_"..slot_name.."_00"
+        local rp_name_ = "rp_"..slot_name.."_00"
+        for i = 1, 9, 1 do
+            slot_name_ = slot_name.."_0"..i
+            ap_name_ = "ap_"..slot_name.."_0"..i
+            rp_name_ = "rp_"..slot_name.."_0"..i
+            -- mod:echo("checking "..ap_name)
+            if (unit_has_node(self.dummy_units[slot].base, slot_name_)) then
+                mod:echo(slot_name_.." = "..tostring(unit_node(self.dummy_units[slot].base, slot_name_)).." in base")
+            elseif (unit_has_node(self.dummy_units[slot].base, ap_name_)) then
+                mod:echo(ap_name_.." = "..tostring(unit_node(self.dummy_units[slot].base, ap_name_)).." in base")
+            elseif (unit_has_node(self.dummy_units[slot].base, rp_name_)) then
+                mod:echo(rp_name_.." = "..tostring(unit_node(self.dummy_units[slot].base, rp_name_)).." in base")
+            end
+            for _, attachment_unit in pairs(self.dummy_units[slot].attachments) do
+                if (unit_has_node(attachment_unit, slot_name_)) then
+                    mod:echo(slot_name_.." = "..tostring(unit_node(attachment_unit, slot_name_)).." in attachment")
+                elseif (unit_has_node(attachment_unit, ap_name_)) then
+                    mod:echo(ap_name_.." = "..tostring(unit_node(attachment_unit, ap_name_)).." in attachment")
+                elseif (unit_has_node(attachment_unit, rp_name_)) then
+                    mod:echo(rp_name_.." = "..tostring(unit_node(attachment_unit, rp_name_)).." in attachment")
+                end
+            end
+        end
+    end
+end
+
 VisibleEquipmentExtension.load_slot = function(self, slot)
 
     if self.slot_loaded[slot] or self.slot_is_loading[slot] or not self.initialized then
@@ -846,7 +920,9 @@ VisibleEquipmentExtension.load_slot = function(self, slot)
     -- self.helper_units[slot] = {}
     if not self.dummy_units[slot].base then
         self.dummy_units[slot].base, self.dummy_units[slot].attachments = VisualLoadoutCustomization.spawn_item(slot.item, attach_settings, self.player_unit)
+        self.dummy_units[slot].attachments = self.dummy_units[slot].attachments and self.dummy_units[slot].attachments[self.dummy_units[slot].base]
     end
+    -- self:check_attach_points(slot)
     -- Get list of units ( Slab shield )
     if self.item_names[slot] == SLAB_SHIELD then
         self.slot_units[slot] = {self.dummy_units[slot].attachments[3], self.dummy_units[slot].attachments[1]}
@@ -1134,9 +1210,11 @@ VisibleEquipmentExtension.update = function(self, dt, t)
     self:update_animation(dt, t)
     -- Visibility
     self:update_equipment_visibility()
+
+    -- self:update_player_visibility()
 end
 
-VisibleEquipmentExtension.update_equipment_visibility = function(self, dt, t)
+VisibleEquipmentExtension.update_equipment_visibility = function(self)
     local mod_attachment_slots_always_sheathed = mod.attachment_slots_always_sheathed
     local mod_attachment_slots_always_unsheathed = mod.attachment_slots_always_unsheathed
     -- Values
@@ -1144,6 +1222,7 @@ VisibleEquipmentExtension.update_equipment_visibility = function(self, dt, t)
     local first_person = self.first_person_extension and self.first_person_extension:is_in_first_person_mode()
     local spectated = not self.is_local_unit and (not self.spectated or not first_person)
     local player = self.is_local_unit and not first_person
+    local cutscene = self.ui_profile_spawner or not self.cut_scene
     -- Iterate slots
     for slot_name, slot in pairs(self.equipment) do
         -- Values
@@ -1163,15 +1242,19 @@ VisibleEquipmentExtension.update_equipment_visibility = function(self, dt, t)
                     if table_contains(mod_attachment_slots_always_sheathed, attachment_slot) and not visible then
                         visible = true
                     end
-                    if table_contains(mod_attachment_slots_always_unsheathed, attachment_slot) and visible then
+                    if (table_contains(mod_attachment_slots_always_unsheathed, attachment_slot) and visible) then
                         visible = false
                     end
+                    visible = (cutscene and visible) or false
                     unit_set_unit_visibility(unit, visible, false)
                 end
             end
             -- Iterate third person units
-            if slot.attachments_3p then
-                for i, unit in pairs(slot.attachments_3p) do
+            local attachments_3p = slot.attachments_by_unit_3p and slot.attachments_by_unit_3p[slot.unit_3p]
+            if attachments_3p then
+                for i, unit in pairs(attachments_3p) do
+            -- if slot.attachments_3p then
+            --     for i, unit in pairs(slot.attachments_3p) do
                     -- Check unit
                     if unit and unit_alive(unit) then
                         -- Set equipment visibility
@@ -1179,14 +1262,18 @@ VisibleEquipmentExtension.update_equipment_visibility = function(self, dt, t)
                         if first_person or table_contains(mod_attachment_slots_always_sheathed, attachment_slot) then
                             unit_set_unit_visibility(unit, false, false)
                         elseif table_contains(mod_attachment_slots_always_unsheathed, attachment_slot) then
-                            unit_set_unit_visibility(unit, true, false)
+                            local visible = (cutscene and true) or false
+                            unit_set_unit_visibility(unit, visible, false)
                         end
                     end
                 end
             end
             -- Iterate first person units
-            if slot.attachments_1p then
-                for i, unit in pairs(slot.attachments_1p) do
+            local attachments_1p = slot.attachments_by_unit_1p and slot.attachments_by_unit_1p[slot.unit_1p]
+            if attachments_1p then
+                for i, unit in pairs(attachments_1p) do
+            -- if slot.attachments_1p then
+            --     for i, unit in pairs(slot.attachments_1p) do
                     -- Check unit
                     if unit and unit_alive(unit) then
                         -- Set equipment visibility
@@ -1194,7 +1281,8 @@ VisibleEquipmentExtension.update_equipment_visibility = function(self, dt, t)
                         if not first_person or table_contains(mod_attachment_slots_always_sheathed, attachment_slot) then
                             unit_set_unit_visibility(unit, false, false)
                         elseif table_contains(mod_attachment_slots_always_unsheathed, attachment_slot) then
-                            unit_set_unit_visibility(unit, true, false)
+                            local visible = (cutscene and true) or false
+                            unit_set_unit_visibility(unit, visible, false)
                         end
                     end
                 end
@@ -1202,6 +1290,29 @@ VisibleEquipmentExtension.update_equipment_visibility = function(self, dt, t)
         end
     end
 end
+
+-- VisibleEquipmentExtension.update_player_visibility = function(self)
+--     if self.player_unit and unit_alive(self.player_unit) then
+--         unit_set_unit_visibility(self.player_unit, true, true)
+--         -- local equipment_component = mod:get_equipment_component(self.player_unit)
+--         -- if equipment_component then
+--         if self.wielded_slot then
+--             self.equipment_component.update_item_visibility(self.equipment, self.wielded_slot.name, self.player_unit, self.first_person_unit, true)
+--             self.equipment_component.update_item_visibility(self.equipment, self.wielded_slot.name, self.player_unit, nil, false)
+--             -- unit_set_unit_visibility(self.player_unit, true, true)
+--             -- Unit.set_visibility(self.player_unit, true)
+--             -- Unit.flow_event(self.player_unit, "lua_visible")
+--             -- Unit.set_shader_pass_flag_for_meshes_in_unit_and_childs(self.player_unit, "custom_fov", false)
+--             -- if ScriptUnit.has_extension(self.wielded_slot.parent_unit_3p, "player_visibility_system") then
+--             --     local player_visibility_extension = ScriptUnit.extension(self.wielded_slot.parent_unit_3p, "player_visibility_system")
+--             --     if player_visibility_extension and not player_visibility_extension:visible() then
+--             --         player_visibility_extension:show()
+--             --     end
+--             -- end
+--         end
+--         -- end
+--     end
+-- end
 
 VisibleEquipmentExtension.get_vectors_almost_same = function(self, v1, v2, tolerance)
     local tolerance = tolerance or .5

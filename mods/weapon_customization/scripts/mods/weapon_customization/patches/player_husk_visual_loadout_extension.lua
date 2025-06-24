@@ -177,7 +177,8 @@ mod:hook_require("scripts/extension_systems/visual_loadout/player_husk_visual_lo
                             player = self._player,
                             player_unit = self._player.player_unit,
                             is_local_unit = self._is_local_unit,
-                            ranged_weapon = table_merge_recursive(slot, {weapon_template = weapon_template, weapon_unit = slot.unit_1p, attachment_units = slot.attachments_1p}
+                            -- ranged_weapon = table_merge_recursive(slot, {weapon_template = weapon_template, weapon_unit = slot.unit_1p, attachment_units = slot.attachments_1p}
+                            ranged_weapon = table_merge_recursive(slot, {weapon_template = weapon_template, weapon_unit = slot.unit_1p, attachment_units = slot.attachments_by_unit_1p and slot.attachments_by_unit_1p[slot.unit_1p]}
                             ),
                             wielded_slot = self._equipment[self._wielded_slot],
                             equipment_component = self._equipment_component,
@@ -251,7 +252,8 @@ mod:hook_require("scripts/extension_systems/visual_loadout/player_husk_visual_lo
                             ranged_weapon = table_merge_recursive(slot, {
                                 weapon_template = weapon_template,
                                 weapon_unit = slot.unit_1p,
-                                attachment_units = slot.attachments_1p
+                                -- attachment_units = slot.attachments_1p
+                                attachment_units = slot.attachments_by_unit_1p and slot.attachments_by_unit_1p[slot.unit_1p],
                             }),
                             wielded_slot = self._equipment[self._wielded_slot],
                         })
@@ -273,8 +275,10 @@ mod:hook_require("scripts/extension_systems/visual_loadout/player_husk_visual_lo
                 local slot = self._equipment[SLOT_SECONDARY]
                 if slot then
                     -- Add FlashlightExtension
-                    local flashlight_unit_1p = mod.gear_settings:attachment_unit(slot.attachments_1p, "flashlight")
-                    local flashlight_unit_3p = mod.gear_settings:attachment_unit(slot.attachments_3p, "flashlight")
+                    -- local flashlight_unit_1p = mod.gear_settings:attachment_unit(slot.attachments_1p, "flashlight")
+                    -- local flashlight_unit_3p = mod.gear_settings:attachment_unit(slot.attachments_3p, "flashlight")
+                    local flashlight_unit_1p = mod.gear_settings:attachment_unit(slot.attachments_by_unit_1p and slot.attachments_by_unit_1p[slot.unit_1p], "flashlight")
+                    local flashlight_unit_3p = mod.gear_settings:attachment_unit(slot.attachments_by_unit_3p and slot.attachments_by_unit_3p[slot.unit_3p], "flashlight")
                     if flashlight_unit_1p and flashlight_unit_3p then
                         -- Add FlashlightExtension
                         script_unit_add_extension({
@@ -286,6 +290,8 @@ mod:hook_require("scripts/extension_systems/visual_loadout/player_husk_visual_lo
                             flashlight_unit_1p = flashlight_unit_1p,
                             flashlight_unit_3p = flashlight_unit_3p,
                             wielded_slot = self._equipment[self._wielded_slot],
+                            -- ranged_weapon = table_merge_recursive(self._weapon_extension._weapons[SLOT_SECONDARY],
+                            --     {attachment_units = slot.attachments_by_unit_1p and slot.attachments_by_unit_1p[slot.unit_1p]}),
                         })
                     end
                 end
@@ -331,6 +337,8 @@ end)
 
 mod:hook(CLASS.PlayerHuskVisualLoadoutExtension, "init", function(func, self, extension_init_context, unit, extension_init_data, game_session, game_object_id, ...)
 
+    self.wc_initialized = true
+
     -- Original function
     func(self, extension_init_context, unit, extension_init_data, game_session, game_object_id, ...)
 
@@ -343,6 +351,8 @@ mod:hook(CLASS.PlayerHuskVisualLoadoutExtension, "init", function(func, self, ex
 end)
 
 mod:hook(CLASS.PlayerHuskVisualLoadoutExtension, "destroy", function(func, self, ...)
+
+    self.wc_initialized = false
 
     -- Destroy custom extensions
     self:remove_custom_extensions()
@@ -363,7 +373,6 @@ mod:hook(CLASS.PlayerHuskVisualLoadoutExtension, "extensions_ready", function(fu
     -- Original function
     func(self, world, unit, ...)
 
-    -- Mod
     mod:on_husk_unit_loaded(self._unit)
     
 end)
@@ -373,15 +382,19 @@ mod:hook(CLASS.PlayerHuskVisualLoadoutExtension, "wield_slot", function(func, se
     -- Original function
     func(self, slot_name, ...)
     
-    -- Wield custom extensions
-    self:custom_wield(slot_name)
+    if self.wc_initialized then
+        -- Wield custom extensions
+        self:custom_wield(slot_name)
+    end
 
 end)
 
 mod:hook(CLASS.PlayerHuskVisualLoadoutExtension, "unwield_slot", function(func, self, slot_name, ...)
 
-    -- Unwield custom extensions
-    self:custom_unwield(slot_name)
+    if self.wc_initialized then
+        -- Unwield custom extensions
+        self:custom_unwield(slot_name)
+    end
 
     -- Original function
     func(self, slot_name, ...)
@@ -393,7 +406,7 @@ mod:hook(CLASS.PlayerHuskVisualLoadoutExtension, "update", function(func, self, 
     -- Original function
     func(self, unit, dt, t, ...)
 
-    if self:unit_3p_from_slot(SLOT_SECONDARY) then
+    if self.wc_initialized and self:unit_3p_from_slot(SLOT_SECONDARY) then
 
         -- Visible equipment
         self:update_visible_equipment(dt, t)
@@ -426,7 +439,7 @@ end)
 mod:hook(CLASS.PlayerHuskVisualLoadoutExtension, "rpc_player_unequip_item_from_slot", function(func, self, channel_id, go_id, slot_id, ...)
     
     -- Destroy custom extensions
-    if NetworkLookup.player_inventory_slot_names[slot_id] == SLOT_SECONDARY then
+    if self.wc_initialized and NetworkLookup.player_inventory_slot_names[slot_id] == SLOT_SECONDARY then
         self:remove_custom_extensions()
     end
 
@@ -441,7 +454,7 @@ mod:hook(CLASS.PlayerHuskVisualLoadoutExtension, "_equip_item_to_slot", function
     func(self, slot_name, item, optional_existing_unit_3p, ...)
 
     -- Destroy custom extensions
-    if slot_name == SLOT_SECONDARY then
+    if self.wc_initialized and slot_name == SLOT_SECONDARY then
         self:remove_custom_extensions()
     end
 

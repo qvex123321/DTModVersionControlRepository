@@ -33,6 +33,7 @@ return {
             {id = "left_06", name = "Slab Shield 5"},
             {id = "left_07", name = "Slab Shield 6"},
             {id = "left_02", name = "Bulwark Shield"},
+            {id = "left_08", name = "Slab Shield 7"},
         }
         if default == nil then default = true end
         if default then return table_icombine(
@@ -51,6 +52,7 @@ return {
             {name = "left_05",      model = _item_melee.."/ogryn_slabshield_p1_04"},
             {name = "left_06",      model = _item_melee.."/ogryn_powermaul_slabshield_p1_05"},
             {name = "left_07",      model = _item_melee.."/ogryn_slabshield_p1_ml01"},
+            {name = "left_08",      model = _item_melee.."/ogryn_slabshield_p1_05"},
         }, parent, angle, move, remove, type or "left", no_support, automatic_equip, hide_mesh, mesh_move)
     end,
 }

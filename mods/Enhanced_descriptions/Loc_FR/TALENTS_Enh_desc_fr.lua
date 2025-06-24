@@ -30,7 +30,7 @@ local enhdesc_col = Color[mod:get("enhdesc_text_colour")](255, true)
 		"- Ne peut pas infliger de Coup Critique.",
 		"- Dégâts de base : 900.",
 		"- Touche toujours un Point faible.",
-		"- Dégâts plus élevés contre Maniaques et Implacables.",
+		-- "- Dégâts plus élevés contre Maniaques et Implacables.",
 		"{#color(255, 35, 5)}- Vous pourriez exploser ! Ne l'utilisez pas si le niveau de Péril est de 97% ou plus !{#reset()}",
 	}, "\n"), enhdesc_col)
 
@@ -40,7 +40,7 @@ local enhdesc_col = Color[mod:get("enhdesc_text_colour")](255, true)
 		"- Ne peut pas infliger de coup critique.",
 		"- Dégâts de base : 1350.",
 		"- Atteint toujours un point faible.",
-		"- Dégâts plus élevés contre les Maniaques et les Implacables.",
+		-- "- Dégâts plus élevés contre les Maniaques et les Implacables.",
 		"- L'attaque principale applique un léger étourdissement à 50 % de charge. Ne peut pas étourdir : Bombardiers, Mutileur, Mutants, Ogryns, Poxbursters, Ragers, Squameux Shotgunners ou Monstrosités.",
 		-- "- À l'impact, étourdit tous les ennemis sauf les Mutants, les Monstrosities et les ennemis avec un bouclier de vide actif.",
 		dmg_is_incr_by_fr,
@@ -68,8 +68,8 @@ local enhdesc_col = Color[mod:get("enhdesc_text_colour")](255, true)
 		"- Ne peut pas infliger de coup critique.",
 		"- Portée maximale : 15 mètres.",
 		"- Ne cible que la zone du torse.",
-		"- Ne peut pas étourdir les Monstruosités et les ennemis avec bouclier de vide actif.",
-		"- Pénétration d'armure moyenne pour toutes les armures, Pénétration d'armure faible contre les carapaces.",
+		-- "- Ne peut pas étourdir les Monstruosités et les ennemis avec bouclier de vide actif.",
+		-- "- Pénétration d'armure moyenne pour toutes les armures, Pénétration d'armure faible contre les carapaces.",
 		dmg_is_incr_by_fr,
 		"{#color(255, 35, 35)}- Vous pouvez seulement exploser si vous portez votre niveau de péril exactement à 100 % avec une attaque chargée et utilisez en même temps une attaque normale !{#reset()}",
 		-- "{#color(255, 35, 35)}- Si vous le jouez comme un imbécile, attendez vous à vous faire insulter par votre équipe.",
@@ -83,7 +83,7 @@ local enhdesc_col = Color[mod:get("enhdesc_text_colour")](255, true)
 		"- Cela augmente également la portée de ciblage de 1 mètre, jusqu'à 16 mètres.",
 	}, "\n"), enhdesc_col)
 
-	--[+ Blitz 2-2 - Dégénérescence +]--
+	--[+ Blitz 2-2 - Dégénérescence +]--!!!
 	local ED_PSY_Blitz_2_2_rgb_fr = iu_actit(table.concat({
 		ppp___ppp,
 		"- Se multiplie/s avec d'autres malus de dégâts subis comme \"Choc empyrique\" ou \"Distraction utile\" et \"On les ramollit\" d'Ogryn, ou \"Ciblage\" du vétéran, avec les bonus de dégâts, et avec les bonus de Puissance des Bénédictions d'arme.",
@@ -422,7 +422,7 @@ local enhdesc_col = Color[mod:get("enhdesc_text_colour")](255, true)
 	--[+ Keystone 3-2 - Providence subtilisée +]--
 	local ED_PSY_Keystone_3_2_rgb_fr = iu_actit(table.concat({
 		ppp___ppp,
-		"- Il y a 2% de chances que le Talent se déclenche sur le même kill en même temps que \"Méditation de guerre\" en supprimant 25% de Péril total.",
+		"- S'additionne à \"Par la fissure de l'os\" et  \"Quiétude par le massacre\". Cet effet peu se déclencher en même temps que \"Méditation de guerre\" atténuant 15% de péril au total.",
 	}, "\n"), enhdesc_col)
 
 --[+ Keystone 3-3 - Lingering Influence +]--
@@ -502,7 +502,7 @@ local enhdesc_col = Color[mod:get("enhdesc_text_colour")](255, true)
 		"- Supprime 10 % de Péril de la quantité de Péril actuelle.",
 		"- A 10 % de chances de se déclencher lorsque des ennemis meurent des attaques de mêlée et à distance du Psyker, des capacités Infligeant des dégâts, des DoT et lorsqu'ils sont poussés par-dessus les rebords dans les zones de mort de la carte par le Psyker.",
 		"- Se déclenche en plus de \"Par la fissure de l'os\" et \"Quiétude par le massacre\".",
-		"- Il y a 2 % de chances que le Talent se déclenche sur le même kill en même temps que \"Providence subtilisée\" en supprimant 25 % de Péril total.",
+		"- Si le Talent se déclenche sur la même élimination en même temps que \"Providence subtilisée\" cela atténue 15 % de Péril total.",
 	}, "\n"), enhdesc_col)
 
 	--[+ Passive 8 - Wildfire +]--
@@ -1058,7 +1058,7 @@ local enhdesc_col = Color[mod:get("enhdesc_text_colour")](255, true)
 		ppp___ppp,
 		"- Active les Coups dans le dos.",
 		"- S'additionne avec les bonus de dégâts de Coup dans le dos de \"Champ d'ombre\" (et \"Perfectionniste\").",
-		"- Se multiplie pendant le calcul avec d'autres bonus de dégâts et les bonus de de Puissance des Bénédictions d'armes.",
+		"- Se multiplie pendant le calcul avec d'autres bonus de dégâts et les bonus de Puissance des Bénédictions d'armes.",
 	}, "\n"), enhdesc_col)
 	
 	--[+ Passive 3 - Onction par le sang +]--
@@ -1124,7 +1124,7 @@ local enhdesc_col = Color[mod:get("enhdesc_text_colour")](255, true)
 	--[+ Passive 8 - Blood Redemption +]--
 	local ED_ZEA_Passive_8_rgb_fr = iu_actit(table.concat({
 		ppp___ppp,
-		"- Augmente la Robustesse maximale de base du Fanatique gagnée sur les éliminations en Mêlée de 5 % à 7,5 %.",
+		"- Augmente la Robustesse maximale de base du Fanatique gagnée sur les éliminations en Mêlée de 5 % à 10 %.",
 		z_eff_of_this_tougn_rep_fr,
 	}, "\n"), enhdesc_col)
 
@@ -1266,7 +1266,7 @@ local enhdesc_col = Color[mod:get("enhdesc_text_colour")](255, true)
 	--[+ Passive 24 - Holy Revenant +]--
 	local ED_ZEA_Passive_24_rgb_fr = iu_actit(table.concat({
 		ppp___ppp,
-		"- Pendant la durée de 5 secondes d'\"Jusqu'à la mort\", vole 0,7 % des Dégâts non-Mêlée et 2,1 % des Dégâts de Mêlée infligés aux ennemis.",
+		"- Pendant la durée de 5 secondes de \"Jusqu'à la mort\", vole 0,7 % des Dégâts non-Mêlée et 2,1 % des Dégâts de Mêlée infligés aux ennemis.",
 		"- Lorsque \"Jusqu'à la mort\" se termine, convertit le montant volé en Santé, jusqu'à 25 % de la Santé maximale du Fanatique.",
 	}, "\n"), enhdesc_col)
 
@@ -1339,7 +1339,7 @@ local enhdesc_col = Color[mod:get("enhdesc_text_colour")](255, true)
 		"- Pousse des cibles supplémentaires (si possible) lorsqu'elles se trouvent dans l'angle de poussée effectif.",
 		"- La Poussée ne peut pas Étourdir : Broyeur, Mutants, Furax, Monstruosités et Capitaines/Jumeaux.",
 		"- Le coup de bouclier de Rempart, bien qu'il n'inflige aucun dégât, déclenche le Talent.",
-		"- Ne se déclenche pas lorsque le Fanatiques est immobilisé ou abattu.",
+		"- Ne se déclenche pas lorsque le Fanatique est immobilisé ou abattu.",
 	}, "\n"), enhdesc_col)
 
 	--[+ Passive 33 - Faith's Fortitude +]--
