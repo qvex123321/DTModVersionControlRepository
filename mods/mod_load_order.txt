@@ -15,7 +15,6 @@ LogMeIn
 NoSkull
 PingMonitor
 scoreboard
-sorted_mission_grid
 NumericUI
 hub_hotkey_menus
 PsykaniumInvHotkey
