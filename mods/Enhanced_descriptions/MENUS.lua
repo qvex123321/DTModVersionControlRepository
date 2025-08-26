@@ -18,6 +18,7 @@ COLORS_KWords = mod:io_dofile("Enhanced_descriptions/Loc_EN/COLORS_KWords")
 COLORS_KWords_ru = mod:io_dofile("Enhanced_descriptions/Loc_RU/COLORS_KWords_ru")
 	--[+ Traditional Chinese +]--
 COLORS_KWords_tw = mod:io_dofile("Enhanced_descriptions/Loc_TW/COLORS_KWords_tw")
+COLORS_KWords2_tw = mod:io_dofile("Enhanced_descriptions/Loc_TW/COLORS_KWords2_tw")
 	--[+ Simplified Chinese +]--
 COLORS_KWords_zh_cn = mod:io_dofile("Enhanced_descriptions/Loc_ZH_CN/COLORS_KWords_zh_cn")
 
@@ -42,6 +43,10 @@ local localization_templates = {
 				-- loc_text(COLORS_Numbers.dmg_var_rgb.." к "..COLORS_KWords.Damage_rgb_YOURLANGUAGE.." против врагов в противоосколочной броне.")), <- Don't forget the comma at the end!
 
 -- Make changes to this file only if you need them!
+
+	create_template("settings_light_quality_ext_ru",
+		{"loc_setting_light_quality_mouseover"}, {"en"},
+		loc_text("Предустановка для настроек качества света и теней. Повышают нагрузку на ОЗУ и на графический процессор.{#color(255, 54, 54)}\n\nНастройка ниже «Средней» даёт МЕРЦАНИЕ ТЕКСТУР!{#reset()}")),
 
 --[+ MELK - 梅爾克 - 梅尔克大人的采购店 +]--
 	-- HERE IS THE NUMBER HIGHLIGHT IN THE CONTRACTS MENU!
@@ -375,7 +380,7 @@ local localization_templates = {
 		{"loc_main_menu_account_wallet_title"}, {"zh-tw"},
 			loc_text("帳號錢包")),
 
-	--[+ Impact Group +]--
+	--[+ Strike Team +]--
 	--[+ Russian - Удар. группа +]--
 	create_template("main_menu_acc_warband_ext_ru",
 		{"loc_main_menu_warband_count", "loc_social_menu_roster_view_display_name"}, {"ru"},
@@ -401,20 +406,20 @@ local localization_templates = {
 
 	--[+ Gold Level Missions' title +]--
 	--[+ Russian - Миссии - Золотой уровень +]--
-	create_template("hud_mission_board_header_auric_ext_ru",
-		{"loc_mission_board_view_header_tertium_hive_auric"}, {"ru"},
-			loc_text("Улей Терциум - Операции золотого уровня")),
+	-- create_template("hud_mission_board_header_auric_ext_ru",
+		-- {"loc_mission_board_view_header_tertium_hive_auric"}, {"ru"},
+			-- loc_text("Улей Терциум - Операции золотого уровня")),
 	--[+ 奧里克任務 - Traditional Chinese +]--
-	create_template("hud_mission_board_header_auric_ext_tw",
-		{"loc_mission_board_view_header_tertium_hive_auric"}, {"zh-tw"},
-			loc_text("奧里克任務")),
+	-- create_template("hud_mission_board_header_auric_ext_tw",
+		-- {"loc_mission_board_view_header_tertium_hive_auric"}, {"zh-tw"},
+			-- loc_text("奧里克任務")),
 
 --[+ HAVOC - Хаос - 浩劫 +]-- руоф Верная смерть
 	--[+ Havoc Title +]--
 	--[+ Russian +]--
 	create_template("havoc_name_ext_ru",
 		{"loc_havoc_name"}, {"ru"},
-			loc_text("Хаос")),
+			loc_text("Хавок")),
 	--[+ 浩劫 - Traditional Chinese +]--
 	create_template("havoc_name_ext_tw",
 		{"loc_havoc_name"}, {"zh-tw"},
@@ -424,7 +429,7 @@ local localization_templates = {
 	--[+ Russian +]--
 	create_template("havoc_reset_rewards_ext_ru",
 		{"loc_havoc_reset_rewards"}, {"ru"},
-			loc_text("Награды режима Хаос")),
+			loc_text("Награды Хавока")),
 	--[+ 浩劫獎勵 - Traditional Chinese +]--
 	create_template("havoc_reset_rewards_ext_tw",
 		{"loc_havoc_reset_rewards"}, {"zh-tw"},
@@ -434,7 +439,7 @@ local localization_templates = {
 	--[+ Russian +]--
 	create_template("havoc_rewards_obj_order_ext_ru",
 		{"loc_havoc_reward_objective_order"}, {"ru"},
-			loc_text("Выполнить задание режима Хаос")),
+			loc_text("Выполнить задание Хавока")),
 	--[+ 完成任一浩劫任務 - Traditional Chinese +]--
 	create_template("havoc_rewards_obj_order_ext_tw",
 		{"loc_havoc_reward_objective_order"}, {"zh-tw"},
@@ -450,92 +455,109 @@ local localization_templates = {
 		{"loc_hud_combat_feed_kill_message"}, {"zh-tw"},
 			loc_text("{killer:%s} 擊殺 {victim:%s}")),
 
+
 --[+ ++TREAT - СЛОЖНОСТЬ - 威胁度等级++ +]-- colored 着色
-	--[+ SEDITION - МЯТЕЖ +]--
+	--[+ SEDITION +]--
 	create_template("mission_board_danger_1_ext_en",
 		{"loc_mission_board_danger_lowest"}, {"en"},
 			loc_text(COLORS_KWords.sedition_rgb)),
-	--[+ Russian +]--
+	--[+ Russian - Мятеж +]--
 	create_template("mission_board_danger_1_ext_ru",
 		{"loc_mission_board_danger_lowest"}, {"ru"},
 			loc_text(COLORS_KWords_ru.sedition_rgb_ru)),
-	--[+  暴動 - Traditional Chinese +]--
+	--[+ Traditional Chinese - 暴動 +]--
 	create_template("mission_board_danger_1_ext_tw",
 		{"loc_mission_board_danger_lowest"}, {"zh-tw"},
-			loc_text(COLORS_KWords_tw.sedition_rgb_tw)),
+			loc_text(COLORS_KWords2_tw.sedition_rgb_tw)),
 	--[+ Simplified Chinese - 煽动 +]--
 	create_template("mission_board_danger_1_ext_zh_cn",
 		{"loc_mission_board_danger_lowest"}, {"zh-cn"},
 			loc_text(COLORS_KWords_zh_cn.sedition_rgb_zh_cn)),
 
-
-	-- [+ UPRISING - ВОССТАНИЕ +]--
+	-- [+ UPRISING +]--
 	create_template("mission_board_danger_2_ext_en",
 		{"loc_mission_board_danger_low"}, {"en"},
 			loc_text(COLORS_KWords.uprising_rgb)),
-	--[+ Russian +]--
+	--[+ Russian - Восстание +]--
 	create_template("mission_board_danger_2_ext_ru",
 		{"loc_mission_board_danger_low"}, {"ru"},
 			loc_text(COLORS_KWords_ru.uprising_rgb_ru)),
-	--[+  起義 - Traditional Chinese +]--
+	--[+ Traditional Chinese - 起義 +]--
 	create_template("mission_board_danger_2_ext_tw",
 		{"loc_mission_board_danger_low"}, {"zh-tw"},
-			loc_text(COLORS_KWords_tw.uprising_rgb_tw)),
+			loc_text(COLORS_KWords2_tw.uprising_rgb_tw)),
 	--[+ Simplified Chinese - 起义 +]--
 	create_template("mission_board_danger_2_ext_zh_cn",
 		{"loc_mission_board_danger_low"}, {"zh-cn"},
 			loc_text(COLORS_KWords_zh_cn.uprising_rgb_zh_cn)),
 
-	-- [+ MALICE - ЗЛОБА +]--
+	-- [+ MALICE +]--
 	create_template("mission_board_danger_3_ext_en",
 		{"loc_mission_board_danger_medium"}, {"en"},
 			loc_text(COLORS_KWords.malice_rgb)),
-	--[+ Russian +]--
+	--[+ Russian - Злоба +]--
 	create_template("mission_board_danger_3_ext_ru",
 		{"loc_mission_board_danger_medium"}, {"ru"},
 			loc_text(COLORS_KWords_ru.malice_rgb_ru)),
-	--[+  惡毒 - Traditional Chinese +]--
+	--[+ Traditional Chinese - 惡毒 +]--
 	create_template("mission_board_danger_3_ext_tw",
 		{"loc_mission_board_danger_medium"}, {"zh-tw"},
-			loc_text(COLORS_KWords_tw.malice_rgb_tw)),
+			loc_text(COLORS_KWords2_tw.malice_rgb_tw)),
 	--[+ Simplified Chinese - 憎恶 +]--
 	create_template("mission_board_danger_3_ext_zh_cn",
 		{"loc_mission_board_danger_medium"}, {"zh-cn"},
 			loc_text(COLORS_KWords_zh_cn.malice_rgb_zh_cn)),
 
-	-- [+ HERESY - ЕРЕСЬ +]--
+	-- [+ HERESY +]--
 	create_template("mission_board_danger_4_ext_en",
 		{"loc_mission_board_danger_high"}, {"en"},
 			loc_text(COLORS_KWords.heresy_rgb)),
-	--[+ Russian +]--
+	--[+ Russian - Ересь +]--
 	create_template("mission_board_danger_4_ext_ru",
 		{"loc_mission_board_danger_high"}, {"ru"},
 			loc_text(COLORS_KWords_ru.heresy_rgb_ru)),
-	--[+  異端 - Traditional Chinese +]--
+	--[+ Traditional Chinese - 異端 +]--
 	create_template("mission_board_danger_4_ext_tw",
 		{"loc_mission_board_danger_high"}, {"zh-tw"},
-			loc_text(COLORS_KWords_tw.heresy_rgb_tw)),
+			loc_text(COLORS_KWords2_tw.heresy_rgb_tw)),
 	--[+ Simplified Chinese - 异端 +]--
 	create_template("mission_board_danger_4_ext_zh_cn",
 		{"loc_mission_board_danger_high"}, {"zh-cn"},
 			loc_text(COLORS_KWords_zh_cn.heresy_rgb_zh_cn)),
 
-	-- [+ DAMNATION - ПРОКЛЯТИЕ +]--
+	-- [+ DAMNATION +]--
 	create_template("mission_board_danger_5_ext_en",
 		{"loc_mission_board_danger_highest"}, {"en"},
 			loc_text(COLORS_KWords.damnation_rgb)),
-	--[+ Russian +]--
+	--[+ Russian - Проклятие +]--
 	create_template("mission_board_danger_5_ext_ru",
 		{"loc_mission_board_danger_highest"}, {"ru"},
 			loc_text(COLORS_KWords_ru.damnation_rgb_ru)),
-	--[+  詛咒 - Traditional Chinese +]--
+	--[+ Traditional Chinese - 詛咒 +]--
 	create_template("mission_board_danger_5_ext_tw",
 		{"loc_mission_board_danger_highest"}, {"zh-tw"},
-			loc_text(COLORS_KWords_tw.damnation_rgb_tw)),
+			loc_text(COLORS_KWords2_tw.damnation_rgb_tw)),
 	--[+ Simplified Chinese - 诅咒 +]--
 	create_template("mission_board_danger_5_ext_zh_cn",
 		{"loc_mission_board_danger_highest"}, {"zh-cn"},
 			loc_text(COLORS_KWords_zh_cn.damnation_rgb_zh_cn)),
+
+	-- [+ AURIC +]--
+	create_template("mission_board_danger_6_ext_en",
+		{"loc_group_finder_difficulty_auric"}, {"en"},
+			loc_text(COLORS_KWords.auric_rgb)),
+	--[+ Russian - Золото +]--
+	-- create_template("mission_board_danger_6_ext_ru",
+		-- {"loc_group_finder_difficulty_auric"}, {"ru"},
+			-- loc_text(COLORS_KWords_ru.auric_rgb_ru)),
+	--[+  詛咒 - Traditional Chinese +]--
+	-- create_template("mission_board_danger_6_ext_tw",
+		-- {"loc_group_finder_difficulty_auric"}, {"zh-tw"},
+			-- loc_text(COLORS_KWords2_tw.auric_rgb_tw)),
+	--[+ Simplified Chinese - 诅咒 +]--
+	-- create_template("mission_board_danger_6_ext_zh_cn",
+		-- {"loc_group_finder_difficulty_auric"}, {"zh-cn"},
+			-- loc_text(COLORS_KWords_zh_cn.auric_rgb_zh_cn)),
 
 
 --[+ ++INVENTORY++ +]--
@@ -594,7 +616,7 @@ local localization_templates = {
 	create_template("hud_inventory_attachments_ext_zh_cn",
 		{"loc_inventory_title_slot_attachment_3"}, {"zh-cn"},
 			loc_text("第三件珍品")),
-	
+
 	--[+ Equipment Page Title +]--
 	--[+ Russian - Снаряжение +]--
 	create_template("hud_inventory_name_ext_ru",

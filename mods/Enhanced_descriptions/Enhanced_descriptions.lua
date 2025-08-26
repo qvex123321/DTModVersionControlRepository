@@ -6,25 +6,29 @@
 local mod = get_mod("Enhanced_descriptions")
 local WTL = get_mod("WhatTheLocalization")
 
-
 --[+ Elements offset +]--
 	--[+ Buttons offset +]--
 		--[+ Equip button in the inventory +]--
-mod:hook_safe(CLASS.InventoryWeaponsView, "on_enter", function (self)
-	self._widgets_by_name.equip_button.offset = {-622,20,0} end)
+		mod:hook_safe(CLASS.InventoryWeaponsView, "on_enter", function (self)
+			self._widgets_by_name.equip_button.offset = {-622,20,0} end)
+		--[+ Discard items button in the inventory +]--
+		mod:hook_safe(CLASS.DiscardItemsView, "on_enter", function (self)
+			self._widgets_by_name.discard_button.offset = {-622,20,0} end)
+		-- mod:hook_safe(CLASS.BaseView, "on_enter", function (self)
+		-- 	self._widgets_by_name.discard_button.offset = {-622,20,0} end)
 		--[+ Buy button in the Melk menu +]--
-mod:hook_safe(CLASS.MarksVendorView, "on_enter", function (self)
-	self._widgets_by_name.purchase_button.offset = {-622,20,0} end)
+		mod:hook_safe(CLASS.MarksVendorView, "on_enter", function (self)
+			self._widgets_by_name.purchase_button.offset = {-622,20,0} end)
 		--[+ Equip button in the Weapon Model selection menu +]--
-mod:hook_safe(CLASS.InventoryWeaponMarksView, "on_enter", function (self)
-	self._widgets_by_name.equip_button.offset = {-622,20,0} end)
+		mod:hook_safe(CLASS.InventoryWeaponMarksView, "on_enter", function (self)
+			self._widgets_by_name.equip_button.offset = {-622,20,0} end)
 	--[+ Window offset +]--
 		--[+ Shifting the stat details window in the weapon inspection menu +]--
-mod:hook_safe("ViewElementWeaponInfo", "_create_bar_breakdown_widgets", function (self, bar_data) -- ty Ashe!
-	local OFFSET = 200
-		self._ui_scenegraph.bar_breakdown_slate.world_position[2] = self._ui_scenegraph.bar_breakdown_slate.world_position[2] - OFFSET
-		self._ui_scenegraph.entry.world_position[2] = self._ui_scenegraph.entry.world_position[2] - OFFSET
-end)
+		mod:hook_safe("ViewElementWeaponInfo", "_create_bar_breakdown_widgets", function (self, bar_data) -- ty Ashe!
+			local OFFSET = 200
+			self._ui_scenegraph.bar_breakdown_slate.world_position[2] = self._ui_scenegraph.bar_breakdown_slate.world_position[2] - OFFSET
+			self._ui_scenegraph.entry.world_position[2] = self._ui_scenegraph.entry.world_position[2] - OFFSET
+		end)
 
 
 --[+ Load localization templates from the specified files +]--
@@ -66,7 +70,6 @@ local NAMES_Talents_Blessings_File = mod:get("enable_names_tal_bless_file") and 
 mod.localization_templates = {
 	--[+ Add templates loaded from the files... +]--
 	custom_unpack(MENUS_File, CURIOS_File, TALENTS_File, WEAPONS_File, PENANCES_File, NAMES_File, NAMES_Talents_Blessings_File),
-	-- custom_unpack(MENUS_File, CURIOS_File, TALENTS_File, WEAPONS_File, NAMES_File, NAMES_Talents_Blessings_File),
 
 -- FOR TESTS ONLY!!!
 -- create_template("weap_testum00", {"loc_trait_bespoke_block_has_chance_to_stun_with_cd_desc"}, {"en"}, function(locale, value) return string.gsub(value, "{", "(") end),

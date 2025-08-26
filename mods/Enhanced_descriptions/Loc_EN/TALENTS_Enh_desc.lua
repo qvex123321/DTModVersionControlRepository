@@ -24,7 +24,7 @@ local become_invis_drop_all_enemy_aggro = Arrow_right_.." Become Invisible dropp
 local can_be_refr_dur_active_dur = Arrow_right_.." Can be refreshed during active duration."
 local doesnt_stack_aura_psy = Arrow_right_.." Doesn't Stack with the same Aura from another Psyker."
 local doesnt_interact_w_c_a_r_from_curio = Arrow_right_.." Does not interact with Combat Ability Regeneration from Curios which only reduces the Maximum cooldown of a Combat Ability."
-local dmg_is_incr_by = " Damage is increased by Rending/Brittleness, \"Skullcrusher\" Blessing (while Staggered) and buffs from \"Empowered Psionics\", \"Empyrean Empowerment\", \"Empyric Shock\", \"Disrupt Destiny\", \"Malefic Momentum\", \"Perfect Timing\", \"Scrier's Gaze\" (including \"Precognition\"), \"Warp Rider\", aura \"Kinetic Presence\" (against Elites), and small Ranged Damage node."
+local dmg_is_incr_by = " Damage is increased by Rending/Brittleness, \"Skullcrusher\" Blessing (while Staggered), by Combat Stimm, and buffs from \"Empowered Psionics\", \"Empyrean Empowerment\", \"Empyric Shock\", \"Disrupt Destiny\", \"Malefic Momentum\", \"Perfect Timing\", \"Scrier's Gaze\" (including \"Precognition\"), \"Warp Rider\", aura \"Kinetic Presence\" (against Elites), and the small Ranged Damage node."
 local procs_on_succss_dodging = Arrow_right_.." Procs on successfully dodging enemy Melee or Ranged attacks (except Gunners, Reaper, Sniper), and disabler attacks (Pox Hound jump, Trapper net, Mutant grab)."
 local red_both_tghns_n_health_dmg = Arrow_right_.." Reduces both Toughness and Health Damage taken."
 local stacks_add_w_oth_dmg = Arrow_right_.." Stacks additively with other Damage buffs, and multiplicatively with Power level buffs from Weapon Blessings."
@@ -39,17 +39,17 @@ local enhdesc_col = Color[mod:get("enhdesc_text_colour")](255, true) -- Do not t
 
 --[+ ++PSYKER++ +]--
 --[+ +BLITZ+ +]--
-	--[+ Blitz 0 - Brain Burst +]--
+	--[+ Blitz 0 - Brain Burst +]--													checked 27.05.2025
 	local ED_PSY_Blitz_0_rgb = iu_actit(table.concat({
 		-- ppp___ppp,
 		-- Arrow_right_.." Cannot Crit.",
-		Arrow_right_.." Base Damage: 900.", -- >
+		Arrow_right_.." Base Damage: 900.",
 		-- Arrow_right_.." Always scores a Weakspot hit.",
 		-- Arrow_right_.." Higher Damage against Maniac and Unyielding.",
 		"{#color(255, 35, 5)} You may Explode! Don't use if Peril level is 97% or above!{#reset()}",
 	}, "\n"), enhdesc_col)
 
-	--[+ Blitz 1 - Brain Rupture +]--
+	--[+ Blitz 1 - Brain Rupture +]--												checked 27.05.2025
 	local ED_PSY_Blitz_1_rgb = iu_actit(table.concat({
 		-- ppp___ppp,
 		-- Arrow_right_.." Cannot Crit.",
@@ -62,22 +62,22 @@ local enhdesc_col = Color[mod:get("enhdesc_text_colour")](255, true) -- Do not t
 		"{#color(255, 35, 5)} You may Explode! Don't use if Peril level is 97% or above!{#reset()}",
 	}, "\n"), enhdesc_col)
 
-	--[+ Blitz 1-1 - Kinetic Resonance +]--!!!
+	--[+ Blitz 1-1 - Kinetic Resonance +]--											checked 27.05.2025
 	local ED_PSY_Blitz_1_1_rgb = iu_actit(table.concat({
 		-- ppp___ppp,
 		-- Arrow_right_.." Reduces Brain Rupture's charge time for both primary and secondary attacks.",
 		Arrow_right_.." Charge Time Reduction stacks additively with itself (if procced twice in succession with \"Bolstered Shield\") and \"Empowered Psionics\", and multiplicatively/additively with Celerity Stimm's two charge time reductions.",
-		Arrow_right_.." Peril Cost Reduction stacks multiplicatively with related buffs from \"By Crack of Bone\", \"Becalming Eruption\", \"Empyric Resolve\", \"Inner Tranquility\", \"Reality Anchor\", small Peril Resistance nodes, Combat Stimm, and the \"Enhanced Blitz\" mutator.",
+		Arrow_right_.." Peril Cost Reduction stacks multiplicatively with related buffs from \"By Crack of Bone\", \"Becalming Eruption\", \"Empyric Resolve\", \"Inner Tranquility\", \"Reality Anchor\", small Peril Resistance nodes, Combat Stimm, and the \"Enhanced Blitz\" difficulty mutator.",
 	}, "\n"), enhdesc_col)
 
-	--[+ Blitz 1-2 - Kinetic Flayer +]--
+	--[+ Blitz 1-2 - Kinetic Flayer +]--											checked 27.05.2025
 	local ED_PSY_Blitz_1_2_rgb = iu_actit(table.concat({
 		-- ppp___ppp,
-		Arrow_right_.." \"Brain Rupture\" attacks triggered by the Talent benefit from \"Empowered Psionics\" Damage buff without consuming a Stack.",
-		"{#color(255, 35, 5)}BUG: When Peril is above 97%, the Talent triggers and a 15-second Cooldown begins, but the enemy does NOT receive Damage at all.{#reset()}",
+		Arrow_right_.." \"Brain Rupture\" attacks triggered by the Talent benefit from \"Empowered Psionics'\" Damage buff without consuming a Stack.",
+		"{#color(255, 35, 5)} BUG: If Peril is above 97%, the Talent triggers and a 15 seconds Cooldown begins, but the enemy does NOT receive Damage at all.{#reset()}",
 	}, "\n"), enhdesc_col)
 
-	--[+ Blitz 2 - Smite +]--
+	--[+ Blitz 2 - Smite +]--														checked 27.05.2025
 	local ED_PSY_Blitz_2_rgb = iu_actit(table.concat({
 		-- ppp___ppp,
 		-- Arrow_right_.." Cannot crit.",
@@ -86,29 +86,29 @@ local enhdesc_col = Color[mod:get("enhdesc_text_colour")](255, true) -- Do not t
 		-- Arrow_right_.." Cannot Stagger Monstrosities and enemies with active void shield.",
 		-- Arrow_right_.." Average armor Damage modifiers, low armor Damage modifier against Carapace.",
 		Arrow_right_..dmg_is_incr_by,
-		Arrow_right_.." Forces a short Quelling action when reaching 100% Peril removing ~8.5% Peril. If released below 100% Peril, pushes enemies back (if possible).",
-		"{#color(255, 35, 5)} You can only Explode if you raise your Peril level to exactly 100% with a charged attack and at same time use a normal attack!{#reset()}",
+		-- Arrow_right_.." Forces a short Quelling action when reaching 100% Peril removing ~8.5% Peril. If released below 100% Peril, pushes enemies back (if possible).",
+		"{#color(255, 35, 5)} You can only Explode if you raise your Peril level to 100% with a charged attack and at same time use a normal attack!{#reset()}",
 	}, "\n"), enhdesc_col)
 
-	--[+ Blitz 2-1 - Lightning Storm +]--
-	local ED_PSY_Blitz_2_1_rgb = iu_actit(table.concat({
+	--[+ Blitz 2-1 - Lightning Storm +]--											checked 27.05.2025
+	-- local ED_PSY_Blitz_2_1_rgb = iu_actit(table.concat({
 		-- ppp___ppp,
 		-- Arrow_right_.." Increases max jumps from 1 to 2.",
-		Arrow_right_.." Applies both to Smite's primary and secondary actions.",
-		Arrow_right_.." Increases the Max radius within which \"Smite\" can chain to another target from 5 to 6 meters.",
-		Arrow_right_.." This also increases the targeting range by 1 meter, up to 16 meters.",
-	}, "\n"), enhdesc_col)
+		-- Arrow_right_.." Applies both to Smite's primary and secondary actions.",
+		-- Arrow_right_.." Increases the Max radius within which \"Smite\" can chain to another target from 5 to 6 meters.",
+		-- Arrow_right_.." This also increases the targeting range by 1 meter, up to 16 meters.",
+	-- }, "\n"), enhdesc_col)
 
-	--[+ Blitz 2-2 - Enfeeble +]--
+	--[+ Blitz 2-2 - Enfeeble +]--													checked 27.05.2025
 	local ED_PSY_Blitz_2_2_rgb = iu_actit(table.concat({
 		-- ppp___ppp,
 		-- Arrow_right_.." The debuff is being applied as long as the enemy is actively affected by \"Smite\".",
-		Arrow_right_.." Stacks multiplicatively with other Damage taken debuffs like \"Empyric Shock\" or Ogryn's \"Soften Them Up\", \"Valuable Destruction\" or Veteran's \"Focus Target!\", with Damage buffs, and with Power level buffs from Weapon Blessings.",
+		Arrow_right_.." Stacks multiplicatively with other Damage taken debuffs like \"Empyric Shock\" or Ogryn's \"Soften Them Up\", \"Valuable Destraction\" or Veteran's \"Focus Target!\", with Damage buffs, and with Power level buffs from Weapon Blessings.",
 		-- Arrow_right_.." Doesn't Stack with the same debuff applied by another Psyker.",
-		Arrow_right_.." Any source that may apply an Electrocution effect to enemies but is not \"Smite\" or \"Charged Strike\" will not proc \"Enfeeble\".",
+		Arrow_right_.." Any source that may apply an Electrocution effect to enemies but is not \"Smite\" or \"Charged Strike\" will NOT proc \"Enfeeble\".",
 	}, "\n"), enhdesc_col)
 
-	--[+ Blitz 2-3 - Charged Strike +]--
+	--[+ Blitz 2-3 - Charged Strike +]--											checked 27.05.2025
 	local ED_PSY_Blitz_2_3_rgb = iu_actit(table.concat({
 		-- ppp___ppp,
 		-- Arrow_right_.." Up to 64 base Damage per tick when reaching Max charge level.",
@@ -116,27 +116,29 @@ local enhdesc_col = Color[mod:get("enhdesc_text_colour")](255, true) -- Do not t
 		-- Arrow_right_.." The Electrocuted state lasts until 2 seconds after the last Damage tick.",
 		Arrow_right_.." Note that the time before the first Damage tick can happen depends on enemy Hit mass (just like with \"Smite\" itself), so the more Hit mass an enemy has the longer it will take before this Talent's Electrocution effect deals Damage. As a result, against Monstrosities (20 Hit mass), only 1 Damage tick can be executed before the Damage window of 2 seconds ends.",
 		Arrow_right_.." If Enfeeble is selected, the Electrocution effect receives a more favorable Hit mass cost, which effectively doubles its tick rate against most enemies, and is also able to reach Max charge level sooner. With \"Enfeeble\", this Talent's Electrocution effect benefits from the 10% increased Damage taken debuff, and attacking players also benefit from it while the Electrocution effect is actively damaging and applying the debuff (just like with \"Smite\" itself).",
+		Arrow_right_.." Note that enemies dying to Charged Strike's Electrocution effect don't pass certain Talents' and Blessings' kill based proc conditions. Charged Strike's Electrocution effect also does NOT benefit from Warp Damage buffs.",
 	}, "\n"), enhdesc_col)
 
-	--[+ Blitz 3 - Assail +]--
+	--[+ Blitz 3 - Assail +]--														checked 27.05.2025
 	local ED_PSY_Blitz_3_rgb = iu_actit(table.concat({
 		-- ppp___ppp,
 		-- Arrow_right_.." Can Crit. Cleave up to 2 enemies.",
 		-- Arrow_right_.." Costs 1 ammo and recharges it every 3 seconds.",
 		-- Arrow_right_.." Very low Damage against Carapace and low against Unyielding.",
-		Arrow_right_.." Affected by Peril Cost Reduction buffs from respective Talents and Combat Stimm.",
+		Arrow_right_.." Affected by Peril Cost Reduction buffs from respective Talents, Combat Stimm, and the \"Enhanced Blitz\" difficulty mutator.",
 		Arrow_right_..dmg_is_incr_by,
 		"{#color(255, 35, 5)} You may Explode! Don't use if Peril level is 100%!{#reset()}",
 	}, "\n"), enhdesc_col)
 
-	--[+ Blitz 3-1 - Ethereal Shards +]--
+	--[+ Blitz 3-1 - Ethereal Shards +]--											checked 27.05.2025
 	local ED_PSY_Blitz_3_1_rgb = iu_actit(table.concat({
 		-- ppp___ppp,
-		Arrow_right_.." If \"Empowered Psionics\" is active, this is doubled, up to 6 targets.",
+		-- Arrow_right_.." If \"Empowered Psionics\" is active, this is doubled, up to 6 targets.",
+		Arrow_right_.." Stacks additively with Empowered Psionics and Warp Splitting.",
 		-- Arrow_right_.." Carapace cannot be Cleaved by default.",
 	}, "\n"), enhdesc_col)
 
-	--[+ Blitz 3-2 - Quick Shards +]--
+	--[+ Blitz 3-2 - Quick Shards +]--												checked 27.05.2025
 	local ED_PSY_Blitz_3_2_rgb = iu_actit(table.concat({
 		-- ppp___ppp,
 		Arrow_right_.." Reduces projectile recharge time from 3 to 2.1 seconds per projectile.",
@@ -144,30 +146,33 @@ local enhdesc_col = Color[mod:get("enhdesc_text_colour")](255, true) -- Do not t
 	}, "\n"), enhdesc_col)
 
 --[+ +AURA+ +]--
-	--[+ Aura 0 - The Quickening +]--
+	--[+ Aura 0 - The Quickening +]--												checked 27.05.2025
 	local ED_PSY_Aura_0_rgb = iu_actit(table.concat({
 		-- ppp___ppp,
-		Arrow_right_.." Stacks additively with Combat Ability Regeneration from Curios and the mission mutators that reduce Ability Cooldowns by 20%.",
-		Arrow_right_.." This Reduces the Max Cooldown of \"Venting Shriek\"/\"Psykinetic's Wrath\" to 27.75 seconds, for \"Scrier's Gaze\" to 23.125 seconds, and for \"Telekine Shield\" to 37 seconds.",
+		Arrow_right_.." Stacks additively with Max Cooldown Reductions (Combat Ability Regeneration from Curios and the difficulty mutators that reduce Ability Cooldowns by 20%).",
+		Arrow_right_.." Stacks additively with the Max Cooldown increase from Zealot's \"Perfectionist\", and multiplicatively with the Max Cooldown increases from Veteran's \"Only in Death Does Duty End\" and \"Overwatch\".",
+		-- Arrow_right_.." This Reduces the Max Cooldown of \"Venting Shriek\"/\"Psykinetic's Wrath\" to 27.75 seconds, for \"Scrier's Gaze\" to 23.125 seconds, and for \"Telekine Shield\" to 37 seconds.",
 		-- doesnt_stack_aura_psy,
 	}, "\n"), enhdesc_col)
 
-	--[+ Aura 1 - Kinetic Presence +]--
+	--[+ Aura 1 - Kinetic Presence +]--												checked 27.05.2025
 	local ED_PSY_Aura_1_rgb = iu_actit(table.concat({
 		-- ppp___ppp,
 		stacks_add_w_oth_dmg,
 		-- doesnt_stack_aura_psy,
 	}, "\n"), enhdesc_col)
 
-	--[+ Aura 2 - Seer's Presence +]--
+	--[+ Aura 2 - Seer's Presence +]--												checked 27.05.2025
 	local ED_PSY_Aura_2_rgb = iu_actit(table.concat({
 		-- ppp___ppp,
-		Arrow_right_.." Stacks additively with Combat Ability Regeneration from Curios and the mission mutators that reduce Ability Cooldowns by 20%.",
+		Arrow_right_.." Stacks additively with Max Cooldown Reductions (Combat Ability Regeneration from Curios and the difficulty mutators that reduce Ability Cooldowns by 20%).",
+		Arrow_right_.." Stacks additively with the Max Cooldown increase from Zealot's \"Perfectionist\", and multiplicatively with the Max Cooldown increases from Veteran's \"Only in Death Does Duty End\" and \"Overwatch\".",
 		Arrow_right_.." This Reduces the Cooldowns of \"Venting Shriek\"/\"Psykinetic's Wrath\" to 27 seconds, for \"Scrier's Gaze\" to 22.5 seconds, and for \"Telekine Shield\" to 36 seconds.",
+		Arrow_right_.." Does not interact with Concentration Stimm's remaining Cooldown Reduction effect which increases a character's Base Ability Cooldown rate of 1 second per second by additional 3 seconds per second.",
 		-- doesnt_stack_aura_psy,
 	}, "\n"), enhdesc_col)
 
-	--[+ Aura 3 - Prescience +]--
+	--[+ Aura 3 - Prescience +]--													checked 27.05.2025
 	local ED_PSY_Aura_3_rgb = iu_actit(table.concat({
 		-- ppp___ppp,
 		-- Arrow_right_.." Applies to all attacks that can Crit.",
@@ -176,33 +181,37 @@ local enhdesc_col = Color[mod:get("enhdesc_text_colour")](255, true) -- Do not t
 	}, "\n"), enhdesc_col)
 
 --[+ +ABILITIES+ +]--
-	--[+ Ability 0 - Psykinetic's Wrath +]--
+	--[+ Ability 0 - Psykinetic's Wrath +]--										checked 27.05.2025
 	local ED_PSY_Ability_0_rgb = iu_actit(table.concat({
 		-- ppp___ppp,
+		-- Arrow_right_.." Max range: 30 meters.",
+		Arrow_right_.." Angle: ~52° in front of Psyker.",
 		-- Arrow_right_.." Can be used to prevent Psyker's self-explode.",
 		-- Arrow_right_.." The Warp wave passes through objects and spreads up to 30 meters. So you can drop the Pox Hound from an Ally through the wall.",
 		-- Arrow_right_.." Stuns enemies within a 5 meter radius in front of Psyker.",
 	}, "\n"), enhdesc_col)
 
-	--[+ Ability 1 - Venting Shriek +]--
+	--[+ Ability 1 - Venting Shriek +]--											checked 27.05.2025
 	local ED_PSY_Ability_1_rgb = iu_actit(table.concat({
 		-- ppp___ppp,
+		-- Arrow_right_.." Max range: 30 meters.",
+		Arrow_right_.." Angle: ~52° in front of Psyker.",
 		-- Arrow_right_.." Always targets torso hitzone.",
 		-- Arrow_right_.." Can be used while exploding thereby preventing Psyker's self-explode.",
 		-- Arrow_right_.." The Warp wave passes through objects and spreads up to 30 meters.",
 		-- Arrow_right_.." Stuns enemies within a 5 meter radius in front of Psyker.",
-		Arrow_right_.." Stagger strength scales with Peril reaching its Maximum strength at 100% Peril. Up to light Staggers against Crushers. Cannot Stagger Mutants, Monstrosities and and enemies with active void shield.",
+		Arrow_right_.." Stagger strength scales with Peril reaching its Maximum strength at 100% Peril. Up to light Staggers against Crushers. Cannot Stagger Mutants, Monstrosities and enemies with active void shield.",
 		Arrow_right_.." Stagger strength decreases with range losing its efficiency almost entirely at 30 meters.",
-		Arrow_right_.." Stagger strength is additionally affected by some Weapon Blessings: \"Executor\", \"Slaughterer\", \"Superiority\", \"Unstable Power\", etc. Applies only when the respective weapon is equipped when shouting.",
+		Arrow_right_.." Stagger strength is additionally affected by some Weapon Blessings that provide a power_level_modifier (e.g. \"Executor\", \"Slaughterer\", \"Superiority\", \"Unstable Power\"). Applies only when the respective weapon is equipped when shouting.",
 	}, "\n"), enhdesc_col)
 
-	--[+ Ability 1-1 - Becalming Eruption +]--
+	--[+ Ability 1-1 - Becalming Eruption +]--										checked 27.05.2025
 	local ED_PSY_Ability_1_1_rgb = iu_actit(table.concat({
 		-- ppp___ppp,
 		Arrow_right_.." Stacks multiplicatively with related Peril Cost Reduction buffs from \"By Crack of Bone\", \"Empyric Resolve\", \"Inner Tranquility\", \"Kinetic Resonance\", small Peril Resistance nodes, and Combat Stimm.",
 	}, "\n"), enhdesc_col)
 
-	--[+ Ability 1-2 - Warp Rupture +]--
+	--[+ Ability 1-2 - Warp Rupture +]--											checked 27.05.2025
 	local ED_PSY_Ability_1_2_rgb = iu_actit(table.concat({
 		-- ppp___ppp,
 		Arrow_right_.." Has same armor Damage modifier against all armor types, loses Damage with range.",
@@ -211,17 +220,17 @@ local enhdesc_col = Color[mod:get("enhdesc_text_colour")](255, true) -- Do not t
 		"Peril:           0%|  25%|  50%|  75%|  100%",
 		"Damage:   100|   125|    150|   175|   200",
 		"_______________________________",
-		Arrow_right_.." Damage is affected by Damage buffs: ",
-		Arrow_right_..Arrow_right_.." from Talents: \"Disrupt Destiny\", \"Empyrean Empowerment\", \"Empyric Shock\" (while debuffed), \"Malefic Momentum\", \"Kinetic Presence\" (vs Elites), \"Perfect Timing\", and \"\".Warp Rider\".",
-		Arrow_right_..Arrow_right_.." from Blessings of the Weapons:",
-		Arrow_right_..Arrow_right_..Arrow_right_.." Melee, if procced with weapon before Warp Rupture's activation: \"Executor\", \"High Voltage\" (vs Electrocuted), \"Skullcrusher\" (vs Staggered), \"Slaughterer\", \"Superiority\", and \"Unstable Power\".",
-		Arrow_right_..Arrow_right_..Arrow_right_.." Ranged, if procced with weapon before Warp Rupture's activation: \"Blaze Away\", \"Ceaseless Barrage\", \"Deathspitter\", \"Dumdum\", \"Execution\" (vs Staggered), \"Fire Frenzy\", \"Full Bore\", \"No Respite\" (vs Staggered), \"Pinning Fire\", \"Powderburn\", and \"Run 'n' Gun\" (while Sprinting).",
+		Arrow_right_.." Damage is increased by Rending/Brittleness, by Perks of currently wielded Weapons, by Combat Stimm, and by the following buffs from:",
+		Arrow_right_..Arrow_right_.." Talents: \"Disrupt Destiny\", \"Empyrean Empowerment\", \"Empyric Shock\" (while debuffed), \"Malefic Momentum\", \"Kinetic Presence\" (vs Elites), \"Perfect Timing\", and \"\".Warp Rider\".",
+		Arrow_right_..Arrow_right_.." Blessings (if procced with weapon before Warp Rupture's activation):",
+		Arrow_right_..Arrow_right_..Arrow_right_.." Melee: \"Executor\", \"High Voltage\" (vs Electrocuted), \"Skullcrusher\" (vs Staggered), \"Slaughterer\", \"Superiority\", and \"Unstable Power\".",
+		Arrow_right_..Arrow_right_..Arrow_right_.." Ranged: \"Blaze Away\", \"Ceaseless Barrage\", \"Deathspitter\", \"Dumdum\", \"Execution\" (vs Staggered), \"Fire Frenzy\", \"Full Bore\", \"No Respite\" (vs Staggered), \"Pinning Fire\", \"Powderburn\", and \"Run 'n' Gun\" (while Sprinting).",
 	}, "\n"), enhdesc_col)
 
-	--[+ Ability 1-3 - Warp Creeping Flames +]--
+	--[+ Ability 1-3 - Warp Creeping Flames +]--									checked 27.05.2025
 	local ED_PSY_Ability_1_3_rgb = iu_actit(table.concat({
 		-- ppp___ppp,
-		Arrow_right_.." The amount of Soulblaze Stacks applied to enemies scales with Peril:",
+		-- Arrow_right_.." The amount of Soulblaze Stacks that are applied to enemies scales with Peril:",
 		"_______________________________",
 		"Stacks: 1|      2|        3|       4|       5|       6",
 		"Peril: 0%|~17%|~34%|~50%|~67%|~84%",
@@ -229,10 +238,12 @@ local enhdesc_col = Color[mod:get("enhdesc_text_colour")](255, true) -- Do not t
 		-- Arrow_right_.." Lasts 8 seconds. Ticks every 0.75 seconds.",
 		-- Arrow_right_.." Refreshes duration on Stack application.",
 		Arrow_right_.." Stacks additively with other sources of Soulblaze.",
-		Arrow_right_.." Soulblaze damage is increased by Rending and Brittleness, by Perks of currently equipped Weapons, and by Buffs from Talents: \"Disrupt Destiny\", \"Empyrean Empowerment\", \"Malefic Momentum\", \"Kinetic Presence\", \"Perfect Timing\", and \"Warp Rider\".",
-		Arrow_right_..Arrow_right_.." Blessings of the Weapons:",
-		Arrow_right_..Arrow_right_..Arrow_right_.." Melee: \"Executor\", \"High Voltage\" (vs Electrocuted), \"Skullcrusher\" (vs Staggered), \"Slaughterer\", \"Superiority\", \"Uncanny Strike\", and \"Unstable Power\".",
-		Arrow_right_..Arrow_right_..Arrow_right_.." Ranged: \"Blaze Away\", \"Deathspitter\", \"Dumdum\", \"Execution\" (vs Staggered), \"Fire Frenzy\", \"No Respite\" (vs Staggered), \"Pinning Fire\", and \"Run 'n' Gun\" (while Sprinting).",
+		Arrow_right_.." Soulblaze damage is increased by Rending/Brittleness, by Perks of currently wielded Weapons, by Combat Stimm, and by Buffs from:",
+		Arrow_right_.."Talents: \"Disrupt Destiny\", \"Empyrean Empowerment\" (only for warp charges gained during Soulblaze's active duration), \"Empyric Shock\" (while debuffed), \"Malefic Momentum\", \"Kinetic Presence\" (vs Elites), \"Perfect Timing\", and \"Warp Rider\".",
+		Arrow_right_..Arrow_right_.." Blessings (if procced with weapon before Warp Rupture's activation):",
+		-- Arrow_right_..Arrow_right_.." Blessings:",
+		Arrow_right_..Arrow_right_..Arrow_right_.." Melee: \"Executor\", \"High Voltage\" (vs Electrocuted), \"Skullcrusher\" (vs Staggered), \"Slaughterer\", \"Superiority\", and \"Unstable Power\".",
+		Arrow_right_..Arrow_right_..Arrow_right_.." Ranged: \"Blaze Away\", \"Ceaseless Barrage\", \"Deathspitter\", \"Dumdum\", \"Execution\" (vs Staggered), \"Fire Frenzy\", \"No Respite\" (vs Staggered), \"Pinning Fire\", and \"Run 'n' Gun\" (while Sprinting).",
 	}, "\n"), enhdesc_col)
 
 	--[+ Ability 2 - Telekine Shield +]--
@@ -329,7 +340,7 @@ local enhdesc_col = Color[mod:get("enhdesc_text_colour")](255, true) -- Do not t
 	--[+ Ability 3-5 - Warp Unbound +]--
 	local ED_PSY_Ability_3_5_rgb = iu_actit(table.concat({
 		-- ppp___ppp,
-		Arrow_right_.." After overcharging has ended, allows Psyker to execute Peril-generating actions while at 100% Peril for 10 seconds without triggering the self-explosion.",
+		-- Arrow_right_.." After overcharging has ended, allows Psyker to execute Peril-generating actions while at 100% Peril for 10 seconds without triggering the self-explosion.",
 		Arrow_right_.." Note that when this 10 seconds duration ends, Scrier's Gaze's base grace period still applies, providing another 1.5 seconds of the same effect.",
 	}, "\n"), enhdesc_col)
 
@@ -755,7 +766,7 @@ local enhdesc_col = Color[mod:get("enhdesc_text_colour")](255, true) -- Do not t
 		Arrow_right_.." For example, when reloading 34 rounds of a clip that has a size of 59 rounds, Psyker would generate 14.4% true peril; 0.25x(34/59)=0.144.",
 		-- Arrow_right_.." Reloading an empty clip generates the Max amount of 25% Peril. ",
 		Arrow_right_.." Peril cost reduction buffs reduce the efficiency of this Reloaded-ammo-to-Peril conversion. For example, reloading the same amount of ammo in a clip of the same size, but with three Peril Resistance nodes (i.e. a warp_charge_amount of 0.95³), Psyker would only generate 12.3% true peril; 0.25x(34/59)x0.95³=0.123.",
-		"Note that the Talent always generates Peril on Reload regardless of current Peril amount but only grants the increased Reload speed when below or at 75% true Peril.",
+		Arrow_right_.." Note that the Talent always generates Peril on Reload regardless of current Peril amount but only grants the increased Reload speed when below or at 75% true Peril.",
 	}, "\n"), enhdesc_col)
 
 --[+ ++ZEALOT++ +]--
@@ -763,60 +774,68 @@ local enhdesc_col = Color[mod:get("enhdesc_text_colour")](255, true) -- Do not t
 	--[+ Blitz 0 - Stun Grenade +]--
 	local ED_ZEA_Blitz_0_rgb = iu_actit(table.concat({
 		-- ppp___ppp,
-		Arrow_right_.." Fuse time: 1.5 seconds.",
-		Arrow_right_.." Explosion radius: 8 meters.",
+		-- Arrow_right_.." Fuse time: 1.5 seconds.",
+		-- Arrow_right_.." Explosion radius: 8 meters.",
 		Arrow_right_.." Electrocution:",
-		Arrow_right_.."- Lasts 8 seconds.",
-		Arrow_right_.."- Stacks once.",
-		Arrow_right_.."- Deals low Damage across the board.",
-		Arrow_right_.."- Deals Damage and Stagger every 0.55 seconds.",
+		Arrow_right_..Arrow_right_.." Lasts 8 seconds.",
+		Arrow_right_..Arrow_right_.." Stacks once.",
+		Arrow_right_..Arrow_right_.." Deals low Damage across the board.",
+		Arrow_right_..Arrow_right_.." Deals Damage and Stagger every 0.55 seconds.",
 		-- Arrow_right_.."- Staggers all enemies in range except Mutants, monstrosities and Captains/Twins.",
-		Arrow_right_.."- Ignores Bulwark shields.",
-		Arrow_right_.."- Can be refreshed during active duration.",
+		-- Arrow_right_.." Ignores Bulwark shields.",
+		-- Arrow_right_.." Can be refreshed during active duration.",
 	}, "\n"), enhdesc_col)
 	
 	--[+ Blitz 1 - Stunstorm Grenade +]--
-	local ED_ZEA_Blitz_1_rgb = iu_actit(table.concat({
+	-- local ED_ZEA_Blitz_1_rgb = iu_actit(table.concat({
 		-- ppp___ppp,
-		Arrow_right_.."- Explosion radius is increased to 12 meters.",
-		Arrow_right_.." Fuse time: 1.5 seconds.",
-		Arrow_right_.." Electrocution:",
-		Arrow_right_.."- Lasts 8 seconds.",
-		Arrow_right_.."- Stacks once.",
-		Arrow_right_.."- Deals low Damage across the board.",
-		Arrow_right_.."- Deals Damage and Stagger every 0.55 seconds.",
-		Arrow_right_.."- Staggers all enemies in range except Mutants, Scab Captain/Twins and Monstrosities.",
-		Arrow_right_.."- Ignores Bulwark shields.",
-		Arrow_right_.."- Can be refreshed during active duration.",
-	}, "\n"), enhdesc_col)
+		-- Arrow_right_.."- Explosion radius is increased to 12 meters.",
+		-- Arrow_right_.." Fuse time: 1.5 seconds.",
+		-- Arrow_right_.." Electrocution:",
+		-- Arrow_right_..Arrow_right_.." Lasts 8 seconds.",
+		-- Arrow_right_..Arrow_right_.." Stacks once.",
+		-- Arrow_right_..Arrow_right_.." Deals low Damage across the board.",
+		-- Arrow_right_..Arrow_right_.." Deals Damage and Stagger every 0.55 seconds.",
+		-- Arrow_right_.." Staggers all enemies in range except Mutants, Scab Captain/Twins and Monstrosities.",
+		-- Arrow_right_.."- Ignores Bulwark shields.",
+		-- Arrow_right_.."- Can be refreshed during active duration.",
+	-- }, "\n"), enhdesc_col)
 	
 	--[+ Blitz 2 - Immolation Grenade +]--
 	local ED_ZEA_Blitz_2_rgb = iu_actit(table.concat({
 		-- ppp___ppp,
-		Arrow_right_.." Fuse time: 1.7 seconds.",
-		Arrow_right_.." Fire patch: Lasts 15 seconds. Radius 5 meters. Enemies avoid it.",
+		-- Arrow_right_.." Fuse time: 1.7 seconds.",
+		Arrow_right_.." Fire patch:",
+		Arrow_right_..Arrow_right_.." Lasts 15 seconds.",
+		Arrow_right_..Arrow_right_.." Radius 5 meters.",
+		Arrow_right_..Arrow_right_.." Enemies avoid it.",
 		Arrow_right_.." Burn (inside fire patch): Stacks once. Ticks every 0.875 seconds. Ignores Bulwark and Void shields.",
-		Arrow_right_.."- Deals varying Damage per tick per armor type (Very high Damage against Unyielding; High Damage against Unarmoured, Infested, Maniac; Very low Damage against Carapace).",
+		Arrow_right_..Arrow_right_.." Deals varying Damage per tick per armor type (Very high Damage against Unyielding; High Damage against Unarmoured, Infested, Maniac; Very low Damage against Carapace).",
 		-- Arrow_right_.." Burn (leaving Fire patch): Lasts 1 second. Ticks every 1 second. Short burn effect with slightly less Damage.",
-		Arrow_right_.." Burn damage is increased by: Rending/Brittleness, Perks of currently equipped Weapons, and the following buffs from:\n-- Talents: \"Anoint in Blood\", \"Purge the Unclean\", \"Ecclesiarch's Call\", and \"Inexorable Judgement\".\n-- Blessings:\n--- Melee: \"Executor\", \"High Voltage\", \"Skullcrusher\", and \"Slaughterer\".\n--- Ranged: \"Blaze Away\", \"Dumdum\", \"Deathspitter\", \"Execution\", \"Fire Frenzy\", \"Full Bore\", \"No Respite\", \"Pinning Fire\", and \"Run 'n' Gun\" (while sprinting).",
+		Arrow_right_.." Burn damage is increased by: Rending/Brittleness, Perks of currently equipped Weapons, and the following buffs from:",
+		Arrow_right_..Arrow_right_.." Talents: \"Anoint in Blood\", \"Purge the Unclean\", \"Ecclesiarch's Call\", and \"Inexorable Judgement\".",
+		Arrow_right_..Arrow_right_.." Blessings:",
+		Arrow_right_..Arrow_right_..Arrow_right_.." Melee: \"Executor\", \"High Voltage\", \"Skullcrusher\", and \"Slaughterer\".",
+		Arrow_right_..Arrow_right_..Arrow_right_.." Ranged: \"Blaze Away\", \"Dumdum\", \"Deathspitter\", \"Execution\", \"Fire Frenzy\", \"Full Bore\", \"No Respite\", \"Pinning Fire\", and \"Run 'n' Gun\" (while sprinting).",
 	}, "\n"), enhdesc_col)
 
 	--[+ Blitz 3 - Blades of Faith +]--
 	local ED_ZEA_Blitz_3_rgb = iu_actit(table.concat({
 		-- ppp___ppp,
-		Arrow_right_.." Quick Throw.",
-		Arrow_right_.." Ammo: Replenishes 1 knife per melee Elite or Special kill. 2 knives per small ammo pickup. 6 knives per big ammo pickup. All knives per ammo crate.",
-		Arrow_right_.." The knife flies along a curving trajectory.",
+		-- Arrow_right_.." Quick Throw.",
+		-- Arrow_right_.." Ammo: Replenishes 1 knife per melee Elite or Special kill. 2 knives per small ammo pickup. 6 knives per big ammo pickup. All knives per ammo crate.",
+		-- Arrow_right_.." The knife flies along a curving trajectory.",
 		Arrow_right_.." Damage: 585 base Damage.",
-		Arrow_right_.."- High armor Damage modifiers against Maniac and Infested.",
-		Arrow_right_.."- Extra Finesse boosts against Unarmoured and Flak.",
-		Arrow_right_.."- Deals no Damage against Carapace unless weakspot like Mauler head.",
-		Arrow_right_.."- Low Crit Chance - 5%.",
-		Arrow_right_.."- No Damage falloff.",
-		Arrow_right_.." Can Cleave 1 Groaner, Poxwalker, Scab/Dreg Stalker or Scab Shooter.",
-		Arrow_right_.." Headshot kills all enemies except Ogryns, Ragers, Maulers and Monstrosities.\n- Knives are affected by Perks of currently equipped Weapons and by the following buffs from:",
-		Arrow_right_.."- Talents: \"Anoint in Blood\", \"Purge the Unclean\", \"Ecclesiarch's Call\", and \"Inexorable Judgement\" (damage).",
-		Arrow_right_.."- A lot of Melee and Ranged Blessings.",
+		-- Arrow_right_..Arrow_right_.." High armor Damage modifiers against Maniac and Infested.",
+		-- Arrow_right_..Arrow_right_.." Extra Finesse boosts against Unarmoured and Flak.",
+		-- Arrow_right_..Arrow_right_.." Deals no Damage against Carapace unless weakspot like Mauler head.",
+		Arrow_right_..Arrow_right_.." Low Crit Chance - 5%.",
+		-- Arrow_right_..Arrow_right_.." No Damage falloff.",
+		-- Arrow_right_.." Can Cleave 1 Groaner, Poxwalker, Scab/Dreg Stalker or Scab Shooter.",
+		-- Arrow_right_.." Headshot kills all enemies except Ogryns, Ragers, Maulers and Monstrosities.",
+		Arrow_right_.." Knives are affected by Perks of currently equipped Weapons and by the following buffs from:",
+		Arrow_right_..Arrow_right_.." Talents: \"Anoint in Blood\", \"Purge the Unclean\", \"Ecclesiarch's Call\", and \"Inexorable Judgement\" (damage).",
+		Arrow_right_..Arrow_right_.." A lot of Melee and Ranged Blessings.",
 	}, "\n"), enhdesc_col)
 
 --[+ +AURA+ +]--
@@ -825,7 +844,7 @@ local enhdesc_col = Color[mod:get("enhdesc_text_colour")](255, true) -- Do not t
 	local ED_ZEA_Aura_0_n_1_rgb = iu_actit(table.concat({
 		-- ppp___ppp,
 		stacks_mult_w_other_dmg_red_buffs,
-		Arrow_right_.." Does not Stack with the same Aura from another Zealot.",
+		-- Arrow_right_.." Does not Stack with the same Aura from another Zealot.",
 	}, "\n"), enhdesc_col)
 
 	--[+ Aura 2 - Beacon of Purity +]--
@@ -842,54 +861,54 @@ local enhdesc_col = Color[mod:get("enhdesc_text_colour")](255, true) -- Do not t
 	}, "\n"), enhdesc_col)
 
 	--[+ Ability 0 - Chastise the Wicked +]--
-	local ED_ZEA_Ability_0_rgb = iu_actit(table.concat({
+	-- local ED_ZEA_Ability_0_rgb = iu_actit(table.concat({
 		-- ppp___ppp,
-		Arrow_right_.." Dash Range:",
-		Arrow_right_.."- Base: 7 meters.",
-		Arrow_right_.."- Aimed: up to 21 meters.",
-		Arrow_right_.." Grants immunity to Toughness Damage and you Dodge all attacks while dashing.",
-		Arrow_right_.." Applies a light Stagger on impact in a 3 meters radius.",
-	}, "\n"), enhdesc_col)
+		-- Arrow_right_.." Dash Range:",
+		-- Arrow_right_.."- Base: 7 meters.",
+		-- Arrow_right_.."- Aimed: up to 21 meters.",
+		-- Arrow_right_.." Grants immunity to Toughness Damage and you Dodge all attacks while dashing.",
+		-- Arrow_right_.." Applies a light Stagger on impact in a 3 meters radius.",
+	-- }, "\n"), enhdesc_col)
 
 	--[+ Ability 1 - Fury of the Faithful +]--
 	local ED_ZEA_Ability_1_rgb = iu_actit(table.concat({
 		-- ppp___ppp,
-		Arrow_right_.." Dash:",
-		Arrow_right_.."- Range: Base: 7 meters. Aimed(hold button): up to 21 meters.",
-		Arrow_right_.."- Cannot be activated while jumping or falling.",
-		Arrow_right_.."- You can't change direction, but you can Cancel the dash with Block or Back buttons.",
-		Arrow_right_.."- You Dodge all Attacks and grants Immunity to Toughness Damage.",
-		Arrow_right_.."- You can be stopped by Unyielding, Carapace, Monstrosities, as well as the Void shields.",
-		Arrow_right_.." Melee armor penetration buff:",
-		Arrow_right_.."- Adds a 100% Rending against Carapace, Flak, Maniac, Unyielding armor types to the next Melee Attack within 3 seconds after activation.",
-		Arrow_right_.."- The first Melee Attack within the duration consumes this buff.",
-		Arrow_right_.."- Ranged attacks do NOT benefit from this buff.",
-		Arrow_right_.."- Stacks additively with other Attack Speed buffs from Talents and Celerity Stimm.",
+		-- Arrow_right_.." Dash:",
+		-- Arrow_right_.."- Range: Base: 7 meters. Aimed(hold button): up to 21 meters.",
+		-- Arrow_right_..Arrow_right_.." Cannot be activated while jumping or falling.",
+		-- Arrow_right_..Arrow_right_.." You can't change direction, but you can Cancel the dash with Block or Back buttons.",
+		-- Arrow_right_..Arrow_right_.." You Dodge all Attacks and grants Immunity to Toughness Damage.",
+		-- Arrow_right_..Arrow_right_.." You can be stopped by Unyielding, Carapace, Monstrosities, as well as the Void shields.",
+		-- Arrow_right_.." Melee armor penetration buff:",
+		-- Arrow_right_..Arrow_right_.." Adds a 100% Rending against Carapace, Flak, Maniac, Unyielding armor types to the next Melee Attack within 3 seconds after activation.",
+		-- Arrow_right_..Arrow_right_.." The first Melee Attack within the duration consumes this buff.",
+		-- Arrow_right_..Arrow_right_.." Ranged attacks do NOT benefit from this buff.",
+		Arrow_right_..Arrow_right_.." Stacks additively with other Attack Speed buffs from Talents and Celerity Stimm.",
 	}, "\n"), enhdesc_col)
 
 	--[+ Ability 1-1 - Redoubled Zeal +]--
-	local ED_ZEA_Ability_1_1_rgb = iu_actit(table.concat({
+	-- local ED_ZEA_Ability_1_1_rgb = iu_actit(table.concat({
 		-- ppp___ppp,
-		Arrow_right_.." The Cooldown of the Second charge only starts after the First charge finished its Cooldown.",
-	}, "\n"), enhdesc_col)
+		-- Arrow_right_.." The Cooldown of the Second charge only starts after the First charge finished its Cooldown.",
+	-- }, "\n"), enhdesc_col)
 
 	--[+ Ability 1-2 - Invocation of Death +]--
 	local ED_ZEA_Ability_1_2_rgb = iu_actit(table.concat({
 		-- ppp___ppp,
 		Arrow_right_.." This results in a total Cooldown Reduction of 12 seconds per proc (4 seconds from Base rate + 4x2 seconds from Talent)",
-		can_be_refr_dur_active_dur,
+		-- can_be_refr_dur_active_dur,
 		Arrow_right_.." Procs additionally to Concentration Stimm's remaining Cooldown Reduction effect of 3 seconds per second.",
-		doesnt_interact_w_c_a_r_from_curio,
+		-- doesnt_interact_w_c_a_r_from_curio,
 	}, "\n"), enhdesc_col)
 
 	--[+ Ability 2 - Chorus of Spiritual Fortitude +]--
 	local ED_ZEA_Ability_2_rgb = iu_actit(table.concat({
 		-- ppp___ppp,
-		Arrow_right_.." Radius: 10 meters.",
-		Arrow_right_.." Immunity to Stuns and Invulnerability can be refreshed during active duration.",
-		Arrow_right_.." \"Invulnerability\" means that player Health can't fall below 1. Players can still lose any Health above 1.",
-		Arrow_right_.." Yellow Toughness bonus lasts 10 seconds and does not Stack with bonus Toughness from the same Talent of another Zealot. But does Stack additively with Veteran's bonus Toughness from \"Duty and Honour\".",
-		Arrow_right_.." Bonus Toughness acts as a 'second' Toughness bar and can be replenished by Melee kills, respective Talents, and Weapon Blessings",
+		-- Arrow_right_.." Radius: 10 meters.",
+		-- Arrow_right_.." Immunity to Stuns and Invulnerability can be refreshed during active duration.",
+		-- Arrow_right_.." \"Invulnerability\" means that player Health can't fall below 1. Players can still lose any Health above 1.",
+		-- Arrow_right_.." Yellow Toughness bonus lasts 10 seconds and does not Stack with bonus Toughness from the same Talent of another Zealot. But does Stack additively with Veteran's bonus Toughness from \"Duty and Honour\".",
+		-- Arrow_right_.." Bonus Toughness acts as a 'second' Toughness bar and can be replenished by Melee kills, respective Talents, and Weapon Blessings.",
 		-- Arrow_right_.." Pulses deal no Damage and do not Stagger.",
 		-- Arrow_right_.." Channeling can be canceled by Blocking, Sprinting, or pressing the Ability button again.",
 		-- Arrow_right_.." While channeling, cooldown is paused. However, its cooldown can still be reduced by using a Concentration Stimm before activation or by benefitting from Psyker's talent Psykinetic's Aura while channeling; its maximum cooldown can be reduced by Combat Ability Regeneration from curios, by Psyker's aura Seer's Presence, and by the mission mutators that reduce ability cooldowns by 20%.",
