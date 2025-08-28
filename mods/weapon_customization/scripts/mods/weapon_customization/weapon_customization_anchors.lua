@@ -140,6 +140,7 @@ end
 	local _autopistol_p1_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/autopistol_p1_m1")
 	local _shotgun_p1_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/shotgun_p1_m1")
 	local _shotgun_p2_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/shotgun_p2_m1")
+	local _shotgun_p4_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/shotgun_p4_m1")
 	local _bolter_p1_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/bolter_p1_m1")
 	local _boltpistol_p1_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/boltpistol_p1_m1")
 	local _stubrevolver_p1_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/stubrevolver_p1_m1")
@@ -159,6 +160,8 @@ end
 	local _thunderhammer_2h_p1_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/thunderhammer_2h_p1_m1")
 	local _powermaul_2h_p1_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/powermaul_2h_p1_m1")
 	local _powermaul_p1_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/powermaul_p1_m1")
+	local _powermaul_p2_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/powermaul_p2_m1")
+	local _powermaul_shield_p1_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/powermaul_shield_p1_m1")
 	local _chainsword_2h_p1_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/chainsword_2h_p1_m1")
 	local _combatsword_p2_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/combatsword_p2_m1")
 	local _forcesword_p1_m1 = mod:io_dofile("weapon_customization/scripts/mods/weapon_customization/weapon_attachments/forcesword_p1_m1")
@@ -187,6 +190,7 @@ end
 			autopistol_p1_m1   = _autopistol_p1_m1.anchors,
 			shotgun_p1_m1      = _shotgun_p1_m1.anchors,
 			shotgun_p2_m1      = _shotgun_p2_m1.anchors,
+			shotgun_p4_m1      = _shotgun_p4_m1.anchors,
 			bolter_p1_m1       = _bolter_p1_m1.anchors,
 			boltpistol_p1_m1   = _boltpistol_p1_m1.anchors,
 			stubrevolver_p1_m1 = _stubrevolver_p1_m1.anchors,
@@ -212,6 +216,8 @@ end
 			thunderhammer_2h_p1_m1 = _thunderhammer_2h_p1_m1.anchors,
 			powermaul_2h_p1_m1     = _powermaul_2h_p1_m1.anchors,
 			powermaul_p1_m1        = _powermaul_p1_m1.anchors,
+			powermaul_p2_m1        = _powermaul_p2_m1.anchors,
+			powermaul_shield_p1_m1 = _powermaul_shield_p1_m1.anchors,
 			chainsword_2h_p1_m1    = _chainsword_2h_p1_m1.anchors,
 			combatsword_p2_m1      = _combatsword_p2_m1.anchors,
 			forcesword_p1_m1       = _forcesword_p1_m1.anchors,
@@ -251,6 +257,8 @@ end
 			mod.anchors.stubrevolver_p1_m2 = mod.anchors.stubrevolver_p1_m1
 			mod.anchors.shotgun_p1_m2      = mod.anchors.shotgun_p1_m1
 			mod.anchors.shotgun_p1_m3      = mod.anchors.shotgun_p1_m1
+			mod.anchors.shotgun_p4_m2      = mod.anchors.shotgun_p4_m1
+			mod.anchors.shotgun_p4_m3      = mod.anchors.shotgun_p4_m1
 			mod.anchors.bolter_p1_m2       = mod.anchors.bolter_p1_m1
 			mod.anchors.bolter_p1_m3       = mod.anchors.bolter_p1_m1
 			mod.anchors.laspistol_p1_m2    = mod.anchors.laspistol_p1_m1
@@ -314,6 +322,8 @@ end
 			mod.anchors.combatsword_p3_m2      = mod.anchors.combatsword_p3_m1
 			mod.anchors.combatsword_p3_m3      = mod.anchors.combatsword_p3_m1
 			mod.anchors.powermaul_p1_m2        = mod.anchors.powermaul_p1_m1
+			mod.anchors.powermaul_shield_p1_m2 = mod.anchors.powermaul_shield_p1_m1
+			-- mod.anchors.powermaul_p2_m2        = mod.anchors.powermaul_p2_m1
 		--#endregion
 	--#endregion
 --#endregion
@@ -339,6 +349,7 @@ end
 			autopistol_p1_m1   = _autopistol_p1_m1.attachments,
 			shotgun_p1_m1      = _shotgun_p1_m1.attachments,
 			shotgun_p2_m1      = _shotgun_p2_m1.attachments,
+			shotgun_p4_m1      = _shotgun_p4_m1.attachments,
 			bolter_p1_m1       = _bolter_p1_m1.attachments,
 			boltpistol_p1_m1   = _boltpistol_p1_m1.attachments,
 			stubrevolver_p1_m1 = _stubrevolver_p1_m1.attachments,
@@ -364,6 +375,8 @@ end
 			thunderhammer_2h_p1_m1 = _thunderhammer_2h_p1_m1.attachments,
 			powermaul_2h_p1_m1     = _powermaul_2h_p1_m1.attachments,
 			powermaul_p1_m1        = _powermaul_p1_m1.attachments,
+			powermaul_p2_m1        = _powermaul_p2_m1.attachments,
+			powermaul_shield_p1_m1 = _powermaul_shield_p1_m1.attachments,
 			chainsword_2h_p1_m1    = _chainsword_2h_p1_m1.attachments,
 			combatsword_p2_m1      = _combatsword_p2_m1.attachments,
 			forcesword_p1_m1       = _forcesword_p1_m1.attachments,
@@ -402,6 +415,8 @@ end
 		--#region Guns
 			mod.attachment.shotgun_p1_m2      = mod.attachment.shotgun_p1_m1
 			mod.attachment.shotgun_p1_m3      = mod.attachment.shotgun_p1_m1
+			mod.attachment.shotgun_p4_m2      = mod.attachment.shotgun_p4_m1
+			mod.attachment.shotgun_p4_m3      = mod.attachment.shotgun_p4_m1
 			mod.attachment.bolter_p1_m2       = mod.attachment.bolter_p1_m1
 			mod.attachment.bolter_p1_m3       = mod.attachment.bolter_p1_m1
 			mod.attachment.stubrevolver_p1_m2 = mod.attachment.stubrevolver_p1_m1
@@ -470,6 +485,8 @@ end
 			mod.attachment.combatsword_p3_m2      = mod.attachment.combatsword_p3_m1
 			mod.attachment.combatsword_p3_m3      = mod.attachment.combatsword_p3_m1
 			mod.attachment.powermaul_p1_m2        = mod.attachment.powermaul_p1_m1
+			mod.attachment.powermaul_shield_p1_m2 = mod.attachment.powermaul_shield_p1_m1
+			-- mod.attachment.powermaul_p2_m2        = mod.attachment.powermaul_p2_m1
 		--#endregion
 	--#endregion
 --#endregion
@@ -909,6 +926,7 @@ end
 			autopistol_p1_m1   = _autopistol_p1_m1.models,
 			shotgun_p1_m1      = _shotgun_p1_m1.models,
 			shotgun_p2_m1      = _shotgun_p2_m1.models,
+			shotgun_p4_m1      = _shotgun_p4_m1.models,
 			bolter_p1_m1       = _bolter_p1_m1.models,
 			boltpistol_p1_m1   = _boltpistol_p1_m1.models,
 			stubrevolver_p1_m1 = _stubrevolver_p1_m1.models,
@@ -934,6 +952,8 @@ end
 			thunderhammer_2h_p1_m1 = _thunderhammer_2h_p1_m1.models,
 			powermaul_2h_p1_m1     = _powermaul_2h_p1_m1.models,
 			powermaul_p1_m1        = _powermaul_p1_m1.models,
+			powermaul_p2_m1        = _powermaul_p2_m1.models,
+			powermaul_shield_p1_m1 = _powermaul_shield_p1_m1.models,
 			chainsword_2h_p1_m1    = _chainsword_2h_p1_m1.models,
 			combatsword_p2_m1      = _combatsword_p2_m1.models,
 			forcesword_p1_m1       = _forcesword_p1_m1.models,
@@ -972,6 +992,8 @@ end
 		--region Guns
 			mod.attachment_models.shotgun_p1_m2      = mod.attachment_models.shotgun_p1_m1
 			mod.attachment_models.shotgun_p1_m3      = mod.attachment_models.shotgun_p1_m1
+			mod.attachment_models.shotgun_p4_m2      = mod.attachment_models.shotgun_p4_m1
+			mod.attachment_models.shotgun_p4_m3      = mod.attachment_models.shotgun_p4_m1
 			mod.attachment_models.bolter_p1_m2       = mod.attachment_models.bolter_p1_m1
 			mod.attachment_models.bolter_p1_m3       = mod.attachment_models.bolter_p1_m1
 			mod.attachment_models.stubrevolver_p1_m2 = mod.attachment_models.stubrevolver_p1_m1
@@ -1040,6 +1062,8 @@ end
 			mod.attachment_models.combatsword_p3_m2      = mod.attachment_models.combatsword_p3_m1
 			mod.attachment_models.combatsword_p3_m3      = mod.attachment_models.combatsword_p3_m1
 			mod.attachment_models.powermaul_p1_m2        = mod.attachment_models.powermaul_p1_m1
+			mod.attachment_models.powermaul_shield_p1_m2 = mod.attachment_models.powermaul_shield_p1_m1
+			-- mod.attachment_models.powermaul_p2_m2        = mod.attachment_models.powermaul_p2_m1
 		--#endregion
 	--#endregion
 --#endregion
@@ -1076,6 +1100,7 @@ end
 			autopistol_p1_m1   = _autopistol_p1_m1.sounds,
 			shotgun_p1_m1      = _shotgun_p1_m1.sounds,
 			shotgun_p2_m1      = _shotgun_p2_m1.sounds,
+			shotgun_p4_m1      = _shotgun_p4_m1.sounds,
 			bolter_p1_m1       = _bolter_p1_m1.sounds,
 			boltpistol_p1_m1   = _boltpistol_p1_m1.sounds,
 			stubrevolver_p1_m1 = _stubrevolver_p1_m1.sounds,
@@ -1101,6 +1126,8 @@ end
 			thunderhammer_2h_p1_m1 = _thunderhammer_2h_p1_m1.sounds,
 			powermaul_2h_p1_m1     = _powermaul_2h_p1_m1.sounds,
 			powermaul_p1_m1        = _powermaul_p1_m1.sounds,
+			powermaul_p2_m1        = _powermaul_p2_m1.sounds,
+			powermaul_shield_p1_m1 = _powermaul_shield_p1_m1.sounds,
 			chainsword_2h_p1_m1    = _chainsword_2h_p1_m1.sounds,
 			combatsword_p2_m1      = _combatsword_p2_m1.sounds,
 			forcesword_p1_m1       = _forcesword_p1_m1.sounds,
@@ -1139,6 +1166,8 @@ end
 		--#region Guns
 			mod.attachment_sounds.shotgun_p1_m2      = mod.attachment_sounds.shotgun_p1_m1
 			mod.attachment_sounds.shotgun_p1_m3      = mod.attachment_sounds.shotgun_p1_m1
+			mod.attachment_sounds.shotgun_p4_m2      = mod.attachment_sounds.shotgun_p4_m1
+			mod.attachment_sounds.shotgun_p4_m3      = mod.attachment_sounds.shotgun_p4_m1
 			mod.attachment_sounds.bolter_p1_m2       = mod.attachment_sounds.bolter_p1_m1
 			mod.attachment_sounds.bolter_p1_m3       = mod.attachment_sounds.bolter_p1_m1
 			mod.attachment_sounds.stubrevolver_p1_m2 = mod.attachment_sounds.stubrevolver_p1_m1
@@ -1207,6 +1236,8 @@ end
 			mod.attachment_sounds.combatsword_p3_m2      = mod.attachment_sounds.combatsword_p3_m1
 			mod.attachment_sounds.combatsword_p3_m3      = mod.attachment_sounds.combatsword_p3_m1
 			mod.attachment_sounds.powermaul_p1_m2        = mod.attachment_sounds.powermaul_p1_m1
+			mod.attachment_sounds.powermaul_shield_p1_m2 = mod.attachment_sounds.powermaul_shield_p1_m1
+			-- mod.attachment_sounds.powermaul_p2_m2        = mod.attachment_sounds.powermaul_p2_m1
 		--#endregion
 	--#endregion
 --#endregion

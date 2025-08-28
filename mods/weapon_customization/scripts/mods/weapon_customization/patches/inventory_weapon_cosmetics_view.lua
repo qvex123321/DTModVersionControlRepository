@@ -1039,6 +1039,9 @@ mod:hook_require("scripts/ui/views/inventory_weapon_cosmetics_view/inventory_wea
 		self:reevaluate_packages()
 		-- Reload current weapon
 		mod:redo_weapon_attachments(self._presentation_item)
+		-- Delete fix cache
+		local temp_cached_fixes = mod:persistent_table(REFERENCE).temp_cached_fixes
+		temp_cached_fixes[self._gear_id] = nil
 		-- Trigger Events
 		managers.event:trigger("weapon_customization_weapon_changed")
 		-- Update UI icons
@@ -2644,7 +2647,7 @@ mod:hook_require("scripts/ui/views/inventory_weapon_cosmetics_view/inventory_wea
 			-- Add tab
 			content[3] = {
 				display_name = "loc_weapon_cosmetics_customization",
-				slot_name = "slot_weapon_skin",
+				slot_name = "slot_weapon_skin_ewc",
 				item_type = "WEAPON_SKIN",
 				icon = "content/ui/materials/icons/system/settings/category_gameplay",
 				filter_on_weapon_template = true,
