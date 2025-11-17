@@ -217,6 +217,11 @@ end
 local function add_unique_buff(unit, buff_name, scenario_data, t)
   scenario_data.unique_buffs = scenario_data.unique_buffs or {}
   local buff_extension = ScriptUnit.extension(unit, "buff_system")
+
+  if not buff_extension then
+    return
+  end
+
   local _, buff_id, component_index = buff_extension:add_externally_controlled_buff(buff_name, t)
   local buff_data = {
     buff_id = buff_id,
@@ -229,6 +234,10 @@ local function remove_unique_buff(unit, buff_name, scenario_data)
   if scenario_data.unique_buffs then
     local buff_data = scenario_data.unique_buffs[buff_name]
     local buff_extension = ScriptUnit.extension(unit, "buff_system")
+
+    if not buff_extension then
+      return
+    end
 
     buff_extension:remove_externally_controlled_buff(buff_data.buff_id, buff_data.component_index)
 
@@ -512,7 +521,12 @@ local function enemies_loop_condition_func(scenario_system, player, scenario_dat
                   health_modifier = 0.4
                 end
 
-                new_unit = Managers.state.minion_spawn:spawn_minion(breed_name, position, rotation, 2, "aggroed", player.player_unit, nil, nil, nil, nil, health_modifier)
+                local spawn_params = {
+                  optional_aggro_state = "aggroed",
+                  optional_target_unit = player.player_unit,
+                  optional_health_modifier = health_modifier,
+                }
+                new_unit = Managers.state.minion_spawn:spawn_minion(breed_name, position, rotation, 2, spawn_params)
                 spawner_data.woundless = true
                 active_units[new_unit] = spawner_data
               else

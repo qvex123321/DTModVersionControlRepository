@@ -32,7 +32,6 @@ TalentRefundBelow
 show_cjk_glyphs
 creature_spawner
 master_item_community_patch
-weapon_customization
 OpenPlayerProfile
 ItemSorting
 more_characters_and_loadouts
