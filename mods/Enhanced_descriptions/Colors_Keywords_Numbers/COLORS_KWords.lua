@@ -1,395 +1,471 @@
 ---@diagnostic disable: undefined-global
--- Version 4.0
 
 local mod = get_mod("Enhanced_descriptions")
 local InputUtils = require("scripts/managers/input/input_utils")
-local iu_actit = InputUtils.apply_color_to_input_text
 
--- LANGUAGE CODES:
--- English				en
--- Russian				ru			_ru
--- French				fr			_fr
--- Chinese Traditional	["zh-tw"]	_tw
--- Chinese Simplified	["zh-cn"]	_zh_cn
--- German				de			_de
--- Italian				it			_it
--- Japanese				ja			_ja
--- Korean				ko			_ko
--- Polish				pl			_pl
--- Portuguese			["pt-br"]	_rgb_pt_br
--- Spanish				es			_es
-
--- FOR TRANSLATORS
--- All these keywords need to be translated to be able to access them in the TALENTS.lua, WEAPONS_Blessings_Perks.lua, etc. files:
--- COLORS_KWords_YOURLANGUAGECODE.Ability_cd_rgb_YOURLANGUAGECODE
--- COLORS_KWords_YOURLANGUAGECODE.Cd_rgb_YOURLANGUAGECODE
--- COLORS_KWords_YOURLANGUAGECODE.Combat_ability_rgb_YOURLANGUAGECODE
-
-local CONFIG = {
 -- KEYWORDS
+local CONFIG = {
 	bleed_text_colour = {
-		Bleed = "Bleed",
-		Bleeds = "Bleeds",
-		Bleeding = "Bleeding",
+		Bleed =			"Bleed",
+		Bleeding =		"Bleeding",
+		Bleeds =		"Bleeds",
 	},
 	brittleness_text_colour = {
-		Brittleness = "Brittleness",
+		Brittleness =	"Brittleness",
 	},
 	burn_text_colour = {
-		Burn = "Burn",
-		Burning = "Burning",
-		Heat = "Heat",
-		Overheat = "Overheat",
+		Burn =			"Burn",
+		Burning =		"Burning",
+		Heat =			"Heat",
+		Overheat =		"Overheat",
 	},
 	cleave_text_colour = {
-		Cleave = "Cleave",
-		Cleaved = "Cleaved",
-		Cleaving = "Cleaving",
+		Cleave =		"Cleave",
+		Cleaved =		"Cleaved",
+		Cleaving =		"Cleaving",
 	},
 	coherency_text_colour = {
-		Coherency = "Coherency",
+		Coherency =		"Coherency",
 	},
 	combat_ability_text_colour = {
-		Ability_cd = "Ability Cooldown",
-		Cd = "Cooldown",
-		Combat_ability = "Combat Ability",
-		Combat_ability_cd = "Combat Ability Cooldown",
+		Ability_cd =	"Ability Cooldown",
+		Cd =			"Cooldown",
+		Cmbt_abil =		"Combat Ability",
+		Cmbt_abil_cd =	"Combat Ability Cooldown",
 	},
 	corruption_text_colour = {
-		Corrupted = "Corrupted",
-		Corruption = "Corruption",
-		Corruptdmg = "Corruption Damage",
+		Corrupted =		"Corrupted",
+		Corruptdmg =	"Corruption Damage",
+		Corruption =	"Corruption",
 	},
 	crit_text_colour = {
-		Crit = "Crit",
-		Critical = "Critical",
-		Crt_chance = "Crit Chance",
-		Crit_chance = "Critical Chance",
-		Crit_hit = "Critical Hit",
-		Crit_hit_chance = "Critical Hit Chance",
-		Crit_hit_color = "Critical Hit Damage",
-		Crit_hits = "Critical Hits",
-		Crit_shots = "Critical Shots",
-		Crt_dmg_r = "Crit Damage",
-		Crit_dmg_r = "Critical Damage",
-		Crit_strike = "Critical Strike",
-		Crit_chance_r = "Critical Strike Chance",
-		Crit_strike_dmg = "Critical Strike Damage",
-		Crit_Attk = "Critical Attack",
+		Crit =			"Crit",
+		Critical =		"Critical",
+
+		Crit_chance =	"Critical Chance",
+		Crt_chance =	"Crit Chance",
+
+		Crit_hit =		"Critical Hit",
+		Crit_hits =		"Critical Hits",
+		Crt_hit_chnc =	"Critical Hit Chance",
+		Crt_hit_col =	"Critical Hit Damage",
+
+		Crit_strike =	"Critical Strike",
+		Crit_strikes =	"Critical Strikes",
+		Crt_chnc_r =	"Critical Strike Chance",
+		Crt_strk_dmg =	"Critical Strike Damage",
+
+		Crit_Attk =		"Critical Attack",
+		Crit_shots =	"Critical Shots",
+
+		Crit_dmg_r =	"Critical Damage",
+		Crt_dmg_r =		"Crit Damage",
+
+		Conc_Stimm =	"Concentration Stimm",
 	},
 	damage_text_colour = {
-		Damage = "Damage",
-		Damagewrp = "Warp-Damage",
+		Damage =		"Damage",
+		Damagewrp =		"Warp-Damage",
+
+		Combat_Stimm =	"Combat Stimm",
 	},
 	electrocuted_text_colour = {
-		Electrocute = "Electrocute",
-		Electrocution = "Electrocution",
-		Electrocuted = "Electrocuted",
-		Electrocutes = "Electrocutes",
-		Electrcuting = "Electrocuting",
+		Electrocute =	"Electrocute",
+		Electrocuted =	"Electrocuted",
+		Electrocutes =	"Electrocutes",
+		Electrcuting =	"Electrocuting",
+		Electrocution =	"Electrocution",
 	},
 	finesse_text_colour = {
-		Finesse = "Finesse",
-		Finesse_dmg = "Finesse Damage",
+		Finesse =		"Finesse",
+		Finesse_dmg =	"Finesse Damage",
 	},
 	health_text_colour = {
-		Health = "Health",
-		Wound = "Wound",
-		Wounds = "Wounds",
+		Health =		"Health",
+		Wound =			"Wound",
+		Wounds =		"Wounds",
 	},
 	hit_mass_text_colour = {
-		Hit_mass = "Hit Mass",
+		Hit_mass =		"Hit Mass",
 	},
 	impact_text_colour = {
-		Impact = "Impact",
+		Impact =		"Impact",
 	},
 	peril_text_colour = {
-		Peril = "Peril",
-		Perils = "Perils",
-		PerilsozWarp = "Perils of the Warp",
+		Peril =			"Peril",
+		Perils =		"Perils",
+		PerilsozWarp =	"Perils of the Warp",
 	},
 	power_text_colour = {
-		Power = "Power",
-		Strength = "Strength",
+		Power =			"Power",
+		Strength =		"Strength",
 	},
 	rending_text_colour = {
-		Rending = "Rending",
+		Rending =		"Rending",
+
+		Cartel_Stimm =	"Cartel Special Stimm",
 	},
 	soulblaze_text_colour = {
-		Soulblaze = "Soulblaze",
+		Soulblaze =		"Soulblaze",
 	},
 	stagger_text_colour = {
-		Stagger = "Stagger",
-		Staggering = "Staggering",
-		Staggers = "Staggers",
-		Stun = "Stun",
-		Stuns = "Stuns",
-		Stunned = "Stunned",
-		Staggered = "Staggered",
+		Stagger =		"Stagger",
+		Staggered =		"Staggered",
+		Staggering =	"Staggering",
+		Staggers =		"Staggers",
+		Stun =			"Stun",
+		Stunned =		"Stunned",
+		Stuns =			"Stuns",
 	},
 	stamina_text_colour = {
-		Stamina = "Stamina",
-		Stamina_c_r = "Stamina Cost",
+		Stamina =		"Stamina",
+		Stamina_c_r =	"Stamina Cost",
 	},
 	toughness_text_colour = {
-		Toughness = "Toughness",
-		Toughness_dmg_red = "Toughness Damage Reduction",
-		TDR = "TDR",
+		TDR =			"TDR",
+		TGHN =			"TGHN",
+		Tghns_dmg =		"Toughness Damage",
+		Tghns_dmg_red =	"Toughness Damage Reduction",
+		Toughness =		"Toughness",
 	},
 	weakspot_text_colour = {
-		Weak_spot = "Weak Spot",
-		Weakspot = "Weakspot",
-		Weakspots = "Weakspots",
-		Weakspothit = "Weakspot Hit",
-		Weakspothits = "Weakspot Hits",
-		Weakspot_dmg = "Weakspot Damage",
+		Weak_spot =		"Weak Spot",
+		Weakspot = 		"Weakspot",
+		Weakspots =		"Weakspots",
+
+		Weakspothit =	"Weakspot Hit",
+		Weakspothits =	"Weakspot Hits",
+
+		Weakspot_dmg =	"Weakspot Damage",
 	},
 
 -- CLASSES
 	-- Psyker
 	class_psyker_text_colour = {
-		cls_psy = "Psyker",
-		cls_psys = "Psykers",
-		cls_psy2 = "Psyker's",
+		cls_psy =		"Psyker",
+		cls_psys =		"Psykers",
+		cls_psy2 =		"Psyker's",
 	},
-	precision_text_colour = {
-		Precision = "Precision",
-	},
+		precision_text_colour = {
+			Precision =		"Precision",
+
+			Celerity_Stimm = "Celerity Stimm",
+		},
 	-- Ogryn
 	class_ogryn_text_colour = {
-		cls_ogr = "Ogryn",
-		cls_ogr2 = "Ogryn's",
+		cls_ogr =		"Ogryn",
+		cls_ogr2 =		"Ogryn's",
 	},
-	fnp_text_colour = {
-		Feel_no_pain = "Feel No Pain",
-	},
-	luckyb_text_colour = {
-		Lucky_bullet = "Lucky Bullet",
-		Tghnss_gold = "Toughness",
-	},
-	trample_text_colour = {
-		Trample = "Trample",
-	},
+		fnp_text_colour = {
+			Feel_no_pain =	"Feel No Pain",
+
+			Desperado =		"Desperado",			-- Hive Scum
+		},
+		luckyb_text_colour = {
+			Lucky_bullet =	"Lucky Bullet",
+
+			Tghnss_gold =	"Toughness",			-- Zealot
+		},
+		trample_text_colour = {
+			Trample =		"Trample",
+
+			Depend =		"Dependency",			-- Hive Scum
+		},
 	-- Zealot
 	class_zealot_text_colour = {
-		cls_zea = "Zealot",
-		cls_zea2 = "Zealot's",
+		cls_zea =		"Zealot",
+		cls_zea2 =		"Zealot's",
 	},
-	fury_text_colour = {
-		Fury = "Fury",
-	},
-	momentum_text_colour = {
-		Momentum = "Momentum",
-	},
-	stealth_text_colour = {
-		Stealth = "Stealth",
-		Psy_Mark = "Marked",
-		Psy_mark = "marked",
-	},
+		fury_text_colour = {
+			Fury =			"Fury",
+
+			Rampage =		"Rampage!",				-- Hive Scum
+		},
+		momentum_text_colour = {
+			Momentum =		"Momentum",
+
+			Taunt =			"Taunt",				-- Ogryn
+			Taunted =		"Taunted",				-- Ogryn
+			Taunting =		"Taunting",				-- Ogryn
+
+			Adren =			"Adrenaline",			-- Hive Scum ???
+			AdrenFr =		"Adrenaline Frenzy",	-- Hive Scum
+		},
+		stealth_text_colour = {
+			Stealth =		"Stealth",
+
+			Psy_Mark =		"Marked",				-- Psyker
+			Psy_mark =		"marked",				-- Psyker
+		},
 	-- Veteran
 	class_veteran_text_colour = {
-		cls_vet = "Veteran",
-		cls_vet2 = "Veteran's",
+		cls_vet =		"Veteran",
+		cls_vet2 =		"Veteran's",
 	},
-	focus_text_colour = {
-		Focus = "Focus",
-		Forceful = "Forceful",
-	},
-	focust_text_colour = {
-		Focus_Target = "Focus Target",
-		Markedenemy = "Marked Enemy",
-	},
-	meleespec_text_colour = {
-		Meleespec = "Melee Specialist",
-		Meleejust = "Melee Justice",
-	},
-	rangedspec_text_colour = {
-		Rangedspec = "Ranged Specialist",
-		Rangedjust = "Ranged Justice",
-	},
-	-- Arbites
+		focus_text_colour = {
+			Forceful =		"Forceful",
+			Focus =			"Focus",
+
+			Shout =			"Shout",				-- Hive Scum
+		},
+		focust_text_colour = {
+			Focus_Target =	"Focus Target",
+
+			Markedenemy =	"Marked Enemy",			-- Psyker
+
+			VultsMark =		"Vulture's Mark",		-- Hive Scum
+		},
+		meleespec_text_colour = {
+			Meleespec =		"Melee Specialist",
+
+			Meleejust =		"Melee Justice",		-- Arbites
+
+			Exhausted =		"Exhausted",			-- Hive Scum
+		},
+		rangedspec_text_colour = {
+			Rangedspec =	"Ranged Specialist",
+
+			Rangedjust =	"Ranged Justice",		-- Arbites
+		},
+	-- Arbitres
 	class_arbites_text_colour = {
-		cls_arb = "Arbitrator",
-		cls_arb2 = "Arbitrator's",
+		cls_arb =		"Arbitrator",
+		cls_arb2 =		"Arbitrator's",
 	},
+	-- Hive Scum
+	class_scum_text_colour = {
+		cls_scm =		"Hive Scum",
+		cls_scm2 =		"Hive Scum's",
+	},
+		chemtox_text_colour = {
+			Chem_Tox =		"Chem Toxin",
+
+			Med_Stimm =		"Med Stimm",
+		},
 
 -- TALENTS
-	talents_text_colour = { -- yellow
-		Arbites_gren = "Arbites Grenade",
-		Assail = "Assail",
-		Brain_burst = "Brain Burst",
-		Brain_rupture = "Brain Rupture",
-		BreakZLine = "Break the Line",
-		Enfeeble = "Enfeeble",
-		Frag_gren = "Frag Grenade",
-		Fragm_gren = "Fragmentation Grenade",
-		Rangd_stnc = "Ranged Stance",
-		Scriers_gaze = "Scrier's Gaze",
-		Smite = "Smite",
-		Stun_gren = "Stun Grenade",
-
-	-- Penances
-		Prologue_p = "Prologue",
-		Curio_p = "Curio",
-		Base_tut_p = "Basic Training",
-		Sir_melk_p = "Sire Melk's Requisitorium",
-		Omnissia_p = "Shrine of the Omnissiah",
-	},
+	talents_text_colour = {
+-- Zealot
+		Holy_relic =	"Holy relic",
+		Stun_gren =		"Stun Grenade",
+-- Arbites
+		Arbites_gren =	"Arbites Grenade",
+		BreakZLine =	"Break the Line",
+-- Psyker
+		Assail =		"Assail",
+		Brain_burst =	"Brain Burst",
+		Brain_rupture =	"Brain Rupture",
+		Enfeeble =		"Enfeeble",
+		Scrier_gaze =	"Scrier Gaze",
+		Scriers_gaze =	"Scrier's Gaze",
+		Smite =			"Smite",
+-- Veteran
+		Frag_gren =		"Frag Grenade",
+		Fragm_gren =	"Fragmentation Grenade",
+		Rangd_stnc =	"Ranged Stance",
+		Duty_honor =	"Duty and Honour",
+-- Ogryn
+		Att_Seeker =		"Attention Seeker",
 
 -- PENANCES
-	talents_penances_text_colour = { -- green
+		Base_tut_p =	"Basic Training",
+		Curio_p =		"Curio",
+		Omnissia_p =	"Shrine of the Omnissiah",
+		Prologue_p =	"Prologue",
+		Sir_melk_p =	"Sire Melk's Requisitorium",
+
 	-- Psyker
-		bburst = "Brain Burst",
-		-- bburst0 = "Brain Burst",
-		bburst1 = "Brain Rupture",
-		-- bburst2 = "Brain Rupture",
-		smite = "Smite",
-		disrdest = "Disrupt Destiny",
-		psy_wrath = "Psykinetic's Wrath",
-		psy_wrath2 = "Venting Shriek",
-		telekshii = "Telekine Shield",
-		empsionics = "Empowered Psionics",
-		assail = "Assail",
-		scriersgaze = "Scrier's Gaze",
-		kinetpres = "Kinetic Presence",
-		prescience = "Prescience",
-		seerspres = "Seer's Presence",
+		assail =		"Assail",
+		bburst =		"Brain Burst",
+		bburst1 =		"Brain Rupture",
+		disrdest =		"Disrupt Destiny",
+		empsionics =	"Empowered Psionics",
+		kinetpres =		"Kinetic Presence",
+		prescience =	"Prescience",
+		psy_wrath =		"Psykinetic's Wrath",
+		psy_wrath2 =	"Venting Shriek",
+		scriersgaze =	"Scrier's Gaze",
+		seerspres =		"Seer's Presence",
+		smite =			"Smite",
+		telekshii =		"Telekine Shield",
 	-- Ogryn
-		bull_rush = "Bull Rush",
-		-- bull_rush2 = "Bull Rush",
-		-- bull_rush3 = "Bull Rush",
-		bull_rush4 = "Indomitable",
-		big_box = "Big Box of Hurt",
-		big_box2 = "Bombs Away!",
-		burstlimo = "Burst Limiter Override",
-		stayclose = "Stay Close!",
-		loyalprot = "Loyal Protector",
-		feelnop = "Feel No Pain",
-		bonebraura = "Bonebreaker's Aura",
-		cowculaura = "Coward Culling",
-		heavyhitter = "Heavy Hitter",
-		bigfriendro = "Big Friendly Rock",
-		fragbomb = "Frag Bomb",
-		pbbarrage = "Point-Blank Barrage",
+		big_box =		"Big Box of Hurt",
+		big_box2 =		"Bombs Away!",
+		bigfriendro =	"Big Friendly Rock",
+		bonebraura =	"Bonebreaker's Aura",
+		bull_rush =		"Bull Rush",
+		bull_rush4 =	"Indomitable",
+		burstlimo =		"Burst Limiter Override",
+		cowculaura =	"Coward Culling",
+		feelnop =		"Feel No Pain",
+		fragbomb =		"Frag Bomb",
+		heavyhitter =	"Heavy Hitter",
+		loyalprot =		"Loyal Protector",
+		pbbarrage =		"Point-Blank Barrage",
+		stayclose =		"Stay Close!",
 	-- Veteran
-		volley_fire = "Volley Fire",
-		snipcon = "Marksman's Focus",
-		exec_stan = "Executioner's Stance",
-		krak_gr = "Krak Grenade",
-		frag_gr = "Frag Grenade",
-		smok_gr = "Smoke Grenade",
-		fcs_trg = "Focus Target!",
-		scavenger = "Scavenger",
-		voiceoc = "Voice of Command",
-		firetim = "Fire Team",
-		infiltr = "Infiltrate",
-		closenkill = "Close and Kill",
-		weapspec = "Weapons Specialist",
-		survivalist = "Survivalist",
+		closenkill =	"Close and Kill",
+		exec_stan =		"Executioner's Stance",
+		fcs_trg =		"Focus Target!",
+		firetim =		"Fire Team",
+		frag_gr =		"Frag Grenade",
+		infiltr =		"Infiltrate",
+		krak_gr =		"Krak Grenade",
+		scavenger =		"Scavenger",
+		snipcon =		"Marksman's Focus",
+		smok_gr =		"Smoke Grenade",
+		survivalist =	"Survivalist",
+		voiceoc =		"Voice of Command",
+		volley_fire =	"Volley Fire",
+		weapspec =		"Weapons Specialist",
 	-- Zealot
-		-- shock_gren0 = "Stunstorm Grenade",
-		shock_gren = "Stunstorm Grenade",
-		fire_gren = "Immolation Grenade",
-		shock_gren1 = "Stun Grenade",
-		-- shock_gren2 = "Stun Grenade",
-		chast_wckd = "Chastise the Wicked",
-		-- chast_wckd2 = "Chastise the Wicked",
-		fury_faithful = "Fury of the Faithful",
-		martydom = "Martyrdom",
-		holy_revenant = "Holy Revenant",
-		chorusosf = "Chorus of Spiritual Fortitude",
-		beaconop = "Beacon of Purity",
-		klinvery = "Blades of Faith",
-		shroudf = "Shroudfield",
-		benedict = "Benediction",
-		loner = "Loner",
-		fanrage = "Fury",
-		momentum = "Momentum",
-		inexor = "Inexorable Judgement",
-		blazingp = "Blazing Piety",
+		beaconop =		"Beacon of Purity",
+		benedict =		"Benediction",
+		blazingp =		"Blazing Piety",
+		chast_wckd =	"Chastise the Wicked",
+		chorusosf =		"Chorus of Spiritual Fortitude",
+		fanrage =		"Fury",
+		fire_gren =		"Immolation Grenade",
+		fury_faithful =	"Fury of the Faithful",
+		holy_revenant =	"Holy Revenant",
+		inexor =		"Inexorable Judgement",
+		klinvery =		"Blades of Faith",
+		loner =			"Loner",
+		martydom =		"Martyrdom",
+		shock_gren =	"Stunstorm Grenade",
+		shock_gren1 =	"Stun Grenade",
+		shroudf =		"Shroudfield",
+		momentum =		"Momentum",
 	},
 
 -- DIFFICULTY
-	sedition_text_colour = {
-		sedition = "Sedition",
-	},
+	-- sedition_text_colour = {
+		-- sedition =		"Sedition",
+	-- },
 	uprising_text_colour = {
-		uprising = "Uprising",
+		uprising =		"Uprising",
 	},
 	malice_text_colour = {
-		malice = "Malice",
+		malice =		"Malice",
 	},
 	heresy_text_colour = {
-		heresy = "Heresy",
+		heresy =		"Heresy",
 	},
 	damnation_text_colour = {
-		damnation = "Damnation",
+		damnation =		"Damnation",
 	},
 	auric_text_colour = {
-		auric = "Auric",
+		auric =			"Auric",
+	},
+
+-- DUMP STATS
+	dump_stat_text_colour = {
+		Mobility =		"Mobility",
+		Melee_dmg =		"Melee Damage",
+		Warp_resist =	"Warp Resistance",
+	},
+	dump_stat2_text_colour = {
+		Ammo =			"Ammo",
+		Defences =		"Defences",
+		Heat_mngt =		"Heat Management",
+	},
+	dump_stat3_text_colour = {
+		DamageDS =		"Damage",
 	},
 }
 
-
--- Universal function for creating colored variables
-local function create_colored_keywords(config)
+-- Основная функция для создания цветных ключевых слов
+local function create_colored_keywords()
 	local result = {}
-	
-	for color_setting, keywords in pairs(config) do
-		local color = Color[mod:get(color_setting)](255, true)
-		
-		for name, text in pairs(keywords) do
--- FOR TRANSLATORS -- For other languages _rgb_YOURLANGUAGECODE
-			result[name .. "_rgb"] = iu_actit(text, color)
+
+	for category, keywords in pairs(CONFIG) do
+		local color_name = mod:get(category) or "white"
+		local color = Color[color_name]
+
+		if not color then
+			color = Color.white(255, true)
+		else
+			color = color(255, true)
 		end
-	end
-	
-	return result
-end
 
--- LANGUAGE CODES:
--- English				en			_rgb
--- Russian				ru			_rgb_ru
--- French				fr			_rgb_fr
--- Chinese Traditional	["zh-tw"]	_rgb_tw
--- Chinese Simplified	["zh-cn"]	_rgb_zh_cn
--- German				de			_rgb_de
--- Italian				it			_rgb_it
--- Japanese				ja			_rgb_ja
--- Korean				ko			_rgb_ko
--- Polish				pl			_rgb_pl
--- Portuguese			["pt-br"]	_rgb_pt_br
--- Spanish				es			_rgb_es
-
--- Validation: check that ALL variables have been created
-local function validate_all()
-	local colors = create_colored_keywords(CONFIG)
-	local total_expected = 0
-	local created_count = 0
-	local missing_vars = {}
-	
-	for color_setting, items in pairs(CONFIG) do
-		for name, _ in pairs(items) do
-			total_expected = total_expected + 1
--- FOR TRANSLATORS -- For other languages _rgb_YOURLANGUAGECODE
-			local var_name = name .. "_rgb"
-			if colors[var_name] then
-				created_count = created_count + 1
+		for key, text in pairs(keywords) do
+			if InputUtils and InputUtils.apply_color_to_input_text then
+				local colored_text = InputUtils.apply_color_to_input_text(text, color)
+				result[key .. "_rgb"] = colored_text
 			else
-				table.insert(missing_vars, var_name)
-				mod:error("Missing variable: " .. var_name)
+				result[key .. "_rgb"] = text
 			end
 		end
 	end
-	
-	if created_count == total_expected then
-		mod:info("✅ All " .. total_expected .. " keyword variables created successfully")
-	else
-		mod:warning("⚠️ Created " .. created_count .. "/" .. total_expected .. " keyword variables")
-	end
-	
-	return colors
+
+	return result
 end
 
--- Create and validate all variables
-return validate_all()
+--[+ +FREQUENTLY REPEATED PHRASES+ +]-- CPhrs("")
+local function create_phrs_en(colors_en)
+	-- Local constants for this file
+	local Dot_green =	"{#color(35, 255, 5)}•{#reset()}"
+	local Dot_red =		"{#color(255, 35, 5)}•{#reset()}"
+
+	local CKWord = function(fallback, key)
+		return colors_en[key] or fallback
+	end
+
+	return {
+	Can_appl_thr_shlds =		Dot_green.." Can be applied through shields.",
+	Can_be_refr =				Dot_green.." Can be refreshed during active duration. ",
+	Can_be_refr_drop_1 =		Dot_green.." Stacks can be refreshed during active duration, and are dropped one by one.",
+	Can_gen_mult =				Dot_green.." Can generate multiple Stacks per Swing.\n",
+	Can_proc_mult =				Dot_green.." Can proc multiple times per swing when "..CKWord("Cleaving", "Cleaving_rgb")..".\n",
+	Can_proc_mult_str =			Dot_green.." Can proc multiple times when "..CKWord("Cleaving", "Cleaving_rgb")..".\n",
+	Refr_dur_stappl =			Dot_green.." Refreshes duration on Stack application. ",
+-- Psyker
+	Doesnt_Stack_Psy_Aura =		Dot_red.." Does not Stack with the same Aura from another "..CKWord("Psyker", "cls_psy_rgb")..".",
+	Doesnt_Stack_Psy_eff =		Dot_red.." Does not Stack with the same debuff from another "..CKWord("Psyker", "cls_psy_rgb")..".",
+-- Veteran
+	Doesnt_Stack_Vet_Aura =		Dot_red.." Does not Stack with the same Aura from another "..CKWord("Veteran", "cls_vet_rgb")..".",
+-- Zealot
+	Doesnt_Stack_Zea_Aura =		Dot_red.." Does not Stack with the same Aura from another "..CKWord("Zealot", "cls_zea_rgb")..".",
+	Doesnt_Stack_Zea_abil =		Dot_red.." Does not Stack with the same talent from another "..CKWord("Zealot", "cls_zea_rgb")..".",
+-- Ogryn
+	Doesnt_Stack_Ogr_Aura =		Dot_red.." Does not Stack with the same Aura from another "..CKWord("Ogryn", "cls_ogr_rgb")..".",
+	Doesnt_Stack_Ogr_abil =		Dot_red.." Does not Stack with the same talent from another "..CKWord("Ogryn", "cls_ogr_rgb")..".",
+-- Hive Scum
+	Doesnt_Stack_Scm_Aura =		Dot_red.." Does not Stack with the same Aura from another "..CKWord("Hive Scum", "cls_scm_rgb")..".",
+	Doesnt_Stack_Scm_eff =		Dot_red.." Does not Stack with the same debuff from another "..CKWord("Hive Scum", "cls_scm_rgb")..".",
+
+	Cant_appl_thr_shlds =		Dot_red.." Can't apply through shields.",
+	Cant_be_refr =				Dot_red.." Cannot be refreshed during active duration. ",
+	Cant_Crit =					Dot_red.." Cannot "..CKWord("Crit", "Crit_rgb")..".\n",
+	Carap_cant_clv =			Dot_red.." Carapace armor cannot be "..CKWord("Cleaved", "Cleaved_rgb").." by default.",
+	Carap_cant_cleave =			Dot_red.." Carapace armor cannot be "..CKWord("Cleaved", "Cleaved_rgb").." by default.",
+	Dont_intw_coher_toughn =	Dot_red.." Does not interact with "..CKWord("Coherency", "Coherency_rgb").." "..CKWord("Toughness", "Toughness_rgb").." Regeneration.",
+	}
+end
+
+--[+ +NOTES+ +]-- CNote("")
+local function create_nts_en(colors_en)
+	local Dot_green = "{#color(35, 255, 5)}•{#reset()}"
+
+	local CKWord = function(fallback, key)
+		return colors_en[key] or fallback
+	end
+
+	return {
+		Brtl_note =				Dot_green.." "..CKWord("Brittleness", "Brittleness_rgb").." increases the team's "..CKWord("Damage", "Damage_rgb").." to the enemy.",
+		Fns_note =				Dot_green.." "..CKWord("Finesse", "Finesse_rgb").." increases "..CKWord("Weakspot Damage", "Weakspot_dmg_rgb").." and "..CKWord("Crit Damage", "Crit_dmg_r_rgb")..".",
+		Impact_note =			Dot_green.." "..CKWord("Impact", "Impact_rgb").." increases the effectiveness of "..CKWord("Stagger", "Stagger_rgb").." on enemies.",
+		Pwr_note =				Dot_green.." "..CKWord("Strength", "Strength_rgb").." increases "..CKWord("Damage", "Damage_rgb")..", "..CKWord("Stagger", "Stagger_rgb").." and "..CKWord("Cleave", "Cleave_rgb")..".",
+		Rend_note =				Dot_green.." "..CKWord("Rending", "Rending_rgb").." increases your own "..CKWord("Damage", "Damage_rgb").."."
+	}
+end
+
+-- Creating colors
+local colored_keywords = create_colored_keywords()
+
+-- RETURN ALL
+return {
+	keywords = colored_keywords,				-- COLORED KEYWORDS
+	phrs = create_phrs_en(colored_keywords),	-- FREQUENTLY REPEATED PHRASES
+	nts = create_nts_en(colored_keywords)		-- NOTES
+}

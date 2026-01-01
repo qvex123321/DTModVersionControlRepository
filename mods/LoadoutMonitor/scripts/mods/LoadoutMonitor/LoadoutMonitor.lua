@@ -18,6 +18,7 @@ local feats_symbol = {
 	Aura = mod:localize("player_Feats_symbol_Aura"),
 	Keystone = mod:localize("player_Feats_symbol_Keystone"),
 }
+local archetype_symbols = {veteran = "", zealot = "", psyker = "", ogryn = "",	adamant = "",	broker = "",}
 local weapon_slot = {Melee = "slot_primary", Range = "slot_secondary"}
 local talents_index = {
 	veteran = {
@@ -29,7 +30,7 @@ local talents_index = {
 	zealot = {
 		Ability = {"zealot_attack_speed_post_ability","zealot_bolstering_prayer","zealot_stealth"},
 		Blitz = {"zealot_improved_stun_grenade","zealot_flame_grenade","zealot_throwing_knives"},
-		Aura = {"zealot_toughness_damage_reduction_coherency_improved","zealot_corruption_healing_coherency_improved","zealot_always_in_coherency"},
+		Aura = {"zealot_toughness_damage_reduction_coherency_improved","zealot_corruption_healing_coherency_improved","zealot_stamina_cost_multiplier_aura"},
 		Keystone = {"zealot_fanatic_rage","zealot_martyrdom","zealot_quickness_passive"},
 	},
 	psyker = {
@@ -40,31 +41,49 @@ local talents_index = {
 	},
 	ogryn = {
 		Ability = {"ogryn_longer_charge","ogryn_taunt_shout","ogryn_special_ammo"},
-		Blitz = {"ogryn_grenade_friend_rock","ogryn_box_explodes","ogryn_grenade_frag"},
+		Blitz = {"ogryn_grenade_friend_rock","ogryn_grenade_frag","ogryn_box_explodes"},
 		Aura = {"ogryn_melee_damage_coherency_improved","ogryn_toughness_regen_aura","ogryn_damage_vs_suppressed_coherency"},
 		Keystone = {"ogryn_passive_heavy_hitter","ogryn_carapace_armor","ogryn_leadbelcher_no_ammo_chance"},
 	},
+	adamant = {
+		Ability = {"adamant_stance","adamant_area_buff_drone_improved","adamant_charge"},
+		Blitz = {"adamant_whistle","adamant_shock_mine","adamant_grenade_improved"},
+		Aura = {"adamant_companion_coherency","adamant_reload_speed_aura","adamant_damage_vs_staggered_aura"},
+		Keystone = {"adamant_execution_order","adamant_terminus_warrant","adamant_forceful"},
+		Keystone_dog = {"adamant_companion_focus_elite","adamant_disable_companion","adamant_companion_focus_ranged"},
+	},
+	broker = {
+		Ability = {"broker_ability_focus_improved","broker_ability_punk_rage","broker_ability_stimm_field"},
+		Blitz = {"broker_blitz_flash_grenade_improved","broker_blitz_missile_launcher","broker_blitz_tox_grenade"},
+		Aura = {"broker_aura_gunslinger_improved","broker_coherency_melee_damage","broker_coherency_anarchist"},
+		Keystone = {"broker_keystone_vultures_mark_on_kill","broker_keystone_adrenaline_junkie","broker_keystone_chemical_dependency"},
+	},
 }
-
-
-
+local feats_abbreviations = {}
+mod.user_custom_feats_abbreviation = mod:get("user_custom_feats_abbreviation") or {}
 mod.teamatesloadout = {}
 mod.left_panel_lift = 0 - mod:get("left_panel_lift")
 mod.text_color = {255,239,238,238}
 
+
+
+
 mod.init = function(self)
 	mod.display = {
 		player_Feats = mod:get("display_player_feats"),
+		player_Feats_display_type = mod:get("player_feats_display_type"),
 		player_Feats_order = {},
 		player_Feats_default_order = true,
 		notable_talents = mod:get("display_notable_talents"),
 		player_name = mod:get("display_player_name"),
+		companion_name = mod:get("display_companion_name"),
 		main_class = mod:get("display_main_class"),
 	}
 	mod.offsets = {
 		lobby = {mod:get("lobby_weapon_offset"),mod:get("lobby_weapon_gap"),mod:get("lobby_talent_offset"),mod:get("lobby_talent_offset_y")},
 		notable_talents = {mod:get("notable_talents_offset_x"),mod:get("notable_talents_offset_y"),mod:get("notable_talents_separation")},
 		PlayerName = { mod:get("player_name_offset_x"), mod:get("player_name_offset_y"),},
+		companion_name = { mod:get("companion_name_offset_x"), mod:get("companion_name_offset_y"),},
 		Feats = { mod:get("player_feats_offset_x"), mod:get("player_feats_offset_y"),},
 		Class = { mod:get("player_class_offset_x"), mod:get("player_class_offset_y"),},
 	}
@@ -73,6 +92,7 @@ mod.init = function(self)
 		feats = mod:get("player_feats_font_size"),
 		notable_talents = {mod:get("notable_talents_icon_size"),mod:get("notable_talents_icon_size")},
 		PlayerName = mod:get("player_name_font_size"),
+		companion_name = mod:get("companion_name_font_size"),
 		Feats = mod:get("player_feats_font_size"),
 		Class = mod:get("player_class_font_size"),
 	}
@@ -100,37 +120,39 @@ mod.init = function(self)
 		mod.display.player_Feats_default_order = mod.display.player_Feats_order[i] == default_feats_order[i] and mod.display.player_Feats_default_order ~= false
 	end
 	mod.load_package("packages/ui/views/talent_builder_view/talent_builder_view")
+	mod.set_feat_abbreviation()
 end
-
+local function is_adamant(archetype)
+	return archetype == "adamant"
+end
 local function player_career(profile)
 	local archetype = profile.archetype
 	local archetypename = archetype.archetype_name
 	local name = archetype.name or "404"
-	local symbols = {
-		veteran = "",
-		zealot = "",
-		psyker = "",
-		ogryn = "",
-	}
-	local symbol = archetype.string_symbol or symbols[name] or "?"
+	local symbol = archetype.string_symbol or archetype_symbols[name] or "?"
 	return Localize(archetypename),symbol
 end
 
-function lobby_keystone(profile)
-	local archetype = profile.archetype.name
-	local talents = profile.talents
-	local vaild_archetype = talents_index[archetype]
-	if vaild_archetype then
-		local keystones = vaild_archetype.Keystone
-		for i = 1,#keystones do
-			if talents[keystones[i]] then
-				return tostring(i)
+
+mod.check_selected_feat = function(player_talents,archetype,feat_type,none)
+	local selected_feat = none or "X"
+	local feat_list = talents_index[archetype] and talents_index[archetype][feat_type]
+	if feat_list then
+		for i = 1,#feat_list do
+			if player_talents[feat_list[i]] then
+				if mod.display.player_Feats_display_type == "character" then
+					selected_feat = feats_abbreviations[feat_list[i]]
+				elseif mod.display.player_Feats_display_type == "number" then
+					selected_feat = tostring(i)
+				end
+				break
 			end
 		end
-		return ""
 	end
+	return selected_feat
 end
-local function player_feats(profile)
+
+mod.get_player_feats = function(profile)	
 	local archetype = profile.archetype.name
 	local talents = profile.talents
 	
@@ -139,19 +161,17 @@ local function player_feats(profile)
 		local feats = {}
 		if talents_index[archetype] then
 			for i = 1,#default_feats_order do
-				if mod.display.player_Feats_order[i] ~= "Disable" then
+				local feat_slot = mod.display.player_Feats_order[i]
+				if feat_slot ~= "Disable" then
 					slots = slots + 1
-					local current = talents_index[archetype][mod.display.player_Feats_order[i]]
-					for o = 1,#current do
-						if talents[current[o]] then
-							feats[slots] = tostring(o)
-							break
-						end
+					feats[slots] = mod.check_selected_feat(talents,archetype,feat_slot)
+					if feat_slot == "Keystone" and is_adamant(archetype) then
+						slots = slots + 1
+						feats[slots] = mod.check_selected_feat(talents,archetype,"Keystone_dog")
 					end
-					feats[slots] = feats[slots] or "X"
 					if not mod.display.player_Feats_default_order then
-						feats[slots] = feats[slots]..feats_symbol[mod.display.player_Feats_order[i]]
-					end
+						feats[slots] = feats[slots]..feats_symbol[feat_slot]
+					end					
 				end
 			end
 		end
@@ -169,7 +189,7 @@ local function notable_talents(profile,style)
 	end	
 	local archetype = profile.archetype.name
 	local talents = profile.talents
-	local talents_index = {
+	local noteworthy = {
 		veteran = {
 			{
 				"veteran_better_deployables",
@@ -181,14 +201,8 @@ local function notable_talents(profile,style)
 				Color.salmon(255, true),
 			},
 		},
-		zealot = {
-		},
-		psyker = {
-		},
-		ogryn = {
-		},	
 	}
-	local arc = talents_index[archetype]
+	local arc = noteworthy[archetype]
 	if arc then
 		local num,icons = 1, #arc
 		if icons >= 1 then
@@ -214,7 +228,7 @@ local function notable_talents(profile,style)
 	end
 end
 
-local function perk_blessing(profile,weapon_type,trait_type)
+mod.get_weapon_perk_blessing = function(profile,weapon_type,trait_type)
 	local item = profile.loadout[weapon_slot[weapon_type]]
 	local traits = item[trait_type]
 	local subjects = {" "," "," "," ",}
@@ -253,9 +267,13 @@ local trait_offsets = {
 	bless = {280,},
 	perk = {370,},
 }
+mod.get_companion_name = function(profile)
+	return profile.talents and not profile.talents.adamant_disable_companion and profile.companion and profile.companion.name or ""
+end
 
 mod.get_playerloadout_intel = function(profile,widget)
 	local player_name = profile.name
+	local companion_name = mod.get_companion_name(profile)
 	local Melee, Range = profile.loadout["slot_primary"], profile.loadout["slot_secondary"]
 	local content = widget.content
 	local style = widget.style
@@ -265,25 +283,26 @@ mod.get_playerloadout_intel = function(profile,widget)
 	local weapons = {
 		Melee = {
 			name = weapon_display_name(profile,"Melee"),
-			bless = perk_blessing(profile,"Melee","traits"),
-			perk = perk_blessing(profile,"Melee","perks"),
+			bless = mod.get_weapon_perk_blessing(profile,"Melee","traits"),
+			perk = mod.get_weapon_perk_blessing(profile,"Melee","perks"),
 			name_offset = 29.5,
 			--template = Melee.weapon_template,
 		},
 		Range = {
 			name = weapon_display_name(profile,"Range"),
-			bless = perk_blessing(profile,"Range","traits"),
-			perk = perk_blessing(profile,"Range","perks"),
+			bless = mod.get_weapon_perk_blessing(profile,"Range","traits"),
+			perk = mod.get_weapon_perk_blessing(profile,"Range","perks"),
 			name_offset = 59.5
 			--template = Range.weapon_template,
 		},
 	}
 	-- feats class name
-	content.loadout_intel_Feats = player_feats(profile)
+	content.loadout_intel_Feats = mod.get_player_feats(profile)
 	content.loadout_intel_Class = main_class_method[mod.display.main_class] or main_class_method.symbol
 	content.loadout_intel_PlayerName = mod.display.player_name and player_name or " "
+	content.loadout_intel_companion_name = mod.display.companion_name and companion_name or ""
 	notable_talents(profile,style)
-	for k,part in pairs({"Feats","Class","PlayerName"}) do
+	for k,part in pairs({"Feats","Class","PlayerName","companion_name"}) do
 		table.merge(style["loadout_intel_"..part].offset,mod.offsets[part])
 		style["loadout_intel_"..part].font_size = mod.font_size[part]
 	end
@@ -293,9 +312,7 @@ mod.get_playerloadout_intel = function(profile,widget)
 
 			-- display name
 			content["loadout_intel_"..weapon_type] = value.name
-			
-			-- Thunder hammer
-			--local name_bug = mod["name_bug_"..value.template] or 0
+
 			local weapon_style = style["loadout_intel_"..weapon_type]
 			weapon_style.offset[2] = value.name_offset
 			weapon_style.font_size = mod.weapon_name_size * (string.len(value.name) >= mod.weapon_name_lenghth and mod.weapon_name_multiplier or 1)
@@ -326,7 +343,16 @@ mod.get_playerloadout_intel = function(profile,widget)
 		end
 	end
 end
-
+function lobby_keystone(profile)
+	local archetype = profile.archetype.name
+	local talents = profile.talents
+	local Keystone = mod.check_selected_feat(talents,archetype,"Keystone","")
+	if is_adamant(archetype) then
+		local Keystone_dog = mod.check_selected_feat(talents,archetype,"Keystone_dog")
+		return string.format("%s-%s",Keystone,Keystone_dog)
+	end
+	return Keystone
+end
 mod.lobby_loadout = function (self, dt, t, input_service)
 	local spawn_slots = self._spawn_slots
 
@@ -572,7 +598,24 @@ mod.playerloadout_definition = function(instance)
 					font_size = 18,
 				},
 				
-			},		
+			},
+			{
+				pass_type = "text",
+				value_id = "loadout_intel_companion_name",
+				style_id = "loadout_intel_companion_name",
+				value = " ",
+				style = {
+					vertical_alignment = "top",
+					text_vertical_alignment = "top",
+					horizontal_alignment = "left",
+					text_horizontal_alignment = "left",
+					offset = {300, 6.5, 150},
+					size = {500, 100},
+					text_color = Color.golden_rod(255, true),
+					font_size = 18,
+				},
+				
+			},
 			{
 				pass_type = "text",
 				value_id = "loadout_intel_Melee",
@@ -850,6 +893,46 @@ mod.on_setting_changed = function(setting_name)
 	mod:init()
 end
 
+mod:command("UCTA",mod:localize("user_custom_feats_abbreviation_description"),function(a,b,...)
+	if a and b then
+		local order = {tonumber(a),tonumber(b)}
+		local player = get_local_player()
+		local archetype = player._profile.archetype.name
+		
+		if order[1] and order[2] and ((order[1] >= 1 and order[1] <= 4) and ((order[2] >= 1 and order[2] <= 3) or (is_adamant(archetype) and order[2] >= 4 and order[2] <= 6))) then
+			local category
+			if order[2] >= 4 then
+				category = "Keystone_dog"
+				order[2] = order[2] - 3
+			else
+				category = default_feats_order[order[1]]
+			end			
+			local feat = talents_index[archetype][category][order[2]]
+			local custom = {...}
+			local new_abb = nil
+			if not table.is_empty(custom) then
+				new_abb = table.concat(custom," ")
+			end
+			feats_abbreviations[feat] = new_abb
+			mod.user_custom_feats_abbreviation[feat] = new_abb
+			mod:set("user_custom_feats_abbreviation",mod.user_custom_feats_abbreviation)
+			mod.teamatesloadout = {}
+		end
+		
+	end
+end)
+
+mod.set_feat_abbreviation = function()
+	local feat
+	for _,archetype in pairs(talents_index) do
+		for __,feat_type in pairs(archetype) do
+			for i = 1, #feat_type do
+				feat = feat_type[i]
+				feats_abbreviations[feat] = mod.user_custom_feats_abbreviation[feat] or mod:localize("def_"..feat) or "?"
+			end
+		end
+	end
+end
 
 -- Define rows
 mod.scoreboard_rows = {
@@ -940,6 +1023,7 @@ mod.scoreboard_rows = {
 	},
 }
 
+
 mod.scoreboard_weaponname = function(profile,weapon_type)
 	local disname = weapon_display_name(profile,weapon_type)
 	local length = string.len(disname)
@@ -975,8 +1059,8 @@ mod.scoreboard_weaponname = function(profile,weapon_type)
 	return line
 end
 
-mod.update_scoreboard = function(t)
-	if t == "on" then
+mod.update_scoreboard = function(trigger)
+	if trigger == "on" then
 		if scoreboard then
 			local players = Managers.player and Managers.player:players()
 			if players then
@@ -994,7 +1078,7 @@ mod.update_scoreboard = function(t)
 						local line = {"",""}
 						local traits_text = {perk = {"",""},blessing = {"",""}}
 						if human then
-							local traits = {perk = perk_blessing(profile,weapon_type,"perks"),blessing = perk_blessing(profile,weapon_type,"traits")}
+							local traits = {perk = mod.get_weapon_perk_blessing(profile,weapon_type,"perks"),blessing = mod.get_weapon_perk_blessing(profile,weapon_type,"traits")}
 							line = mod.scoreboard_weaponname(profile,weapon_type)
 							for i = 1,2 do
 								for k,v in pairs(traits) do
@@ -1011,13 +1095,13 @@ mod.update_scoreboard = function(t)
 							scoreboard:update_stat(string.format("row_scoreboard_weapon_%s_blessing_%s",weapon_type,i), account_id, traits_text.blessing[i])
 						end
 					end
-					local feats = human and player_feats(profile) or " "
+					local feats = human and mod.get_player_feats(profile) or " "
 					scoreboard:update_stat("row_scoreboard_player_feat", account_id, feats)
 					scoreboard:update_stat("row_scoreboard_blank_1", account_id, " ")
 				end
 			end
 		end
-	elseif t == "off" then
+	elseif trigger == "off" then
 		mod:set("Loadout_weapons",false)
 		mod:set("Loadout_weapons_perk",false)
 		mod:set("Loadout_weapons_blessing",false)

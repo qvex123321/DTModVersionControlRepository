@@ -1,4 +1,5 @@
 local mod = get_mod("StimmsPickupIcon")
+local UIHudSettings = require("scripts/settings/ui/ui_hud_settings")
 
 local settings = mod:persistent_table("settings")
 local recolor_mod = nil
@@ -8,6 +9,7 @@ local STIMM_COLORS = {
 	syringe_ability_boost_pocketable = { 255, 230, 192, 13 },
 	syringe_power_boost_pocketable = { 255, 205, 51, 26 },
 	syringe_speed_boost_pocketable = { 255, 0, 127, 218 },
+	syringe_broker_pocketable = { 255, 208, 69, 255 },
 }
 
 mod.on_all_mods_loaded = function ()
@@ -127,8 +129,12 @@ mod:hook_safe("HudElementTeamPlayerPanel", "_update_player_features", function (
 			local item = visual_loadout_extension:item_from_slot(slot_name)
 			if item and item.weapon_template then
 				local _, _, color = get_stimm_colors(item.weapon_template)
-				if color and syringe_icon_widget.style and syringe_icon_widget.style.texture then
-					syringe_icon_widget.style.texture.color = color
+				if syringe_icon_widget.style and syringe_icon_widget.style.texture then
+					if color then
+						syringe_icon_widget.style.texture.color = color
+					else
+						syringe_icon_widget.style.texture.color = UIHudSettings.color_tint_main_1
+					end
 				end
 			end
 		end

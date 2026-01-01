@@ -900,21 +900,22 @@ DMFOptionsView._set_tooltip_data = function (self, widget)
   if current_widget ~= widget or current_widget == widget and new_y ~= current_y then
     self._tooltip_data = {
       widget = widget,
-      text = localized_text
+      text = localized_text,
     }
     self._widgets_by_name.tooltip.content.text = localized_text
+
     local text_style = self._widgets_by_name.tooltip.style.text
     local x_pos = starting_point[1] + widget.offset[1]
     local width = widget.content.size[1] * 0.5
-    local text_options = UIFonts.get_font_options_by_style(text_style)
-    local _, text_height = self:_text_size(localized_text, text_style.font_type, text_style.font_size, {
+    local _, text_height = self:_text_size(localized_text, text_style, {
       width,
-      0
-    }, text_options)
+      0,
+    })
     local height = text_height
+
     self._widgets_by_name.tooltip.content.size = {
       width,
-      height
+      height,
     }
     self._widgets_by_name.tooltip.offset[1] = x_pos - width * 0.8
     self._widgets_by_name.tooltip.offset[2] = math.max(new_y - height, 20)
